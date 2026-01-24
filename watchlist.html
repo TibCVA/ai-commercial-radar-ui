@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Commercial Radar - Nouvelle Watchlist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+                    },
+                    colors: {
+                        'radar': {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+
+        .mesh-gradient {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+        }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+        }
+
+        .card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .checkbox-card {
+            transition: all 0.2s ease;
+        }
+        .checkbox-card:has(input:checked) {
+            background: #eef2ff;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        .checkbox-card:hover {
+            border-color: #a5b4fc;
+        }
+
+        .section-indicator {
+            position: relative;
+        }
+        .section-indicator::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
+            border-radius: 4px 0 0 4px;
+        }
+
+        .tag-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            min-height: 3rem;
+            cursor: text;
+        }
+        .tag-input:focus-within {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .tag-input input {
+            flex: 1;
+            min-width: 120px;
+            border: none;
+            outline: none;
+            background: transparent;
+        }
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: #eef2ff;
+            color: #4338ca;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .tag button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background: rgba(67, 56, 202, 0.2);
+            color: #4338ca;
+        }
+        .tag button:hover {
+            background: rgba(67, 56, 202, 0.4);
+        }
+
+        .suggestion-chip {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            background: #f1f5f9;
+            color: #475569;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .suggestion-chip:hover {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .btn-press:active { transform: scale(0.98); }
+
+        /* Toast */
+        .toast {
+            animation: slideInRight 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(20px); }
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="mesh-gradient min-h-screen">
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Header -->
+    <header class="header-gradient text-white sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm hover:bg-white/20 transition-colors">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </a>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight">AI Commercial Radar</h1>
+                        <p class="text-xs text-indigo-200 -mt-0.5">M&A Intelligence Platform</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="index.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Dashboard</a>
+                    <a href="watchlist.html" class="px-4 py-2 rounded-lg bg-white/10 text-sm font-medium">Watchlists</a>
+                    <a href="results.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Resultats</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                <a href="index.html" class="hover:text-radar-600">Dashboard</a>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+                <span class="text-gray-900">Nouvelle Watchlist</span>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900">Creer une nouvelle watchlist</h2>
+            <p class="text-gray-500 mt-1">Definissez precisement vos criteres de veille M&A</p>
+        </div>
+
+        <form id="watchlistForm" class="space-y-6">
+            <!-- Section 1: Identification -->
+            <section class="card rounded-2xl p-6 section-indicator">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-radar-100 text-radar-700 text-sm font-bold">1</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Identification</h3>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Nom de la watchlist <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="name" required
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all"
+                            placeholder="Ex: Rumeurs M&A Datacenters Europe">
+                        <p class="text-xs text-gray-400 mt-1.5">Un nom unique et descriptif pour identifier cette veille</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Secteur & Perimetre -->
+            <section class="card rounded-2xl p-6 section-indicator">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-radar-100 text-radar-700 text-sm font-bold">2</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Secteur & Perimetre</h3>
+                </div>
+
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Secteur principal <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="sector" required list="sectorSuggestions"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all"
+                            placeholder="Ex: Datacenters, Energie solaire, Infrastructure fibre...">
+                        <datalist id="sectorSuggestions">
+                            <option value="Datacenters">
+                            <option value="Energie renouvelable">
+                            <option value="Energie solaire">
+                            <option value="Energie eolienne">
+                            <option value="Infrastructure fibre">
+                            <option value="Tours telecom">
+                            <option value="Infrastructure digitale">
+                            <option value="Transport & Logistique">
+                            <option value="Utilities / Eau">
+                            <option value="Real Estate Infrastructure">
+                            <option value="Healthcare Infrastructure">
+                            <option value="Education Infrastructure">
+                        </datalist>
+                        <p class="text-xs text-gray-400 mt-1.5">Saisissez librement ou selectionnez une suggestion</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Mots-cles du secteur
+                        </label>
+                        <div id="sectorTagsInput" class="tag-input" onclick="this.querySelector('input').focus()">
+                            <input type="text" placeholder="Ajoutez des mots-cles (Entree pour valider)..."
+                                onkeydown="handleTagInput(event, 'sectorTags')">
+                        </div>
+                        <input type="hidden" id="sectorTags" name="sector_tags">
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            <span class="text-xs text-gray-400">Suggestions:</span>
+                            <button type="button" onclick="addTag('sectorTags', 'colocation')" class="suggestion-chip">colocation</button>
+                            <button type="button" onclick="addTag('sectorTags', 'hyperscale')" class="suggestion-chip">hyperscale</button>
+                            <button type="button" onclick="addTag('sectorTags', 'edge computing')" class="suggestion-chip">edge computing</button>
+                            <button type="button" onclick="addTag('sectorTags', 'cloud')" class="suggestion-chip">cloud</button>
+                            <button type="button" onclick="addTag('sectorTags', 'PPA')" class="suggestion-chip">PPA</button>
+                            <button type="button" onclick="addTag('sectorTags', 'battery storage')" class="suggestion-chip">battery storage</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Geographies cibles</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="FR" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">France</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="DE" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Allemagne</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="UK" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">UK</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="ES" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Espagne</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="IT" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Italie</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="NL" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Pays-Bas</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="BE" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Belgique</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="CH" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Suisse</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="PL" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Pologne</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="Nordics" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Nordics</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer bg-radar-50 border-radar-200">
+                                <input type="checkbox" name="geographies" value="EU" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                <span class="text-sm text-radar-700 font-medium">Toute l'UE</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="geographies" value="US" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">USA</span>
+                            </label>
+                        </div>
+                        <div class="mt-3">
+                            <label class="block text-xs text-gray-500 mb-1">Geographies supplementaires (separez par virgules)</label>
+                            <input type="text" id="customGeographies"
+                                class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-radar-500 focus:border-transparent"
+                                placeholder="Ex: Canada, Australie, Singapour...">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Criteres de recherche -->
+            <section class="card rounded-2xl p-6 section-indicator">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-radar-100 text-radar-700 text-sm font-bold">3</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Criteres de recherche</h3>
+                </div>
+
+                <div class="space-y-5">
+                    <!-- Types d'operations -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Types d'operations a surveiller</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
+                                <input type="checkbox" name="operation_types" value="ma_rumor" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-800 flex items-center gap-2">
+                                        M&A - Rumeurs
+                                        <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] rounded">PRIORITE</span>
+                                    </span>
+                                    <span class="block text-xs text-gray-500">Signaux precoces, advisors mandates</span>
+                                </div>
+                            </label>
+                            <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
+                                <input type="checkbox" name="operation_types" value="ma_discussions" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-800">M&A - Discussions</span>
+                                    <span class="block text-xs text-gray-500">Negociations confirmees</span>
+                                </div>
+                            </label>
+                            <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
+                                <input type="checkbox" name="operation_types" value="financing" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-800 flex items-center gap-2">
+                                        Financement
+                                        <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded">CLE</span>
+                                    </span>
+                                    <span class="block text-xs text-gray-500">Levees, project finance</span>
+                                </div>
+                            </label>
+                            <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
+                                <input type="checkbox" name="operation_types" value="growth_signal" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-800 flex items-center gap-2">
+                                        Signal croissance
+                                        <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded">EARLY</span>
+                                    </span>
+                                    <span class="block text-xs text-gray-500">Expansion, recrutement C-level</span>
+                                </div>
+                            </label>
+                            <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
+                                <input type="checkbox" name="operation_types" value="asset_deal" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-800">Asset Deal</span>
+                                    <span class="block text-xs text-gray-500">Cession d'actifs specifiques</span>
+                                </div>
+                            </label>
+                            <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
+                                <input type="checkbox" name="operation_types" value="ma_announced" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-800">M&A Annonce</span>
+                                    <span class="block text-xs text-gray-500">Deals deja publics</span>
+                                </div>
+                            </label>
+                            <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
+                                <input type="checkbox" name="operation_types" value="jv" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-800">JV / Partenariat</span>
+                                    <span class="block text-xs text-gray-500">Joint-ventures strategiques</span>
+                                </div>
+                            </label>
+                            <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
+                                <input type="checkbox" name="operation_types" value="minority" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5">
+                                <div>
+                                    <span class="text-sm font-medium text-gray-800">Minoritaire</span>
+                                    <span class="block text-xs text-gray-500">Prises de participation &lt; 50%</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Types d'acteurs -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Types d'acteurs a identifier</label>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="actor_types" value="developer" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                <span class="text-sm text-gray-700">Developpeurs</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="actor_types" value="fonds_infra" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                <span class="text-sm text-gray-700">Fonds infra</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="actor_types" value="fonds_pe" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Fonds PE</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="actor_types" value="corporate" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Corporates</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="actor_types" value="operator" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Operateurs</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" name="actor_types" value="advisors" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Advisors</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Criteres specifiques -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Entreprises ou acteurs specifiques a surveiller
+                        </label>
+                        <div id="targetCompaniesInput" class="tag-input" onclick="this.querySelector('input').focus()">
+                            <input type="text" placeholder="Ex: Equinix, Digital Realty... (Entree pour valider)"
+                                onkeydown="handleTagInput(event, 'targetCompanies')">
+                        </div>
+                        <input type="hidden" id="targetCompanies" name="target_companies">
+                        <p class="text-xs text-gray-400 mt-1.5">Noms d'entreprises specifiques a inclure dans la recherche</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Entreprises ou acteurs a exclure
+                        </label>
+                        <div id="excludeCompaniesInput" class="tag-input" onclick="this.querySelector('input').focus()">
+                            <input type="text" placeholder="Entreprises a ignorer... (Entree pour valider)"
+                                onkeydown="handleTagInput(event, 'excludeCompanies')">
+                        </div>
+                        <input type="hidden" id="excludeCompanies" name="exclude_companies">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Instructions personnalisees -->
+            <section class="card rounded-2xl p-6 section-indicator">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-radar-100 text-radar-700 text-sm font-bold">4</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Instructions de recherche personnalisees</h3>
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">Avance</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Instructions specifiques pour l'IA
+                        </label>
+                        <textarea id="customInstructions" rows="4"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all resize-none"
+                            placeholder="Decrivez precisement ce que vous recherchez. Par exemple:
+- Chercher specifiquement les rumeurs de consolidation dans le secteur
+- Focus sur les developpeurs ayant des projets en phase de construction
+- Identifier les situations ou des advisors ont ete mandates
+- Exclure les deals deja finalises (signing/closing)"></textarea>
+                        <p class="text-xs text-gray-400 mt-1.5">Ces instructions seront utilisees par l'IA pour affiner sa recherche</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Sources a privilegier
+                        </label>
+                        <div id="preferredSourcesInput" class="tag-input" onclick="this.querySelector('input').focus()">
+                            <input type="text" placeholder="Ex: Infrastructure Investor, IJGlobal... (Entree pour valider)"
+                                onkeydown="handleTagInput(event, 'preferredSources')">
+                        </div>
+                        <input type="hidden" id="preferredSources" name="preferred_sources">
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            <span class="text-xs text-gray-400">Suggestions:</span>
+                            <button type="button" onclick="addTag('preferredSources', 'Infrastructure Investor')" class="suggestion-chip">Infrastructure Investor</button>
+                            <button type="button" onclick="addTag('preferredSources', 'IJGlobal')" class="suggestion-chip">IJGlobal</button>
+                            <button type="button" onclick="addTag('preferredSources', 'PE Hub')" class="suggestion-chip">PE Hub</button>
+                            <button type="button" onclick="addTag('preferredSources', 'Mergermarket')" class="suggestion-chip">Mergermarket</button>
+                            <button type="button" onclick="addTag('preferredSources', 'Reuters')" class="suggestion-chip">Reuters</button>
+                            <button type="button" onclick="addTag('preferredSources', 'Data Center Dynamics')" class="suggestion-chip">Data Center Dynamics</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Taille de transaction cible
+                        </label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Minimum (M€)</label>
+                                <input type="number" id="dealSizeMin"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-radar-500 focus:border-transparent"
+                                    placeholder="Ex: 50">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">Maximum (M€)</label>
+                                <input type="number" id="dealSizeMax"
+                                    class="w-full border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-radar-500 focus:border-transparent"
+                                    placeholder="Ex: 500">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Parametres -->
+            <section class="card rounded-2xl p-6 section-indicator">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-radar-100 text-radar-700 text-sm font-bold">5</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Parametres de scan</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Fraicheur des infos</label>
+                        <select id="freshness_days" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="7">7 derniers jours</option>
+                            <option value="30" selected>30 derniers jours</option>
+                            <option value="90">90 derniers jours</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Frequence refresh</label>
+                        <select id="refresh_frequency" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="manual">Manuel uniquement</option>
+                            <option value="daily">Quotidien</option>
+                            <option value="weekly">Hebdomadaire</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Heure refresh</label>
+                        <input type="time" id="refresh_hour" value="08:00" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gray-50 rounded-xl">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Seuil de confiance minimum</label>
+                    <div class="flex flex-wrap gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="confidence_threshold" value="low" class="w-4 h-4 text-radar-600 focus:ring-radar-500">
+                            <span class="text-sm text-gray-700">Faible <span class="text-gray-400">(tout inclure)</span></span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="confidence_threshold" value="medium" class="w-4 h-4 text-radar-600 focus:ring-radar-500" checked>
+                            <span class="text-sm text-gray-700">Moyen <span class="text-gray-400">(equilibre)</span></span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="confidence_threshold" value="high" class="w-4 h-4 text-radar-600 focus:ring-radar-500">
+                            <span class="text-sm text-gray-700">Eleve <span class="text-gray-400">(stricte)</span></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Submit -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" id="submitBtn" class="flex-1 flex items-center justify-center gap-2 bg-radar-600 text-white py-4 rounded-xl font-semibold hover:bg-radar-700 transition-all btn-press shadow-lg shadow-radar-600/25">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Creer la Watchlist
+                </button>
+                <a href="index.html" class="flex items-center justify-center gap-2 px-8 py-4 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors font-medium">
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 border-t border-gray-200">
+        <div class="text-center text-sm text-gray-500">
+            AI Commercial Radar v1.0 - M&A Intelligence pour fonds d'infrastructure
+        </div>
+    </footer>
+
+    <script>
+        const API_KEY = localStorage.getItem('radar_api_key') || '';
+        const API_BASE = localStorage.getItem('radar_api_base') || '';
+
+        // Tags management
+        const tagsData = {
+            sectorTags: [],
+            targetCompanies: [],
+            excludeCompanies: [],
+            preferredSources: []
+        };
+
+        function handleTagInput(event, tagType) {
+            if (event.key === 'Enter' || event.key === ',') {
+                event.preventDefault();
+                const value = event.target.value.trim().replace(',', '');
+                if (value) {
+                    addTag(tagType, value);
+                    event.target.value = '';
+                }
+            }
+        }
+
+        function addTag(tagType, value) {
+            if (!tagsData[tagType].includes(value)) {
+                tagsData[tagType].push(value);
+                renderTags(tagType);
+                document.getElementById(tagType).value = tagsData[tagType].join(',');
+            }
+        }
+
+        function removeTag(tagType, value) {
+            tagsData[tagType] = tagsData[tagType].filter(t => t !== value);
+            renderTags(tagType);
+            document.getElementById(tagType).value = tagsData[tagType].join(',');
+        }
+
+        function renderTags(tagType) {
+            const container = document.getElementById(tagType + 'Input');
+            const input = container.querySelector('input');
+            const existingTags = container.querySelectorAll('.tag');
+            existingTags.forEach(t => t.remove());
+
+            tagsData[tagType].forEach(tag => {
+                const tagEl = document.createElement('span');
+                tagEl.className = 'tag';
+                tagEl.innerHTML = `${tag}<button type="button" onclick="removeTag('${tagType}', '${tag}')">&times;</button>`;
+                container.insertBefore(tagEl, input);
+            });
+        }
+
+        // Toast
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const colors = { success: 'bg-emerald-500', error: 'bg-red-500', info: 'bg-radar-600' };
+            const toast = document.createElement('div');
+            toast.className = `toast flex items-center gap-3 px-4 py-3 ${colors[type]} text-white rounded-xl shadow-lg`;
+            toast.innerHTML = `<span class="text-sm font-medium">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!API_KEY || !API_BASE) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Form submission
+        document.getElementById('watchlistForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Collect geographies
+            const geos = Array.from(document.querySelectorAll('input[name="geographies"]:checked')).map(c => c.value);
+            const customGeos = document.getElementById('customGeographies').value
+                .split(',')
+                .map(g => g.trim())
+                .filter(g => g);
+            const allGeographies = [...new Set([...geos, ...customGeos])];
+
+            const formData = {
+                name: document.getElementById('name').value,
+                sector: document.getElementById('sector').value,
+                sector_tags: tagsData.sectorTags.join(','),
+                geographies: allGeographies,
+                operation_types: Array.from(document.querySelectorAll('input[name="operation_types"]:checked')).map(c => c.value),
+                actor_types: Array.from(document.querySelectorAll('input[name="actor_types"]:checked')).map(c => c.value),
+                freshness_days: parseInt(document.getElementById('freshness_days').value),
+                refresh_frequency: document.getElementById('refresh_frequency').value,
+                refresh_hour: document.getElementById('refresh_hour').value,
+                confidence_threshold: document.querySelector('input[name="confidence_threshold"]:checked').value,
+                // Advanced options
+                target_companies: tagsData.targetCompanies,
+                exclude_companies: tagsData.excludeCompanies,
+                preferred_sources: tagsData.preferredSources,
+                custom_instructions: document.getElementById('customInstructions').value,
+                deal_size_min: document.getElementById('dealSizeMin').value ? parseInt(document.getElementById('dealSizeMin').value) : null,
+                deal_size_max: document.getElementById('dealSizeMax').value ? parseInt(document.getElementById('dealSizeMax').value) : null
+            };
+
+            // Validation
+            if (allGeographies.length === 0) {
+                showToast('Selectionnez au moins une geographie', 'error');
+                return;
+            }
+            if (formData.operation_types.length === 0) {
+                showToast('Selectionnez au moins un type d\'operation', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            const originalContent = btn.innerHTML;
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = `
+                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creation en cours...
+                `;
+
+                const response = await fetch(`${API_BASE}/watchlist/create`, {
+                    method: 'POST',
+                    headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    btn.innerHTML = `
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Watchlist creee!
+                    `;
+                    btn.classList.remove('bg-radar-600', 'hover:bg-radar-700', 'shadow-radar-600/25');
+                    btn.classList.add('bg-emerald-500');
+                    showToast('Watchlist creee avec succes', 'success');
+                    setTimeout(() => window.location.href = 'index.html', 1500);
+                } else {
+                    throw new Error(result.error || 'Erreur inconnue');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Erreur: ' + error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }
+        });
+    </script>
+</body>
+</html>

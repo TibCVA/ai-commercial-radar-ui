@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Commercial Radar - Resultats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    colors: {
+                        'radar': {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        },
+                        'success': '#059669',
+                        'warning': '#d97706',
+                        'danger': '#dc2626'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1e40af 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+        }
+        .freshness-new { border-left: 4px solid #059669; }
+        .freshness-recent { border-left: 4px solid #d97706; }
+        .freshness-old { border-left: 4px solid #9ca3af; }
+        .confidence-high { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+        .confidence-medium { background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); }
+        .confidence-low { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); }
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .source-primary { background: #dbeafe; color: #1e40af; }
+        .source-secondary { background: #f3f4f6; color: #374151; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-header text-white shadow-xl">
+        <div class="container mx-auto px-4 py-5">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-tight">AI Commercial Radar</h1>
+                        <p class="text-blue-100 text-sm">Intelligence M&A pour fonds d'infrastructure</p>
+                    </div>
+                </div>
+                <nav class="flex gap-2">
+                    <a href="index.html" class="px-5 py-2.5 hover:bg-white/10 rounded-xl transition-colors">Dashboard</a>
+                    <a href="watchlist.html" class="px-5 py-2.5 hover:bg-white/10 rounded-xl transition-colors">+ Watchlist</a>
+                    <a href="results.html" class="px-5 py-2.5 bg-white/20 rounded-xl font-medium backdrop-blur-sm border border-white/10">Resultats</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Filters Bar -->
+        <div class="glass-card rounded-2xl shadow-sm p-5 mb-6">
+            <div class="flex flex-col lg:flex-row gap-4 items-end">
+                <div class="flex-1 min-w-0">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Watchlist</label>
+                    <select id="watchlistSelect" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-shadow">
+                        <option value="">Toutes les watchlists</option>
+                    </select>
+                </div>
+                <div class="w-full lg:w-40">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Confiance</label>
+                    <select id="confidenceFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                        <option value="">Toutes</option>
+                        <option value="high">Elevee</option>
+                        <option value="medium">Moyenne</option>
+                        <option value="low">Faible</option>
+                    </select>
+                </div>
+                <div class="w-full lg:w-40">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
+                    <select id="typeFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                        <option value="">Tous</option>
+                        <option value="ma_rumor">M&A Rumeur</option>
+                        <option value="ma_discussions">M&A Discussions</option>
+                        <option value="ma_announced">M&A Annonce</option>
+                        <option value="asset_deal">Asset Deal</option>
+                        <option value="financing">Financement</option>
+                        <option value="growth_signal">Signal croissance</option>
+                    </select>
+                </div>
+                <div class="w-full lg:w-40">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Fraicheur</label>
+                    <select id="freshnessFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                        <option value="">Toutes</option>
+                        <option value="24h">Dernieres 24h</option>
+                        <option value="7d">7 derniers jours</option>
+                        <option value="30d">30 derniers jours</option>
+                    </select>
+                </div>
+                <button onclick="loadResults()" class="px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-colors shadow-sm flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                    </svg>
+                    Filtrer
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="glass-card rounded-xl p-4 shadow-sm">
+                <div class="text-sm text-gray-500 mb-1">Total Deals</div>
+                <div id="totalDeals" class="text-2xl font-bold text-gray-900">0</div>
+            </div>
+            <div class="glass-card rounded-xl p-4 shadow-sm">
+                <div class="text-sm text-gray-500 mb-1">Total Acteurs</div>
+                <div id="totalActors" class="text-2xl font-bold text-gray-900">0</div>
+            </div>
+            <div class="glass-card rounded-xl p-4 shadow-sm">
+                <div class="text-sm text-gray-500 mb-1">Haute confiance</div>
+                <div id="highConfidence" class="text-2xl font-bold text-success">0</div>
+            </div>
+            <div class="glass-card rounded-xl p-4 shadow-sm">
+                <div class="text-sm text-gray-500 mb-1">Nouveaux (24h)</div>
+                <div id="newToday" class="text-2xl font-bold text-radar-600">0</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-5">
+            <button id="tabDeals" onclick="switchTab('deals')" class="flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+                Deals (<span id="dealsCount">0</span>)
+            </button>
+            <button id="tabActors" onclick="switchTab('actors')" class="flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                Acteurs (<span id="actorsCount">0</span>)
+            </button>
+            <div class="flex-1"></div>
+            <button onclick="exportCurrentResults()" class="flex items-center gap-2 px-4 py-2.5 bg-success text-white rounded-xl font-medium hover:bg-green-600 transition-colors shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Export XLSX
+            </button>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" class="space-y-4">
+            <div class="glass-card rounded-2xl p-12 text-center">
+                <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <p class="text-gray-500">Selectionnez une watchlist ou cliquez "Filtrer" pour voir les resultats</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Deal Detail Modal -->
+    <div id="dealModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="glass-card rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="sticky top-0 bg-white/95 backdrop-blur-sm px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h2 id="modalTitle" class="text-xl font-bold text-gray-900"></h2>
+                <button onclick="closeModal()" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="modalContent" class="p-6"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="container mx-auto px-4 py-6 text-center text-sm text-gray-400">
+        AI Commercial Radar v1.0 - Veille M&A pour fonds d'infrastructure
+    </footer>
+
+    <script>
+        const API_KEY = localStorage.getItem('radar_api_key') || '';
+        const API_BASE = localStorage.getItem('radar_api_base') || '';
+        let currentTab = 'deals';
+        let currentData = { deals: [], actors: [] };
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!API_KEY || !API_BASE) {
+                window.location.href = 'index.html';
+                return;
+            }
+            loadWatchlists();
+
+            const params = new URLSearchParams(window.location.search);
+            const watchlistId = params.get('watchlist_id');
+            if (watchlistId) {
+                setTimeout(() => {
+                    document.getElementById('watchlistSelect').value = watchlistId;
+                    loadResults();
+                }, 500);
+            }
+        });
+
+        async function loadWatchlists() {
+            try {
+                const response = await fetch(`${API_BASE}/watchlist/list`, {
+                    headers: { 'workspace-api-key': API_KEY }
+                });
+                const data = await response.json();
+
+                const select = document.getElementById('watchlistSelect');
+                (data.watchlists || []).forEach(w => {
+                    const option = document.createElement('option');
+                    option.value = w.watchlist_id;
+                    option.textContent = `${w.name} (${w.sector})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading watchlists:', error);
+            }
+        }
+
+        async function loadResults() {
+            const watchlistId = document.getElementById('watchlistSelect').value;
+            const confidence = document.getElementById('confidenceFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const freshness = document.getElementById('freshnessFilter').value;
+
+            let url = `${API_BASE}/watchlist/results?`;
+            if (watchlistId) url += `watchlist_id=${watchlistId}&`;
+            if (confidence) url += `confidence=${confidence}&`;
+            if (type) url += `type=${type}&`;
+            if (freshness) url += `freshness=${freshness}&`;
+
+            document.getElementById('resultsContainer').innerHTML = `
+                <div class="glass-card rounded-2xl p-12 text-center">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-radar-500 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="text-gray-500">Chargement des resultats...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'workspace-api-key': API_KEY }
+                });
+                currentData = await response.json();
+
+                document.getElementById('dealsCount').textContent = currentData.deals?.length || 0;
+                document.getElementById('actorsCount').textContent = currentData.actors?.length || 0;
+
+                updateSummaryStats();
+                renderResults();
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('resultsContainer').innerHTML = `
+                    <div class="glass-card rounded-2xl p-8 text-center">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        <p class="text-danger font-medium mb-2">Erreur de chargement</p>
+                        <p class="text-gray-500 text-sm">Verifiez votre connexion et reessayez</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateSummaryStats() {
+            const deals = currentData.deals || [];
+            const actors = currentData.actors || [];
+
+            document.getElementById('totalDeals').textContent = deals.length;
+            document.getElementById('totalActors').textContent = actors.length;
+
+            const highConf = deals.filter(d => d.confiance === 'high').length;
+            document.getElementById('highConfidence').textContent = highConf;
+
+            const now = new Date();
+            const yesterday = new Date(now - 24 * 60 * 60 * 1000);
+            const newToday = deals.filter(d => new Date(d.first_seen_at) > yesterday).length;
+            document.getElementById('newToday').textContent = newToday;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('tabDeals').className = tab === 'deals'
+                ? 'flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all'
+                : 'flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200';
+            document.getElementById('tabActors').className = tab === 'actors'
+                ? 'flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all'
+                : 'flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200';
+            renderResults();
+        }
+
+        function getFreshnessClass(dateStr) {
+            if (!dateStr) return 'freshness-old';
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffDays = (now - date) / (1000 * 60 * 60 * 24);
+            if (diffDays < 1) return 'freshness-new';
+            if (diffDays < 7) return 'freshness-recent';
+            return 'freshness-old';
+        }
+
+        function getRelativeTime(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 60) return `il y a ${diffMins}min`;
+            if (diffHours < 24) return `il y a ${diffHours}h`;
+            if (diffDays < 7) return `il y a ${diffDays}j`;
+            return date.toLocaleDateString('fr-FR');
+        }
+
+        function renderResults() {
+            const container = document.getElementById('resultsContainer');
+            const items = currentTab === 'deals' ? currentData.deals : currentData.actors;
+
+            if (!items || items.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-card rounded-2xl p-12 text-center">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <p class="text-gray-500">Aucun ${currentTab === 'deals' ? 'deal' : 'acteur'} trouve avec ces criteres</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (currentTab === 'deals') {
+                container.innerHTML = items.map(deal => renderDealCard(deal)).join('');
+            } else {
+                container.innerHTML = items.map(actor => renderActorCard(actor)).join('');
+            }
+        }
+
+        function renderDealCard(deal) {
+            const confidenceConfig = {
+                high: { class: 'confidence-high', text: 'Confiance elevee', icon: '✓✓' },
+                medium: { class: 'confidence-medium', text: 'Confiance moyenne', icon: '✓' },
+                low: { class: 'confidence-low', text: 'Confiance faible', icon: '?' }
+            };
+            const conf = confidenceConfig[deal.confiance] || confidenceConfig.medium;
+
+            const stageLabels = {
+                rumeur: { label: 'Rumeur', color: 'bg-purple-100 text-purple-700' },
+                discussions: { label: 'Discussions', color: 'bg-blue-100 text-blue-700' },
+                annoncé: { label: 'Annonce', color: 'bg-green-100 text-green-700' },
+                review_reg: { label: 'Review reg.', color: 'bg-orange-100 text-orange-700' },
+                signé: { label: 'Signe', color: 'bg-teal-100 text-teal-700' },
+                clos: { label: 'Clos', color: 'bg-gray-100 text-gray-700' },
+                annulé: { label: 'Annule', color: 'bg-red-100 text-red-700' }
+            };
+            const stage = stageLabels[deal.stade] || { label: deal.stade || 'N/A', color: 'bg-gray-100 text-gray-600' };
+
+            const freshnessClass = getFreshnessClass(deal.first_seen_at);
+            const relativeTime = getRelativeTime(deal.first_seen_at);
+
+            const sourceCount = deal.sources?.length || 0;
+            const primarySources = deal.sources?.filter(s => s.quality === 'primary').length || 0;
+
+            return `
+                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass}" onclick="showDealDetail('${deal.deal_id}')">
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <!-- Main Content -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap items-start gap-2 mb-3">
+                                <h3 class="font-bold text-gray-900 text-lg">${deal.titre || 'Deal sans titre'}</h3>
+                                <span class="px-2.5 py-1 ${stage.color} text-xs font-medium rounded-full">${stage.label}</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm mb-4">
+                                <div>
+                                    <span class="text-gray-400 text-xs block">Type</span>
+                                    <span class="text-gray-700 font-medium">${deal.type_operation || 'N/A'}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400 text-xs block">Geographie</span>
+                                    <span class="text-gray-700 font-medium">${deal.geographie_pays || 'N/A'}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400 text-xs block">Valeur est.</span>
+                                    <span class="text-gray-700 font-medium">${deal.valeur_montant ? `${deal.valeur_montant} ${deal.valeur_devise}` : 'N/A'}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400 text-xs block">Detecte</span>
+                                    <span class="text-gray-700 font-medium">${relativeTime || 'N/A'}</span>
+                                </div>
+                            </div>
+
+                            <div class="text-sm mb-3">
+                                <span class="text-gray-500">Parties:</span>
+                                <span class="text-gray-800 ml-1">
+                                    ${(deal.parties_acquereurs || []).join(', ') || '?'}
+                                    ${deal.parties_cibles?.length ? ' <span class="text-radar-600">→</span> ' + deal.parties_cibles.join(', ') : ''}
+                                </span>
+                            </div>
+
+                            ${deal.rationnel?.length ? `
+                                <div class="text-sm text-gray-600 italic mb-3 line-clamp-2">
+                                    "${deal.rationnel[0]}"
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Right Panel -->
+                        <div class="lg:w-48 flex flex-col gap-3">
+                            <div class="p-3 rounded-xl ${conf.class}">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-lg">${conf.icon}</span>
+                                    <span class="font-semibold text-sm">${conf.text}</span>
+                                </div>
+                                ${deal.confiance_justification ? `
+                                    <p class="text-xs opacity-80 line-clamp-2">${deal.confiance_justification}</p>
+                                ` : ''}
+                            </div>
+
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                </svg>
+                                <span>${sourceCount} source${sourceCount > 1 ? 's' : ''}</span>
+                                ${primarySources > 0 ? `<span class="source-badge source-primary">${primarySources} prim.</span>` : ''}
+                            </div>
+
+                            <button class="text-radar-600 text-sm font-medium hover:text-radar-700 text-left flex items-center gap-1">
+                                Voir details
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderActorCard(actor) {
+            const typeLabels = {
+                developer: { label: 'Developpeur', color: 'bg-blue-100 text-blue-700', icon: '🏗' },
+                fonds: { label: 'Fonds', color: 'bg-green-100 text-green-700', icon: '💰' },
+                corporate: { label: 'Corporate', color: 'bg-purple-100 text-purple-700', icon: '🏢' },
+                operateur: { label: 'Operateur', color: 'bg-orange-100 text-orange-700', icon: '⚙' }
+            };
+            const actorType = typeLabels[actor.type_acteur] || { label: actor.type_acteur || 'N/A', color: 'bg-gray-100 text-gray-600', icon: '👤' };
+
+            const freshnessClass = getFreshnessClass(actor.first_seen_at);
+            const relativeTime = getRelativeTime(actor.first_seen_at);
+
+            return `
+                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass}" onclick="showActorDetail('${actor.actor_id}')">
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-start gap-3 mb-4">
+                                <div class="w-12 h-12 rounded-xl ${actorType.color} flex items-center justify-center text-2xl">
+                                    ${actorType.icon}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-lg">${actor.nom || 'Acteur sans nom'}</h3>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="px-2.5 py-0.5 ${actorType.color} text-xs font-medium rounded-full">${actorType.label}</span>
+                                        <span class="text-sm text-gray-500">${actor.geographie || 'Geo N/A'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${actor.signaux_recents?.length ? `
+                                <div class="mb-3">
+                                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Signaux recents</span>
+                                    <ul class="mt-2 space-y-1">
+                                        ${actor.signaux_recents.slice(0, 3).map(s => `
+                                            <li class="flex items-start gap-2 text-sm text-gray-700">
+                                                <svg class="w-4 h-4 text-radar-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                                </svg>
+                                                <span>${s}</span>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="lg:w-48 flex flex-col gap-3">
+                            <div class="text-sm text-gray-500">
+                                <span class="block text-xs text-gray-400">Detecte</span>
+                                <span class="font-medium text-gray-700">${relativeTime || 'N/A'}</span>
+                            </div>
+
+                            ${actor.contact_points?.length ? `
+                                <div class="flex items-center gap-2 text-sm text-success">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span>${actor.contact_points.length} contact(s)</span>
+                                </div>
+                            ` : ''}
+
+                            <button class="text-radar-600 text-sm font-medium hover:text-radar-700 text-left flex items-center gap-1 mt-auto">
+                                Voir fiche
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showDealDetail(dealId) {
+            const deal = currentData.deals.find(d => d.deal_id === dealId);
+            if (!deal) return;
+
+            document.getElementById('modalTitle').textContent = deal.titre || 'Detail du Deal';
+            document.getElementById('modalContent').innerHTML = `
+                <div class="space-y-6">
+                    <!-- Status Bar -->
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-3 py-1.5 ${deal.confiance === 'high' ? 'bg-green-100 text-green-700' : deal.confiance === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'} text-sm font-medium rounded-full">
+                            Confiance: ${deal.confiance || 'N/A'}
+                        </span>
+                        <span class="px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                            Stade: ${deal.stade || 'N/A'}
+                        </span>
+                        <span class="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-full">
+                            ${deal.type_operation || 'Type N/A'}
+                        </span>
+                    </div>
+
+                    <!-- Main Info Grid -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Geographie</span>
+                            <p class="text-gray-800 mt-1">${deal.geographie_pays || 'N/A'} ${deal.geographie_ville ? '(' + deal.geographie_ville + ')' : ''}</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl">
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Valeur estimee</span>
+                            <p class="text-gray-800 mt-1">${deal.valeur_montant ? `${deal.valeur_montant} ${deal.valeur_devise} (${deal.valeur_type || 'est.'})` : 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <!-- Parties -->
+                    <div class="p-4 bg-radar-50 rounded-xl">
+                        <span class="text-xs font-medium text-radar-700 uppercase tracking-wide">Parties impliquees</span>
+                        <div class="mt-3 space-y-2">
+                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Acquereurs:</span> ${(deal.parties_acquereurs || []).join(', ') || 'Non identifie'}</p>
+                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Cibles:</span> ${(deal.parties_cibles || []).join(', ') || 'Non identifie'}</p>
+                            ${deal.parties_vendeurs?.length ? `<p class="text-gray-800"><span class="font-semibold text-gray-600">Vendeurs:</span> ${deal.parties_vendeurs.join(', ')}</p>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Assets -->
+                    ${deal.actifs ? `
+                        <div>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Actifs concernes</span>
+                            <p class="text-gray-800 mt-1">${deal.actifs}</p>
+                        </div>
+                    ` : ''}
+
+                    <!-- Rationnel -->
+                    ${deal.rationnel?.length ? `
+                        <div>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Rationnel / Signaux detectes</span>
+                            <ul class="mt-2 space-y-2">
+                                ${deal.rationnel.map(r => `
+                                    <li class="flex items-start gap-2 text-gray-700">
+                                        <svg class="w-5 h-5 text-radar-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span>${r}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+
+                    <!-- Timeline -->
+                    <div class="grid grid-cols-3 gap-4">
+                        ${deal.timeline_rumeur ? `
+                            <div class="text-center p-3 bg-purple-50 rounded-xl">
+                                <span class="text-xs text-purple-600 font-medium">Rumeur</span>
+                                <p class="text-purple-800 font-semibold mt-1">${deal.timeline_rumeur}</p>
+                            </div>
+                        ` : ''}
+                        ${deal.timeline_annonce ? `
+                            <div class="text-center p-3 bg-blue-50 rounded-xl">
+                                <span class="text-xs text-blue-600 font-medium">Annonce</span>
+                                <p class="text-blue-800 font-semibold mt-1">${deal.timeline_annonce}</p>
+                            </div>
+                        ` : ''}
+                        ${deal.timeline_deadline ? `
+                            <div class="text-center p-3 bg-orange-50 rounded-xl">
+                                <span class="text-xs text-orange-600 font-medium">Deadline</span>
+                                <p class="text-orange-800 font-semibold mt-1">${deal.timeline_deadline}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- Confidence Justification -->
+                    ${deal.confiance_justification ? `
+                        <div class="p-4 ${deal.confiance === 'high' ? 'bg-green-50 border-green-200' : deal.confiance === 'medium' ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'} border rounded-xl">
+                            <span class="text-xs font-medium uppercase tracking-wide ${deal.confiance === 'high' ? 'text-green-700' : deal.confiance === 'medium' ? 'text-yellow-700' : 'text-red-700'}">Justification confiance</span>
+                            <p class="mt-1 ${deal.confiance === 'high' ? 'text-green-800' : deal.confiance === 'medium' ? 'text-yellow-800' : 'text-red-800'}">${deal.confiance_justification}</p>
+                        </div>
+                    ` : ''}
+
+                    <!-- Sources -->
+                    ${deal.sources?.length ? `
+                        <div>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3 block">Sources (${deal.sources.length})</span>
+                            <div class="space-y-3">
+                                ${deal.sources.map((s, i) => `
+                                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="flex-1">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="source-badge ${s.quality === 'primary' ? 'source-primary' : 'source-secondary'}">
+                                                        ${s.quality === 'primary' ? 'Source primaire' : 'Source secondaire'}
+                                                    </span>
+                                                    <span class="text-xs text-gray-400">${s.date_pub || ''}</span>
+                                                </div>
+                                                <a href="${s.url}" target="_blank" class="text-radar-600 hover:text-radar-700 font-medium hover:underline">
+                                                    ${s.source_name || 'Source ' + (i + 1)}
+                                                </a>
+                                                ${s.extrait ? `<p class="text-sm text-gray-600 mt-2 italic border-l-2 border-gray-300 pl-3">"${s.extrait}"</p>` : ''}
+                                            </div>
+                                            <a href="${s.url}" target="_blank" class="p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
+                                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Metadata -->
+                    <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
+                        <p>ID: ${deal.deal_id} | Detecte: ${deal.first_seen_at ? new Date(deal.first_seen_at).toLocaleString('fr-FR') : 'N/A'} | Maj: ${deal.last_seen_at ? new Date(deal.last_seen_at).toLocaleString('fr-FR') : 'N/A'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('dealModal').classList.remove('hidden');
+        }
+
+        function showActorDetail(actorId) {
+            const actor = currentData.actors.find(a => a.actor_id === actorId);
+            if (!actor) return;
+
+            document.getElementById('modalTitle').textContent = actor.nom || 'Detail Acteur';
+            document.getElementById('modalContent').innerHTML = `
+                <div class="space-y-6">
+                    <!-- Header -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-radar-100 flex items-center justify-center text-3xl">
+                            ${actor.type_acteur === 'developer' ? '🏗' : actor.type_acteur === 'fonds' ? '💰' : actor.type_acteur === 'corporate' ? '🏢' : '👤'}
+                        </div>
+                        <div>
+                            <span class="px-3 py-1 bg-radar-100 text-radar-700 text-sm font-medium rounded-full">${actor.type_acteur || 'N/A'}</span>
+                            <p class="text-gray-600 mt-1">${actor.geographie || 'Geographie non specifiee'}</p>
+                        </div>
+                    </div>
+
+                    <!-- Signaux -->
+                    ${actor.signaux_recents?.length ? `
+                        <div>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Signaux detectes</span>
+                            <ul class="mt-3 space-y-2">
+                                ${actor.signaux_recents.map(s => `
+                                    <li class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                                        <svg class="w-5 h-5 text-radar-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                        </svg>
+                                        <span class="text-gray-700">${s}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+
+                    <!-- Contacts -->
+                    ${actor.contact_points?.length ? `
+                        <div>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Points de contact (${actor.contact_points.length})</span>
+                            <div class="mt-3 space-y-3">
+                                ${actor.contact_points.map(c => `
+                                    <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+                                        <p class="font-semibold text-gray-800">${c.nom_contact || 'Contact'}</p>
+                                        ${c.role ? `<p class="text-sm text-gray-600">${c.role}</p>` : ''}
+                                        ${c.email ? `
+                                            <p class="mt-2">
+                                                <a href="mailto:${c.email}" class="text-radar-600 hover:text-radar-700 flex items-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    ${c.email}
+                                                </a>
+                                            </p>
+                                        ` : ''}
+                                        ${c.preuve_url ? `
+                                            <a href="${c.preuve_url}" target="_blank" class="text-xs text-gray-500 hover:underline mt-2 inline-flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                                </svg>
+                                                Voir source
+                                            </a>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Sources -->
+                    ${actor.sources?.length ? `
+                        <div>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Sources</span>
+                            <div class="mt-3 space-y-2">
+                                ${actor.sources.map(s => `
+                                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                                        <a href="${s.url}" target="_blank" class="text-radar-600 hover:text-radar-700 hover:underline flex-1">
+                                            ${s.source_name || 'Source'}
+                                        </a>
+                                        <span class="text-xs text-gray-400">${s.date_pub || ''}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Metadata -->
+                    <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
+                        <p>ID: ${actor.actor_id} | Detecte: ${actor.first_seen_at ? new Date(actor.first_seen_at).toLocaleString('fr-FR') : 'N/A'} | Maj: ${actor.last_seen_at ? new Date(actor.last_seen_at).toLocaleString('fr-FR') : 'N/A'}</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('dealModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('dealModal').classList.add('hidden');
+        }
+
+        function exportCurrentResults() {
+            const watchlistId = document.getElementById('watchlistSelect').value;
+            if (!watchlistId) {
+                alert('Selectionnez une watchlist pour exporter');
+                return;
+            }
+
+            const url = `${API_BASE}/export/xlsx?watchlist_id=${watchlistId}`;
+            fetch(url, { headers: { 'workspace-api-key': API_KEY } })
+                .then(res => res.blob())
+                .then(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = blobUrl;
+                    link.download = `radar_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+                    link.click();
+                    URL.revokeObjectURL(blobUrl);
+                })
+                .catch(err => {
+                    console.error('Export error:', err);
+                    alert('Erreur lors de l\'export');
+                });
+        }
+
+        // Close modal on escape or click outside
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+        document.getElementById('dealModal').addEventListener('click', (e) => {
+            if (e.target.id === 'dealModal') closeModal();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Commercial Radar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+                    },
+                    colors: {
+                        'radar': {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'slide-in-right': 'slideInRight 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'shimmer': 'shimmer 2s infinite',
+                        'bounce-subtle': 'bounceSubtle 2s infinite',
+                        'scale-in': 'scaleIn 0.2s ease-out',
+                        'counter': 'counter 1s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideInRight: {
+                            '0%': { opacity: '0', transform: 'translateX(20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' }
+                        },
+                        shimmer: {
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' }
+                        },
+                        bounceSubtle: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-3px)' }
+                        },
+                        scaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+
+        /* Premium Glass Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+        }
+        .glass-dark {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+        }
+
+        /* Gradient Mesh Background */
+        .mesh-gradient {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 50%, rgba(236, 72, 153, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(99, 102, 241, 0.1) 0px, transparent 50%);
+        }
+
+        /* Header Gradient */
+        .header-gradient {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%);
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* Status Indicators */
+        .status-live {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Freshness Indicators */
+        .fresh-new {
+            border-left: 3px solid #10b981;
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);
+        }
+        .fresh-recent {
+            border-left: 3px solid #f59e0b;
+            background: linear-gradient(90deg, rgba(245, 158, 11, 0.05) 0%, transparent 100%);
+        }
+        .fresh-old {
+            border-left: 3px solid #94a3b8;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            animation: slideInRight 0.3s ease-out, fadeOut 0.3s ease-in 2.7s forwards;
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(20px); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Button Press Effect */
+        .btn-press:active { transform: scale(0.98); }
+
+        /* Focus States */
+        .focus-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Stagger Animation */
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+
+        /* Number Counter */
+        .counter-value {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        .tooltip-trigger:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Empty State Illustration */
+        .empty-illustration {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+        }
+    </style>
+</head>
+<body class="mesh-gradient min-h-screen">
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Header -->
+    <header class="header-gradient text-white sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight">AI Commercial Radar</h1>
+                        <p class="text-xs text-indigo-200 -mt-0.5">M&A Intelligence Platform</p>
+                    </div>
+                </div>
+
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="index.html" class="px-4 py-2 rounded-lg bg-white/10 text-sm font-medium">Dashboard</a>
+                    <a href="watchlist.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Watchlists</a>
+                    <a href="results.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Resultats</a>
+                </nav>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="showSettings()" class="p-2 rounded-lg hover:bg-white/10 transition-colors tooltip-trigger relative">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span class="tooltip absolute top-full mt-2 right-0 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap">Parametres API</span>
+                    </button>
+                    <div id="connectionStatus" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 status-live"></span>
+                        <span class="text-emerald-300">Connecte</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden" onclick="if(event.target === this) closeSettings()">
+        <div class="glass rounded-2xl p-6 m-4 max-w-md w-full shadow-2xl animate-scale-in border border-white/20">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-radar-100 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-radar-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Configuration API</h2>
+                        <p class="text-sm text-gray-500">Connexion a n8n</p>
+                    </div>
+                </div>
+                <button onclick="closeSettings()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Cle API</label>
+                    <input type="password" id="apiKeyInput" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all" placeholder="radar_xxxxx">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">URL Webhook n8n</label>
+                    <input type="text" id="apiBaseUrl" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all" placeholder="https://xxx.app.n8n.cloud/webhook">
+                </div>
+                <button onclick="saveApiConfig()" class="w-full bg-radar-600 text-white py-3 rounded-xl font-semibold hover:bg-radar-700 transition-colors btn-press">
+                    Sauvegarder
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8 animate-fade-in">
+            <h2 class="text-2xl font-bold text-gray-900 mb-1">Bonjour</h2>
+            <p class="text-gray-500">Voici votre tableau de bord M&A Intelligence</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="card rounded-2xl p-5 animate-slide-up stagger-1">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                    </div>
+                    <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Actives</span>
+                </div>
+                <div id="stat-watchlists" class="text-3xl font-bold text-gray-900 counter-value">-</div>
+                <div class="text-sm text-gray-500 mt-1">Watchlists</div>
+            </div>
+
+            <div class="card rounded-2xl p-5 animate-slide-up stagger-2">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                        </svg>
+                    </div>
+                    <span id="deals-trend" class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full hidden">+0 new</span>
+                </div>
+                <div id="stat-deals" class="text-3xl font-bold text-gray-900 counter-value">-</div>
+                <div class="text-sm text-gray-500 mt-1">Deals detectes</div>
+            </div>
+
+            <div class="card rounded-2xl p-5 animate-slide-up stagger-3">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="stat-actors" class="text-3xl font-bold text-gray-900 counter-value">-</div>
+                <div class="text-sm text-gray-500 mt-1">Acteurs identifies</div>
+            </div>
+
+            <div class="card rounded-2xl p-5 animate-slide-up stagger-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div id="stat-lastrun" class="text-3xl font-bold text-gray-900 counter-value">-</div>
+                <div id="stat-lastrun-time" class="text-sm text-gray-500 mt-1">Dernier scan</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="flex flex-wrap gap-3 mb-8">
+            <button onclick="runAllWatchlists()" class="group flex items-center gap-2 px-5 py-2.5 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-all btn-press shadow-lg shadow-radar-600/25">
+                <svg class="w-5 h-5 group-hover:animate-bounce-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Scanner toutes les watchlists
+            </button>
+            <a href="watchlist.html" class="flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all border border-gray-200 shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Nouvelle watchlist
+            </a>
+            <button onclick="refreshDashboard()" class="flex items-center gap-2 px-4 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-white rounded-xl transition-all">
+                <svg id="refreshIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Actualiser
+            </button>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Watchlists Column -->
+            <div class="lg:col-span-2">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Mes Watchlists</h3>
+                    <div class="flex items-center gap-3 text-xs text-gray-500">
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            &lt;24h
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            &lt;7j
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                            &gt;7j
+                        </span>
+                    </div>
+                </div>
+                <div id="watchlists-container" class="space-y-3">
+                    <!-- Skeleton Loaders -->
+                    <div class="card rounded-2xl p-5">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl skeleton"></div>
+                            <div class="flex-1">
+                                <div class="h-5 w-48 skeleton rounded-lg mb-2"></div>
+                                <div class="h-4 w-32 skeleton rounded-lg"></div>
+                            </div>
+                            <div class="h-8 w-24 skeleton rounded-lg"></div>
+                        </div>
+                    </div>
+                    <div class="card rounded-2xl p-5">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl skeleton"></div>
+                            <div class="flex-1">
+                                <div class="h-5 w-40 skeleton rounded-lg mb-2"></div>
+                                <div class="h-4 w-28 skeleton rounded-lg"></div>
+                            </div>
+                            <div class="h-8 w-24 skeleton rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Feed -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Activite recente</h3>
+                    <a href="results.html" class="text-sm text-radar-600 hover:text-radar-700 font-medium">Voir tout</a>
+                </div>
+                <div id="activity-feed" class="card rounded-2xl divide-y divide-gray-100">
+                    <div class="p-4">
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full skeleton"></div>
+                            <div class="flex-1">
+                                <div class="h-4 w-full skeleton rounded mb-2"></div>
+                                <div class="h-3 w-20 skeleton rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full skeleton"></div>
+                            <div class="flex-1">
+                                <div class="h-4 w-full skeleton rounded mb-2"></div>
+                                <div class="h-3 w-20 skeleton rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Runs Table -->
+        <div class="mt-8">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Historique des scans</h3>
+            </div>
+            <div class="card rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50/80">
+                                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Watchlist</th>
+                                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Resultats</th>
+                                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="runs-table-body" class="divide-y divide-gray-100">
+                            <tr>
+                                <td colspan="5" class="px-5 py-12 text-center">
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-16 h-16 rounded-2xl empty-illustration flex items-center justify-center mb-4">
+                                            <svg class="w-8 h-8 text-radar-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                            </svg>
+                                        </div>
+                                        <p class="text-gray-500">Chargement de l'historique...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 border-t border-gray-200">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+                <span class="font-medium text-gray-900">AI Commercial Radar</span>
+                <span>v1.0</span>
+            </div>
+            <div class="flex items-center gap-4 text-sm text-gray-500">
+                <span>M&A Intelligence pour fonds d'infrastructure</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== Configuration =====
+        let API_KEY = localStorage.getItem('radar_api_key') || '';
+        let API_BASE = localStorage.getItem('radar_api_base') || '';
+
+        // ===== Toast System =====
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const colors = {
+                success: 'bg-emerald-500',
+                error: 'bg-red-500',
+                info: 'bg-radar-600',
+                warning: 'bg-amber-500'
+            };
+            const icons = {
+                success: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>',
+                error: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>',
+                info: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>',
+                warning: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast flex items-center gap-3 px-4 py-3 ${colors[type]} text-white rounded-xl shadow-lg`;
+            toast.innerHTML = `
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[type]}</svg>
+                <span class="text-sm font-medium">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ===== Settings Modal =====
+        function showSettings() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+            document.getElementById('apiKeyInput').value = API_KEY;
+            document.getElementById('apiBaseUrl').value = API_BASE;
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function saveApiConfig() {
+            API_KEY = document.getElementById('apiKeyInput').value;
+            API_BASE = document.getElementById('apiBaseUrl').value;
+            if (API_KEY && API_BASE) {
+                localStorage.setItem('radar_api_key', API_KEY);
+                localStorage.setItem('radar_api_base', API_BASE);
+                closeSettings();
+                showToast('Configuration sauvegardee', 'success');
+                loadDashboard();
+            } else {
+                showToast('Veuillez remplir tous les champs', 'error');
+            }
+        }
+
+        // ===== API =====
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' }
+            };
+            if (body) options.body = JSON.stringify(body);
+            const response = await fetch(`${API_BASE}/${endpoint}`, options);
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            return response.json();
+        }
+
+        // ===== Dashboard =====
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!API_KEY || !API_BASE) {
+                showSettings();
+            } else {
+                loadDashboard();
+            }
+        });
+
+        function refreshDashboard() {
+            const icon = document.getElementById('refreshIcon');
+            icon.classList.add('animate-spin');
+            loadDashboard().finally(() => {
+                setTimeout(() => icon.classList.remove('animate-spin'), 500);
+            });
+        }
+
+        async function loadDashboard() {
+            try {
+                const data = await apiCall('watchlist/list');
+                renderWatchlists(data.watchlists || []);
+                updateStats(data.watchlists || []);
+                renderActivityFeed(data.watchlists || []);
+                updateConnectionStatus(true);
+            } catch (error) {
+                console.error('Error:', error);
+                updateConnectionStatus(false);
+                renderErrorState();
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('connectionStatus');
+            if (connected) {
+                status.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 status-live"></span><span class="text-emerald-300">Connecte</span>';
+            } else {
+                status.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-400"></span><span class="text-red-300">Deconnecte</span>';
+            }
+        }
+
+        function getRelativeTime(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            if (diffMins < 1) return 'A l\'instant';
+            if (diffMins < 60) return `Il y a ${diffMins}min`;
+            if (diffHours < 24) return `Il y a ${diffHours}h`;
+            if (diffDays < 7) return `Il y a ${diffDays}j`;
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+        }
+
+        function getFreshnessClass(dateStr) {
+            if (!dateStr) return '';
+            const diffDays = (new Date() - new Date(dateStr)) / 86400000;
+            if (diffDays < 1) return 'fresh-new';
+            if (diffDays < 7) return 'fresh-recent';
+            return 'fresh-old';
+        }
+
+        function animateCounter(element, target) {
+            const duration = 1000;
+            const start = 0;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(start + (target - start) * easeOut);
+                element.textContent = current;
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        function updateStats(watchlists) {
+            const statWatchlists = document.getElementById('stat-watchlists');
+            const statDeals = document.getElementById('stat-deals');
+            const statActors = document.getElementById('stat-actors');
+            const statLastrun = document.getElementById('stat-lastrun');
+
+            animateCounter(statWatchlists, watchlists.length);
+
+            const totalDeals = watchlists.reduce((sum, w) => sum + (w.last_run?.deals_new || 0), 0);
+            const totalActors = watchlists.reduce((sum, w) => sum + (w.last_run?.actors_new || 0), 0);
+            animateCounter(statDeals, totalDeals);
+            animateCounter(statActors, totalActors);
+
+            if (totalDeals > 0) {
+                const dealsTrend = document.getElementById('deals-trend');
+                dealsTrend.textContent = `+${totalDeals} new`;
+                dealsTrend.classList.remove('hidden');
+            }
+
+            const lastRun = watchlists
+                .filter(w => w.last_run)
+                .sort((a, b) => new Date(b.last_run.started_at) - new Date(a.last_run.started_at))[0];
+
+            if (lastRun) {
+                statLastrun.textContent = getRelativeTime(lastRun.last_run.started_at);
+                document.getElementById('stat-lastrun-time').textContent = 'Dernier scan';
+            }
+        }
+
+        function renderWatchlists(watchlists) {
+            const container = document.getElementById('watchlists-container');
+
+            if (watchlists.length === 0) {
+                container.innerHTML = `
+                    <div class="card rounded-2xl p-12 text-center">
+                        <div class="w-20 h-20 rounded-2xl empty-illustration flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-10 h-10 text-radar-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucune watchlist</h3>
+                        <p class="text-gray-500 mb-6 max-w-sm mx-auto">Creez votre premiere watchlist pour commencer a detecter des opportunites M&A</p>
+                        <a href="watchlist.html" class="inline-flex items-center gap-2 px-6 py-3 bg-radar-600 text-white rounded-xl font-semibold hover:bg-radar-700 transition-colors shadow-lg shadow-radar-600/25">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Creer ma premiere watchlist
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = watchlists.map((w, i) => {
+                const freshnessClass = getFreshnessClass(w.last_run?.started_at);
+                const relativeTime = getRelativeTime(w.last_run?.started_at);
+                const sectorIcons = {
+                    'Datacenters': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>',
+                    'Energie renouvelable': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
+                    'default': '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>'
+                };
+                const icon = sectorIcons[w.sector] || sectorIcons.default;
+
+                return `
+                    <div class="card rounded-2xl p-5 ${freshnessClass} animate-slide-up" style="animation-delay: ${i * 0.05}s">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-radar-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icon}</svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2 mb-1">
+                                    <h4 class="font-semibold text-gray-900 truncate">${w.name}</h4>
+                                    ${w.last_run?.status === 'running' ?
+                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full status-live"></span>En cours</span>' :
+                                        w.last_run?.status === 'error' ?
+                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">Erreur</span>' :
+                                        w.last_run ?
+                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">OK</span>' :
+                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">Nouveau</span>'
+                                    }
+                                </div>
+                                <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
+                                    <span>${w.sector}</span>
+                                    <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                    <span>${(w.geographies || []).slice(0, 2).join(', ')}${w.geographies?.length > 2 ? '...' : ''}</span>
+                                    ${relativeTime ? `<span class="w-1 h-1 bg-gray-300 rounded-full"></span><span>${relativeTime}</span>` : ''}
+                                </div>
+                                ${w.last_run ? `
+                                    <div class="flex items-center gap-4 text-sm">
+                                        <span class="flex items-center gap-1.5 text-emerald-600 font-medium">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                            </svg>
+                                            ${w.last_run.deals_new || 0} deals
+                                        </span>
+                                        <span class="flex items-center gap-1.5 text-amber-600 font-medium">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                            ${w.last_run.actors_new || 0} acteurs
+                                        </span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <button onclick="runNow('${w.watchlist_id}', this)" class="p-2 text-radar-600 hover:bg-radar-50 rounded-lg transition-colors" title="Lancer un scan">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                    </svg>
+                                </button>
+                                <a href="results.html?watchlist_id=${w.watchlist_id}" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="Voir les resultats">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </a>
+                                <button onclick="exportXlsx('${w.watchlist_id}')" class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Export Excel">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update runs table
+            renderRunsTable(watchlists);
+        }
+
+        function renderActivityFeed(watchlists) {
+            const container = document.getElementById('activity-feed');
+            const activities = watchlists
+                .filter(w => w.last_run)
+                .map(w => ({
+                    type: 'scan',
+                    name: w.name,
+                    deals: w.last_run.deals_new || 0,
+                    actors: w.last_run.actors_new || 0,
+                    time: w.last_run.started_at,
+                    status: w.last_run.status
+                }))
+                .sort((a, b) => new Date(b.time) - new Date(a.time))
+                .slice(0, 5);
+
+            if (activities.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 text-center">
+                        <p class="text-sm text-gray-500">Aucune activite recente</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = activities.map(a => `
+                <div class="p-4 hover:bg-gray-50 transition-colors">
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full ${a.status === 'success' ? 'bg-emerald-100' : a.status === 'error' ? 'bg-red-100' : 'bg-blue-100'} flex items-center justify-center flex-shrink-0">
+                            ${a.status === 'success' ?
+                                '<svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' :
+                                a.status === 'error' ?
+                                '<svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>' :
+                                '<svg class="w-4 h-4 text-blue-600 status-live" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>'
+                            }
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm text-gray-900">
+                                <span class="font-medium">${a.name}</span>
+                                ${a.status === 'success' ? `: ${a.deals} deals, ${a.actors} acteurs` : a.status === 'error' ? ' - Erreur' : ' - En cours...'}
+                            </p>
+                            <p class="text-xs text-gray-500 mt-0.5">${getRelativeTime(a.time)}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRunsTable(watchlists) {
+            const runs = watchlists
+                .filter(w => w.last_run)
+                .map(w => ({ ...w.last_run, watchlist_name: w.name, watchlist_id: w.watchlist_id }))
+                .sort((a, b) => new Date(b.started_at) - new Date(a.started_at))
+                .slice(0, 10);
+
+            const tbody = document.getElementById('runs-table-body');
+
+            if (runs.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-5 py-12 text-center">
+                            <p class="text-gray-500">Aucun scan effectue</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = runs.map(r => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-5 py-4">
+                        <span class="font-medium text-gray-900">${r.watchlist_name}</span>
+                    </td>
+                    <td class="px-5 py-4 text-sm text-gray-600">
+                        ${new Date(r.started_at).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td class="px-5 py-4">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+                            r.status === 'success' ? 'bg-emerald-100 text-emerald-700' :
+                            r.status === 'running' ? 'bg-blue-100 text-blue-700' :
+                            'bg-red-100 text-red-700'
+                        }">
+                            <span class="w-1.5 h-1.5 rounded-full ${
+                                r.status === 'success' ? 'bg-emerald-500' :
+                                r.status === 'running' ? 'bg-blue-500 status-live' :
+                                'bg-red-500'
+                            }"></span>
+                            ${r.status === 'success' ? 'Termine' : r.status === 'running' ? 'En cours' : 'Erreur'}
+                        </span>
+                    </td>
+                    <td class="px-5 py-4">
+                        <div class="flex items-center gap-3 text-sm">
+                            <span class="text-emerald-600 font-medium">${r.deals_new || 0} deals</span>
+                            <span class="text-amber-600 font-medium">${r.actors_new || 0} acteurs</span>
+                        </div>
+                    </td>
+                    <td class="px-5 py-4">
+                        <a href="results.html?watchlist_id=${r.watchlist_id}" class="text-radar-600 hover:text-radar-700 text-sm font-medium">
+                            Voir →
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderErrorState() {
+            document.getElementById('watchlists-container').innerHTML = `
+                <div class="card rounded-2xl p-8 text-center border-red-200">
+                    <div class="w-16 h-16 rounded-2xl bg-red-100 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Erreur de connexion</h3>
+                    <p class="text-gray-500 mb-4">Impossible de se connecter a l'API</p>
+                    <button onclick="showSettings()" class="px-6 py-2 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-colors">
+                        Verifier la configuration
+                    </button>
+                </div>
+            `;
+        }
+
+        async function runNow(watchlistId, btn) {
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>';
+            btn.disabled = true;
+
+            try {
+                await apiCall('watchlist/run', 'POST', { watchlist_id: watchlistId });
+                showToast('Scan lance avec succes', 'success');
+                setTimeout(() => loadDashboard(), 2000);
+            } catch (error) {
+                showToast('Erreur lors du lancement', 'error');
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        }
+
+        async function runAllWatchlists() {
+            try {
+                const data = await apiCall('watchlist/list');
+                const watchlists = data.watchlists || [];
+
+                if (watchlists.length === 0) {
+                    showToast('Aucune watchlist a scanner', 'warning');
+                    return;
+                }
+
+                showToast(`Lancement de ${watchlists.length} scan(s)...`, 'info');
+
+                for (const w of watchlists) {
+                    await apiCall('watchlist/run', 'POST', { watchlist_id: w.watchlist_id });
+                }
+
+                showToast('Tous les scans ont ete lances', 'success');
+                setTimeout(() => loadDashboard(), 3000);
+            } catch (error) {
+                showToast('Erreur lors du lancement', 'error');
+            }
+        }
+
+        function exportXlsx(watchlistId) {
+            showToast('Preparation de l\'export...', 'info');
+
+            fetch(`${API_BASE}/export/xlsx?watchlist_id=${watchlistId}`, {
+                headers: { 'workspace-api-key': API_KEY }
+            })
+            .then(res => res.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `radar_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Export telecharge', 'success');
+            })
+            .catch(() => showToast('Erreur lors de l\'export', 'error'));
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeSettings();
+            if (e.key === 'r' && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                refreshDashboard();
+            }
+        });
+    </script>
+</body>
+</html>
