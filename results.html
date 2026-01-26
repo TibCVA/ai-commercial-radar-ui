@@ -224,6 +224,29 @@
         let currentTab = 'deals';
         let currentData = { deals: [], actors: [] };
 
+        // === Security & Data Helpers ===
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        }
+
+        function ensureArray(val) {
+            if (Array.isArray(val)) return val;
+            if (!val || val === '[]') return [];
+            if (typeof val === 'string') {
+                try { const p = JSON.parse(val); return Array.isArray(p) ? p : [String(val)]; } catch(e) {
+                    return val.includes(',') ? val.split(',').map(s => s.trim()).filter(Boolean) : [val];
+                }
+            }
+            return [];
+        }
+
+        function safeUrl(url) {
+            if (!url) return '#';
+            const s = String(url).trim();
+            return (s.startsWith('http://') || s.startsWith('https://')) ? escapeHtml(s) : '#';
+        }
+
         // Init
         document.addEventListener('DOMContentLoaded', async () => {
             if (!API_KEY || !API_BASE) {
@@ -415,31 +438,35 @@
             const freshnessClass = getFreshnessClass(deal.first_seen_at);
             const relativeTime = getRelativeTime(deal.first_seen_at);
 
-            const sourceCount = deal.sources?.length || 0;
-            const primarySources = deal.sources?.filter(s => s.quality === 'primary').length || 0;
+            const sources = ensureArray(deal.sources);
+            const sourceCount = sources.length;
+            const primarySources = sources.filter(s => s && s.quality === 'primary').length;
+            const acquereurs = ensureArray(deal.parties_acquereurs);
+            const cibles = ensureArray(deal.parties_cibles);
+            const rationnel = ensureArray(deal.rationnel);
 
             return `
-                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass}" onclick="showDealDetail('${deal.deal_id}')">
+                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass}" onclick="showDealDetail('${escapeHtml(deal.deal_id)}')">
                     <div class="flex flex-col lg:flex-row gap-4">
                         <!-- Main Content -->
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-start gap-2 mb-3">
-                                <h3 class="font-bold text-gray-900 text-lg">${deal.titre || 'Deal sans titre'}</h3>
-                                <span class="px-2.5 py-1 ${stage.color} text-xs font-medium rounded-full">${stage.label}</span>
+                                <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(deal.titre) || 'Deal sans titre'}</h3>
+                                <span class="px-2.5 py-1 ${stage.color} text-xs font-medium rounded-full">${escapeHtml(stage.label)}</span>
                             </div>
 
                             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm mb-4">
                                 <div>
                                     <span class="text-gray-400 text-xs block">Type</span>
-                                    <span class="text-gray-700 font-medium">${deal.type_operation || 'N/A'}</span>
+                                    <span class="text-gray-700 font-medium">${escapeHtml(deal.type_operation) || 'N/A'}</span>
                                 </div>
                                 <div>
                                     <span class="text-gray-400 text-xs block">Geographie</span>
-                                    <span class="text-gray-700 font-medium">${deal.geographie_pays || 'N/A'}</span>
+                                    <span class="text-gray-700 font-medium">${escapeHtml(deal.geographie_pays) || 'N/A'}</span>
                                 </div>
                                 <div>
                                     <span class="text-gray-400 text-xs block">Valeur est.</span>
-                                    <span class="text-gray-700 font-medium">${deal.valeur_montant ? `${deal.valeur_montant} ${deal.valeur_devise}` : 'N/A'}</span>
+                                    <span class="text-gray-700 font-medium">${deal.valeur_montant ? `${escapeHtml(deal.valeur_montant)} ${escapeHtml(deal.valeur_devise || '')}` : 'N/A'}</span>
                                 </div>
                                 <div>
                                     <span class="text-gray-400 text-xs block">Detecte</span>
@@ -450,14 +477,14 @@
                             <div class="text-sm mb-3">
                                 <span class="text-gray-500">Parties:</span>
                                 <span class="text-gray-800 ml-1">
-                                    ${(deal.parties_acquereurs || []).join(', ') || '?'}
-                                    ${deal.parties_cibles?.length ? ' <span class="text-radar-600">→</span> ' + deal.parties_cibles.join(', ') : ''}
+                                    ${acquereurs.map(escapeHtml).join(', ') || '?'}
+                                    ${cibles.length ? ' <span class="text-radar-600">&rarr;</span> ' + cibles.map(escapeHtml).join(', ') : ''}
                                 </span>
                             </div>
 
-                            ${deal.rationnel?.length ? `
+                            ${rationnel.length ? `
                                 <div class="text-sm text-gray-600 italic mb-3 line-clamp-2">
-                                    "${deal.rationnel[0]}"
+                                    "${escapeHtml(rationnel[0])}"
                                 </div>
                             ` : ''}
                         </div>
@@ -470,7 +497,7 @@
                                     <span class="font-semibold text-sm">${conf.text}</span>
                                 </div>
                                 ${deal.confiance_justification ? `
-                                    <p class="text-xs opacity-80 line-clamp-2">${deal.confiance_justification}</p>
+                                    <p class="text-xs opacity-80 line-clamp-2">${escapeHtml(deal.confiance_justification)}</p>
                                 ` : ''}
                             </div>
 
@@ -501,13 +528,15 @@
                 corporate: { label: 'Corporate', color: 'bg-purple-100 text-purple-700', icon: '🏢' },
                 operateur: { label: 'Operateur', color: 'bg-orange-100 text-orange-700', icon: '⚙' }
             };
-            const actorType = typeLabels[actor.type_acteur] || { label: actor.type_acteur || 'N/A', color: 'bg-gray-100 text-gray-600', icon: '👤' };
+            const actorType = typeLabels[actor.type_acteur] || { label: escapeHtml(actor.type_acteur) || 'N/A', color: 'bg-gray-100 text-gray-600', icon: '👤' };
 
             const freshnessClass = getFreshnessClass(actor.first_seen_at);
             const relativeTime = getRelativeTime(actor.first_seen_at);
+            const signaux = ensureArray(actor.signaux_recents);
+            const contacts = ensureArray(actor.contact_points);
 
             return `
-                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass}" onclick="showActorDetail('${actor.actor_id}')">
+                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass}" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
                     <div class="flex flex-col lg:flex-row gap-4">
                         <div class="flex-1">
                             <div class="flex items-start gap-3 mb-4">
@@ -515,24 +544,24 @@
                                     ${actorType.icon}
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-gray-900 text-lg">${actor.nom || 'Acteur sans nom'}</h3>
+                                    <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(actor.nom) || 'Acteur sans nom'}</h3>
                                     <div class="flex items-center gap-2 mt-1">
                                         <span class="px-2.5 py-0.5 ${actorType.color} text-xs font-medium rounded-full">${actorType.label}</span>
-                                        <span class="text-sm text-gray-500">${actor.geographie || 'Geo N/A'}</span>
+                                        <span class="text-sm text-gray-500">${escapeHtml(actor.geographie) || 'Geo N/A'}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            ${actor.signaux_recents?.length ? `
+                            ${signaux.length ? `
                                 <div class="mb-3">
                                     <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Signaux recents</span>
                                     <ul class="mt-2 space-y-1">
-                                        ${actor.signaux_recents.slice(0, 3).map(s => `
+                                        ${signaux.slice(0, 3).map(s => `
                                             <li class="flex items-start gap-2 text-sm text-gray-700">
                                                 <svg class="w-4 h-4 text-radar-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                                 </svg>
-                                                <span>${s}</span>
+                                                <span>${escapeHtml(s)}</span>
                                             </li>
                                         `).join('')}
                                     </ul>
@@ -546,12 +575,12 @@
                                 <span class="font-medium text-gray-700">${relativeTime || 'N/A'}</span>
                             </div>
 
-                            ${actor.contact_points?.length ? `
+                            ${contacts.length ? `
                                 <div class="flex items-center gap-2 text-sm text-success">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
-                                    <span>${actor.contact_points.length} contact(s)</span>
+                                    <span>${contacts.length} contact(s)</span>
                                 </div>
                             ` : ''}
 
@@ -568,30 +597,41 @@
         }
 
         function showDealDetail(dealId) {
-            const deal = currentData.deals.find(d => d.deal_id === dealId);
+            const deal = (currentData.deals || []).find(d => d.deal_id === dealId);
             if (!deal) return;
+
+            const confLevel = normalizeConfidence(deal.confiance);
+            const confColors = { high: ['bg-green-50 border-green-200','text-green-700','text-green-800','bg-green-100 text-green-700'], medium: ['bg-yellow-50 border-yellow-200','text-yellow-700','text-yellow-800','bg-yellow-100 text-yellow-700'], low: ['bg-red-50 border-red-200','text-red-700','text-red-800','bg-red-100 text-red-700'] };
+            const cc = confColors[confLevel] || confColors.medium;
+            const sectorTags = ensureArray(deal.secteur_tags);
+            const acquereurs = ensureArray(deal.parties_acquereurs);
+            const cibles = ensureArray(deal.parties_cibles);
+            const vendeurs = ensureArray(deal.parties_vendeurs);
+            const advisors = ensureArray(deal.advisors);
+            const rationnel = ensureArray(deal.rationnel);
+            const sources = ensureArray(deal.sources);
 
             document.getElementById('modalTitle').textContent = deal.titre || 'Detail du Deal';
             document.getElementById('modalContent').innerHTML = `
                 <div class="space-y-6">
                     <!-- Status Bar -->
                     <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1.5 ${normalizeConfidence(deal.confiance) === 'high' ? 'bg-green-100 text-green-700' : normalizeConfidence(deal.confiance) === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'} text-sm font-medium rounded-full">
-                            Confiance: ${deal.confiance || 'N/A'}
+                        <span class="px-3 py-1.5 ${cc[3]} text-sm font-medium rounded-full">
+                            Confiance: ${escapeHtml(deal.confiance) || 'N/A'}
                         </span>
                         <span class="px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
-                            Stade: ${deal.stade || 'N/A'}
+                            Stade: ${escapeHtml(deal.stade) || 'N/A'}
                         </span>
                         <span class="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-full">
-                            ${deal.type_operation || 'Type N/A'}
+                            ${escapeHtml(deal.type_operation) || 'Type N/A'}
                         </span>
                     </div>
 
                     <!-- Sector Tags -->
-                    ${(deal.secteur_tags && (Array.isArray(deal.secteur_tags) ? deal.secteur_tags : deal.secteur_tags.split(',').map(s=>s.trim())).length) ? `
+                    ${sectorTags.length ? `
                         <div class="flex flex-wrap gap-2">
-                            ${(Array.isArray(deal.secteur_tags) ? deal.secteur_tags : deal.secteur_tags.split(',').map(s=>s.trim())).map(t => `
-                                <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-full">${t}</span>
+                            ${sectorTags.map(t => `
+                                <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-medium rounded-full">${escapeHtml(t)}</span>
                             `).join('')}
                         </div>
                     ` : ''}
@@ -600,16 +640,16 @@
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                         <div class="p-4 bg-gray-50 rounded-xl">
                             <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Geographie</span>
-                            <p class="text-gray-800 mt-1">${deal.geographie_pays || 'N/A'} ${deal.geographie_ville ? '(' + deal.geographie_ville + ')' : ''}</p>
+                            <p class="text-gray-800 mt-1">${escapeHtml(deal.geographie_pays) || 'N/A'} ${deal.geographie_ville ? '(' + escapeHtml(deal.geographie_ville) + ')' : ''}</p>
                         </div>
                         <div class="p-4 bg-gray-50 rounded-xl">
                             <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Valeur estimee</span>
-                            <p class="text-gray-800 mt-1">${deal.valeur_montant ? `${deal.valeur_montant} ${deal.valeur_devise} (${deal.valeur_type || 'est.'})` : 'N/A'}</p>
+                            <p class="text-gray-800 mt-1">${deal.valeur_montant ? `${escapeHtml(deal.valeur_montant)} ${escapeHtml(deal.valeur_devise || '')} (${escapeHtml(deal.valeur_type || 'est.')})` : 'N/A'}</p>
                         </div>
                         ${deal.valeur_estimee_rumeur ? `
                             <div class="p-4 bg-purple-50 rounded-xl">
                                 <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Valeur rumeur</span>
-                                <p class="text-purple-800 mt-1 font-medium">${deal.valeur_estimee_rumeur}</p>
+                                <p class="text-purple-800 mt-1 font-medium">${escapeHtml(deal.valeur_estimee_rumeur)}</p>
                             </div>
                         ` : ''}
                     </div>
@@ -618,19 +658,19 @@
                     <div class="p-4 bg-radar-50 rounded-xl">
                         <span class="text-xs font-medium text-radar-700 uppercase tracking-wide">Parties impliquees</span>
                         <div class="mt-3 space-y-2">
-                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Acquereurs:</span> ${(deal.parties_acquereurs || []).join(', ') || 'Non identifie'}</p>
-                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Cibles:</span> ${(deal.parties_cibles || []).join(', ') || 'Non identifie'}</p>
-                            ${deal.parties_vendeurs?.length ? `<p class="text-gray-800"><span class="font-semibold text-gray-600">Vendeurs:</span> ${deal.parties_vendeurs.join(', ')}</p>` : ''}
+                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Acquereurs:</span> ${acquereurs.map(escapeHtml).join(', ') || 'Non identifie'}</p>
+                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Cibles:</span> ${cibles.map(escapeHtml).join(', ') || 'Non identifie'}</p>
+                            ${vendeurs.length ? `<p class="text-gray-800"><span class="font-semibold text-gray-600">Vendeurs:</span> ${vendeurs.map(escapeHtml).join(', ')}</p>` : ''}
                         </div>
                     </div>
 
                     <!-- Advisors -->
-                    ${deal.advisors?.length ? `
+                    ${advisors.length ? `
                         <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
                             <span class="text-xs font-medium text-amber-700 uppercase tracking-wide">Conseils / Advisors</span>
                             <div class="mt-2 flex flex-wrap gap-2">
-                                ${deal.advisors.map(a => `
-                                    <span class="px-3 py-1.5 bg-amber-100 text-amber-800 text-sm font-medium rounded-full">${a}</span>
+                                ${advisors.map(a => `
+                                    <span class="px-3 py-1.5 bg-amber-100 text-amber-800 text-sm font-medium rounded-full">${escapeHtml(a)}</span>
                                 `).join('')}
                             </div>
                         </div>
@@ -640,21 +680,21 @@
                     ${deal.actifs ? `
                         <div>
                             <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Actifs concernes</span>
-                            <p class="text-gray-800 mt-1">${deal.actifs}</p>
+                            <p class="text-gray-800 mt-1">${escapeHtml(deal.actifs)}</p>
                         </div>
                     ` : ''}
 
                     <!-- Rationnel -->
-                    ${deal.rationnel?.length ? `
+                    ${rationnel.length ? `
                         <div>
                             <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Rationnel / Signaux detectes</span>
                             <ul class="mt-2 space-y-2">
-                                ${deal.rationnel.map(r => `
+                                ${rationnel.map(r => `
                                     <li class="flex items-start gap-2 text-gray-700">
                                         <svg class="w-5 h-5 text-radar-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
-                                        <span>${r}</span>
+                                        <span>${escapeHtml(r)}</span>
                                     </li>
                                 `).join('')}
                             </ul>
@@ -666,37 +706,37 @@
                         ${deal.timeline_rumeur ? `
                             <div class="text-center p-3 bg-purple-50 rounded-xl">
                                 <span class="text-xs text-purple-600 font-medium">Rumeur</span>
-                                <p class="text-purple-800 font-semibold mt-1">${deal.timeline_rumeur}</p>
+                                <p class="text-purple-800 font-semibold mt-1">${escapeHtml(deal.timeline_rumeur)}</p>
                             </div>
                         ` : ''}
                         ${deal.timeline_annonce ? `
                             <div class="text-center p-3 bg-blue-50 rounded-xl">
                                 <span class="text-xs text-blue-600 font-medium">Annonce</span>
-                                <p class="text-blue-800 font-semibold mt-1">${deal.timeline_annonce}</p>
+                                <p class="text-blue-800 font-semibold mt-1">${escapeHtml(deal.timeline_annonce)}</p>
                             </div>
                         ` : ''}
                         ${deal.timeline_deadline ? `
                             <div class="text-center p-3 bg-orange-50 rounded-xl">
                                 <span class="text-xs text-orange-600 font-medium">Deadline</span>
-                                <p class="text-orange-800 font-semibold mt-1">${deal.timeline_deadline}</p>
+                                <p class="text-orange-800 font-semibold mt-1">${escapeHtml(deal.timeline_deadline)}</p>
                             </div>
                         ` : ''}
                     </div>
 
                     <!-- Confidence Justification -->
                     ${deal.confiance_justification ? `
-                        <div class="p-4 ${normalizeConfidence(deal.confiance) === 'high' ? 'bg-green-50 border-green-200' : normalizeConfidence(deal.confiance) === 'medium' ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'} border rounded-xl">
-                            <span class="text-xs font-medium uppercase tracking-wide ${normalizeConfidence(deal.confiance) === 'high' ? 'text-green-700' : normalizeConfidence(deal.confiance) === 'medium' ? 'text-yellow-700' : 'text-red-700'}">Justification confiance</span>
-                            <p class="mt-1 ${normalizeConfidence(deal.confiance) === 'high' ? 'text-green-800' : normalizeConfidence(deal.confiance) === 'medium' ? 'text-yellow-800' : 'text-red-800'}">${deal.confiance_justification}</p>
+                        <div class="p-4 ${cc[0]} border rounded-xl">
+                            <span class="text-xs font-medium uppercase tracking-wide ${cc[1]}">Justification confiance</span>
+                            <p class="mt-1 ${cc[2]}">${escapeHtml(deal.confiance_justification)}</p>
                         </div>
                     ` : ''}
 
                     <!-- Sources -->
-                    ${deal.sources?.length ? `
+                    ${sources.length ? `
                         <div>
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3 block">Sources (${deal.sources.length})</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3 block">Sources (${sources.length})</span>
                             <div class="space-y-3">
-                                ${deal.sources.map((s, i) => `
+                                ${sources.filter(s => s).map((s, i) => `
                                     <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
                                         <div class="flex items-start justify-between gap-3">
                                             <div class="flex-1">
@@ -704,14 +744,14 @@
                                                     <span class="source-badge ${s.quality === 'primary' ? 'source-primary' : 'source-secondary'}">
                                                         ${s.quality === 'primary' ? 'Source primaire' : 'Source secondaire'}
                                                     </span>
-                                                    <span class="text-xs text-gray-400">${s.date_pub || ''}</span>
+                                                    <span class="text-xs text-gray-400">${escapeHtml(s.date_pub || '')}</span>
                                                 </div>
-                                                <a href="${s.url}" target="_blank" class="text-radar-600 hover:text-radar-700 font-medium hover:underline">
-                                                    ${s.source_name || 'Source ' + (i + 1)}
+                                                <a href="${safeUrl(s.url)}" target="_blank" rel="noopener" class="text-radar-600 hover:text-radar-700 font-medium hover:underline">
+                                                    ${escapeHtml(s.source_name) || 'Source ' + (i + 1)}
                                                 </a>
-                                                ${s.extrait ? `<p class="text-sm text-gray-600 mt-2 italic border-l-2 border-gray-300 pl-3">"${s.extrait}"</p>` : ''}
+                                                ${s.extrait ? `<p class="text-sm text-gray-600 mt-2 italic border-l-2 border-gray-300 pl-3">"${escapeHtml(s.extrait)}"</p>` : ''}
                                             </div>
-                                            <a href="${s.url}" target="_blank" class="p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
+                                            <a href="${safeUrl(s.url)}" target="_blank" rel="noopener" class="p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0">
                                                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                                 </svg>
@@ -725,7 +765,7 @@
 
                     <!-- Metadata -->
                     <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
-                        <p>ID: ${deal.deal_id} | Detecte: ${deal.first_seen_at ? new Date(deal.first_seen_at).toLocaleString('fr-FR') : 'N/A'} | Maj: ${deal.last_seen_at ? new Date(deal.last_seen_at).toLocaleString('fr-FR') : 'N/A'}</p>
+                        <p>ID: ${escapeHtml(deal.deal_id)} | Detecte: ${deal.first_seen_at ? new Date(deal.first_seen_at).toLocaleString('fr-FR') : 'N/A'} | Maj: ${deal.last_seen_at ? new Date(deal.last_seen_at).toLocaleString('fr-FR') : 'N/A'}</p>
                     </div>
                 </div>
             `;
@@ -733,8 +773,13 @@
         }
 
         function showActorDetail(actorId) {
-            const actor = currentData.actors.find(a => a.actor_id === actorId);
+            const actor = (currentData.actors || []).find(a => a.actor_id === actorId);
             if (!actor) return;
+
+            const signaux = ensureArray(actor.signaux_recents);
+            const contacts = ensureArray(actor.contact_points);
+            const dirigeants = ensureArray(actor.dirigeants_cles);
+            const sources = ensureArray(actor.sources);
 
             document.getElementById('modalTitle').textContent = actor.nom || 'Detail Acteur';
             document.getElementById('modalContent').innerHTML = `
@@ -745,8 +790,8 @@
                             ${actor.type_acteur === 'developer' ? '🏗' : actor.type_acteur === 'fonds' ? '💰' : actor.type_acteur === 'corporate' ? '🏢' : '👤'}
                         </div>
                         <div>
-                            <span class="px-3 py-1 bg-radar-100 text-radar-700 text-sm font-medium rounded-full">${actor.type_acteur || 'N/A'}</span>
-                            <p class="text-gray-600 mt-1">${actor.geographie || 'Geographie non specifiee'}</p>
+                            <span class="px-3 py-1 bg-radar-100 text-radar-700 text-sm font-medium rounded-full">${escapeHtml(actor.type_acteur) || 'N/A'}</span>
+                            <p class="text-gray-600 mt-1">${escapeHtml(actor.geographie) || 'Geographie non specifiee'}</p>
                         </div>
                     </div>
 
@@ -756,13 +801,13 @@
                             ${actor.capacite_installee ? `
                                 <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
                                     <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">Capacite / AUM / Portfolio</span>
-                                    <p class="text-blue-800 mt-1 font-medium">${actor.capacite_installee}</p>
+                                    <p class="text-blue-800 mt-1 font-medium">${escapeHtml(actor.capacite_installee)}</p>
                                 </div>
                             ` : ''}
                             ${actor.derniere_levee ? `
                                 <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
                                     <span class="text-xs font-medium text-emerald-600 uppercase tracking-wide">Derniere levee / Capital raise</span>
-                                    <p class="text-emerald-800 mt-1 font-medium">${actor.derniere_levee}</p>
+                                    <p class="text-emerald-800 mt-1 font-medium">${escapeHtml(actor.derniere_levee)}</p>
                                 </div>
                             ` : ''}
                         </div>
@@ -772,23 +817,23 @@
                     ${actor.pipeline_projets ? `
                         <div class="p-4 bg-gray-50 rounded-xl">
                             <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pipeline de projets</span>
-                            <p class="text-gray-700 mt-2">${actor.pipeline_projets}</p>
+                            <p class="text-gray-700 mt-2">${escapeHtml(actor.pipeline_projets)}</p>
                         </div>
                     ` : ''}
 
                     <!-- Dirigeants Cles -->
-                    ${actor.dirigeants_cles?.length ? `
+                    ${dirigeants.length ? `
                         <div>
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Dirigeants cles (${actor.dirigeants_cles.length})</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Dirigeants cles (${dirigeants.length})</span>
                             <div class="mt-3 space-y-2">
-                                ${actor.dirigeants_cles.map(d => `
+                                ${dirigeants.map(d => `
                                     <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                                         <div class="w-9 h-9 rounded-full bg-radar-100 flex items-center justify-center flex-shrink-0">
                                             <svg class="w-4 h-4 text-radar-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                                             </svg>
                                         </div>
-                                        <span class="text-sm text-gray-800 font-medium">${d}</span>
+                                        <span class="text-sm text-gray-800 font-medium">${escapeHtml(d)}</span>
                                     </div>
                                 `).join('')}
                             </div>
@@ -796,16 +841,16 @@
                     ` : ''}
 
                     <!-- Signaux -->
-                    ${actor.signaux_recents?.length ? `
+                    ${signaux.length ? `
                         <div>
                             <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Signaux detectes</span>
                             <ul class="mt-3 space-y-2">
-                                ${actor.signaux_recents.map(s => `
+                                ${signaux.map(s => `
                                     <li class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
                                         <svg class="w-5 h-5 text-radar-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                                         </svg>
-                                        <span class="text-gray-700">${s}</span>
+                                        <span class="text-gray-700">${escapeHtml(s)}</span>
                                     </li>
                                 `).join('')}
                             </ul>
@@ -813,26 +858,26 @@
                     ` : ''}
 
                     <!-- Contacts -->
-                    ${actor.contact_points?.length ? `
+                    ${contacts.length ? `
                         <div>
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Points de contact (${actor.contact_points.length})</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Points de contact (${contacts.length})</span>
                             <div class="mt-3 space-y-3">
-                                ${actor.contact_points.map(c => `
+                                ${contacts.filter(c => c).map(c => `
                                     <div class="p-4 bg-green-50 rounded-xl border border-green-100">
-                                        <p class="font-semibold text-gray-800">${c.nom_contact || 'Contact'}</p>
-                                        ${c.role ? `<p class="text-sm text-gray-600">${c.role}</p>` : ''}
+                                        <p class="font-semibold text-gray-800">${escapeHtml(c.nom_contact) || 'Contact'}</p>
+                                        ${c.role ? `<p class="text-sm text-gray-600">${escapeHtml(c.role)}</p>` : ''}
                                         ${c.email ? `
                                             <p class="mt-2">
-                                                <a href="mailto:${c.email}" class="text-radar-600 hover:text-radar-700 flex items-center gap-2">
+                                                <a href="mailto:${escapeHtml(c.email)}" class="text-radar-600 hover:text-radar-700 flex items-center gap-2">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                                     </svg>
-                                                    ${c.email}
+                                                    ${escapeHtml(c.email)}
                                                 </a>
                                             </p>
                                         ` : ''}
                                         ${c.preuve_url ? `
-                                            <a href="${c.preuve_url}" target="_blank" class="text-xs text-gray-500 hover:underline mt-2 inline-flex items-center gap-1">
+                                            <a href="${safeUrl(c.preuve_url)}" target="_blank" rel="noopener" class="text-xs text-gray-500 hover:underline mt-2 inline-flex items-center gap-1">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                                 </svg>
@@ -846,16 +891,16 @@
                     ` : ''}
 
                     <!-- Sources -->
-                    ${actor.sources?.length ? `
+                    ${sources.length ? `
                         <div>
                             <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Sources</span>
                             <div class="mt-3 space-y-2">
-                                ${actor.sources.map(s => `
+                                ${sources.filter(s => s).map(s => `
                                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                                        <a href="${s.url}" target="_blank" class="text-radar-600 hover:text-radar-700 hover:underline flex-1">
-                                            ${s.source_name || 'Source'}
+                                        <a href="${safeUrl(s.url)}" target="_blank" rel="noopener" class="text-radar-600 hover:text-radar-700 hover:underline flex-1">
+                                            ${escapeHtml(s.source_name) || 'Source'}
                                         </a>
-                                        <span class="text-xs text-gray-400">${s.date_pub || ''}</span>
+                                        <span class="text-xs text-gray-400">${escapeHtml(s.date_pub || '')}</span>
                                     </div>
                                 `).join('')}
                             </div>
@@ -864,7 +909,7 @@
 
                     <!-- Metadata -->
                     <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
-                        <p>ID: ${actor.actor_id} | Detecte: ${actor.first_seen_at ? new Date(actor.first_seen_at).toLocaleString('fr-FR') : 'N/A'} | Maj: ${actor.last_seen_at ? new Date(actor.last_seen_at).toLocaleString('fr-FR') : 'N/A'}</p>
+                        <p>ID: ${escapeHtml(actor.actor_id)} | Detecte: ${actor.first_seen_at ? new Date(actor.first_seen_at).toLocaleString('fr-FR') : 'N/A'} | Maj: ${actor.last_seen_at ? new Date(actor.last_seen_at).toLocaleString('fr-FR') : 'N/A'}</p>
                     </div>
                 </div>
             `;
@@ -882,9 +927,10 @@
                 return;
             }
 
-            const url = `${API_BASE}/export/xlsx?watchlist_id=${watchlistId}`;
+            const url = `${API_BASE}/export/xlsx?watchlist_id=${encodeURIComponent(watchlistId)}`;
             fetch(url, { headers: { 'workspace-api-key': API_KEY } })
                 .then(res => {
+                    if (!res.ok) throw new Error(`Export failed: HTTP ${res.status}`);
                     const cd = res.headers.get('Content-Disposition') || '';
                     const match = cd.match(/filename="?(.+?)"?$/);
                     const filename = match ? match[1] : `radar_export_${new Date().toISOString().split('T')[0]}.csv`;

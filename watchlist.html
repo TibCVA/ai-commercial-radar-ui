@@ -670,7 +670,12 @@
             tagsData[tagType].forEach(tag => {
                 const tagEl = document.createElement('span');
                 tagEl.className = 'tag';
-                tagEl.innerHTML = `${tag}<button type="button" onclick="removeTag('${tagType}', '${tag}')">&times;</button>`;
+                tagEl.textContent = tag;
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.onclick = () => removeTag(tagType, tag);
+                tagEl.appendChild(removeBtn);
                 container.insertBefore(tagEl, input);
             });
         }
@@ -679,7 +684,7 @@
         function safeParse(val) {
             if (Array.isArray(val)) return val;
             if (!val || val === '[]') return [];
-            try { return JSON.parse(val); } catch(e) {
+            try { const p = JSON.parse(val); return Array.isArray(p) ? p : [String(val)]; } catch(e) {
                 if (typeof val === 'string' && val.includes(',')) return val.split(',').map(s => s.trim()).filter(Boolean);
                 if (typeof val === 'string' && val.length > 0) return [val];
                 return [];
@@ -692,7 +697,10 @@
             const colors = { success: 'bg-emerald-500', error: 'bg-red-500', info: 'bg-radar-600' };
             const toast = document.createElement('div');
             toast.className = `toast flex items-center gap-3 px-4 py-3 ${colors[type]} text-white rounded-xl shadow-lg`;
-            toast.innerHTML = `<span class="text-sm font-medium">${message}</span>`;
+            const span = document.createElement('span');
+            span.className = 'text-sm font-medium';
+            span.textContent = message;
+            toast.appendChild(span);
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
@@ -720,7 +728,7 @@
             const customGeos = [];
             document.querySelectorAll('input[name="geographies"]').forEach(cb => { cb.checked = false; });
             geos.forEach(g => {
-                const cb = document.querySelector(`input[name="geographies"][value="${g}"]`);
+                const cb = document.querySelector(`input[name="geographies"][value="${CSS.escape(g)}"]`);
                 if (cb) { cb.checked = true; }
                 else { customGeos.push(g); }
             });
@@ -734,7 +742,7 @@
             const ops = safeParse(wl.operation_types);
             document.querySelectorAll('input[name="operation_types"]').forEach(cb => { cb.checked = false; });
             ops.forEach(op => {
-                const cb = document.querySelector(`input[name="operation_types"][value="${op}"]`);
+                const cb = document.querySelector(`input[name="operation_types"][value="${CSS.escape(op)}"]`);
                 if (cb) cb.checked = true;
             });
 
@@ -742,7 +750,7 @@
             const actors = safeParse(wl.actor_types);
             document.querySelectorAll('input[name="actor_types"]').forEach(cb => { cb.checked = false; });
             actors.forEach(a => {
-                const cb = document.querySelector(`input[name="actor_types"][value="${a}"]`);
+                const cb = document.querySelector(`input[name="actor_types"][value="${CSS.escape(a)}"]`);
                 if (cb) cb.checked = true;
             });
 
@@ -753,7 +761,7 @@
 
             // Confidence threshold
             if (wl.confidence_threshold) {
-                const radio = document.querySelector(`input[name="confidence_threshold"][value="${wl.confidence_threshold}"]`);
+                const radio = document.querySelector(`input[name="confidence_threshold"][value="${CSS.escape(wl.confidence_threshold)}"]`);
                 if (radio) radio.checked = true;
             }
 
@@ -832,7 +840,7 @@
                 freshness_days: parseInt(document.getElementById('freshness_days').value),
                 refresh_frequency: document.getElementById('refresh_frequency').value,
                 refresh_hour: document.getElementById('refresh_hour').value,
-                confidence_threshold: document.querySelector('input[name="confidence_threshold"]:checked').value,
+                confidence_threshold: document.querySelector('input[name="confidence_threshold"]:checked')?.value || 'medium',
                 target_companies: tagsData.targetCompanies,
                 exclude_companies: tagsData.excludeCompanies,
                 preferred_sources: tagsData.preferredSources,

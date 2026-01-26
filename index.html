@@ -487,6 +487,12 @@
         let API_KEY = localStorage.getItem('radar_api_key') || '';
         let API_BASE = localStorage.getItem('radar_api_base') || '';
 
+        // ===== Security Helpers =====
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        }
+
         // ===== Toast System =====
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
@@ -507,8 +513,9 @@
             toast.className = `toast flex items-center gap-3 px-4 py-3 ${colors[type]} text-white rounded-xl shadow-lg`;
             toast.innerHTML = `
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[type]}</svg>
-                <span class="text-sm font-medium">${message}</span>
+                <span class="text-sm font-medium"></span>
             `;
+            toast.querySelector('span').textContent = message;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
@@ -715,7 +722,7 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-start justify-between gap-2 mb-1">
-                                    <h4 class="font-semibold text-gray-900 truncate">${w.name}</h4>
+                                    <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(w.name)}</h4>
                                     ${w.last_run?.status === 'running' ?
                                         '<span class="flex-shrink-0 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full status-live"></span>En cours</span>' :
                                         w.last_run?.status === 'error' ?
@@ -726,7 +733,7 @@
                                     }
                                 </div>
                                 <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
-                                    <span>${w.sector}</span>
+                                    <span>${escapeHtml(w.sector)}</span>
                                     <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
                                     <span>${(w.geographies || []).slice(0, 2).join(', ')}${w.geographies?.length > 2 ? '...' : ''}</span>
                                     ${relativeTime ? `<span class="w-1 h-1 bg-gray-300 rounded-full"></span><span>${relativeTime}</span>` : ''}
@@ -770,7 +777,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                 </button>
-                                <button onclick="deleteWatchlist('${w.watchlist_id}', '${w.name.replace(/'/g, "\\'")}', this)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Supprimer">
+                                <button data-wlid="${escapeHtml(w.watchlist_id)}" data-wlname="${escapeHtml(w.name)}" onclick="deleteWatchlist(this.dataset.wlid, this.dataset.wlname, this)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Supprimer">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
@@ -822,7 +829,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm text-gray-900">
-                                <span class="font-medium">${a.name}</span>
+                                <span class="font-medium">${escapeHtml(a.name)}</span>
                                 ${a.status === 'success' ? `: ${a.deals} deals, ${a.actors} acteurs` : a.status === 'error' ? ' - Erreur' : ' - En cours...'}
                             </p>
                             <p class="text-xs text-gray-500 mt-0.5">${getRelativeTime(a.time)}</p>
@@ -855,7 +862,7 @@
             tbody.innerHTML = runs.map(r => `
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-5 py-4">
-                        <span class="font-medium text-gray-900">${r.watchlist_name}</span>
+                        <span class="font-medium text-gray-900">${escapeHtml(r.watchlist_name)}</span>
                     </td>
                     <td class="px-5 py-4 text-sm text-gray-600">
                         ${new Date(r.started_at).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
@@ -970,10 +977,11 @@
         function exportXlsx(watchlistId) {
             showToast('Preparation de l\'export...', 'info');
 
-            fetch(`${API_BASE}/export/xlsx?watchlist_id=${watchlistId}`, {
+            fetch(`${API_BASE}/export/xlsx?watchlist_id=${encodeURIComponent(watchlistId)}`, {
                 headers: { 'workspace-api-key': API_KEY }
             })
             .then(res => {
+                if (!res.ok) throw new Error(`Export failed: HTTP ${res.status}`);
                 const cd = res.headers.get('Content-Disposition') || '';
                 const match = cd.match(/filename="?(.+?)"?$/);
                 const filename = match ? match[1] : `radar_export_${new Date().toISOString().split('T')[0]}.csv`;
