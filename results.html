@@ -224,21 +224,19 @@
         let currentData = { deals: [], actors: [] };
 
         // Init
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             if (!API_KEY || !API_BASE) {
                 window.location.href = 'index.html';
                 return;
             }
-            loadWatchlists();
+            await loadWatchlists();
 
             const params = new URLSearchParams(window.location.search);
             const watchlistId = params.get('watchlist_id');
             if (watchlistId) {
-                setTimeout(() => {
-                    document.getElementById('watchlistSelect').value = watchlistId;
-                    loadResults();
-                }, 500);
+                document.getElementById('watchlistSelect').value = watchlistId;
             }
+            loadResults();
         });
 
         async function loadWatchlists() {
@@ -307,6 +305,18 @@
             }
         }
 
+        function normalizeConfidence(val) {
+            if (val === 'high' || val === 'élevée' || val === 'elevee' || val === 'haute') return 'high';
+            if (val === 'medium' || val === 'moyenne' || val === 'moyen') return 'medium';
+            if (val === 'low' || val === 'faible' || val === 'basse') return 'low';
+            if (typeof val === 'number') return val >= 0.7 ? 'high' : val >= 0.4 ? 'medium' : 'low';
+            return 'medium';
+        }
+
+        function isHighConfidence(val) {
+            return normalizeConfidence(val) === 'high';
+        }
+
         function updateSummaryStats() {
             const deals = currentData.deals || [];
             const actors = currentData.actors || [];
@@ -314,7 +324,7 @@
             document.getElementById('totalDeals').textContent = deals.length;
             document.getElementById('totalActors').textContent = actors.length;
 
-            const highConf = deals.filter(d => d.confiance === 'high').length;
+            const highConf = deals.filter(d => isHighConfidence(d.confiance)).length;
             document.getElementById('highConfidence').textContent = highConf;
 
             const now = new Date();
@@ -388,7 +398,7 @@
                 medium: { class: 'confidence-medium', text: 'Confiance moyenne', icon: '✓' },
                 low: { class: 'confidence-low', text: 'Confiance faible', icon: '?' }
             };
-            const conf = confidenceConfig[deal.confiance] || confidenceConfig.medium;
+            const conf = confidenceConfig[normalizeConfidence(deal.confiance)] || confidenceConfig.medium;
 
             const stageLabels = {
                 rumeur: { label: 'Rumeur', color: 'bg-purple-100 text-purple-700' },
@@ -565,7 +575,7 @@
                 <div class="space-y-6">
                     <!-- Status Bar -->
                     <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1.5 ${deal.confiance === 'high' ? 'bg-green-100 text-green-700' : deal.confiance === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'} text-sm font-medium rounded-full">
+                        <span class="px-3 py-1.5 ${normalizeConfidence(deal.confiance) === 'high' ? 'bg-green-100 text-green-700' : normalizeConfidence(deal.confiance) === 'medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'} text-sm font-medium rounded-full">
                             Confiance: ${deal.confiance || 'N/A'}
                         </span>
                         <span class="px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
@@ -647,9 +657,9 @@
 
                     <!-- Confidence Justification -->
                     ${deal.confiance_justification ? `
-                        <div class="p-4 ${deal.confiance === 'high' ? 'bg-green-50 border-green-200' : deal.confiance === 'medium' ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'} border rounded-xl">
-                            <span class="text-xs font-medium uppercase tracking-wide ${deal.confiance === 'high' ? 'text-green-700' : deal.confiance === 'medium' ? 'text-yellow-700' : 'text-red-700'}">Justification confiance</span>
-                            <p class="mt-1 ${deal.confiance === 'high' ? 'text-green-800' : deal.confiance === 'medium' ? 'text-yellow-800' : 'text-red-800'}">${deal.confiance_justification}</p>
+                        <div class="p-4 ${normalizeConfidence(deal.confiance) === 'high' ? 'bg-green-50 border-green-200' : normalizeConfidence(deal.confiance) === 'medium' ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'} border rounded-xl">
+                            <span class="text-xs font-medium uppercase tracking-wide ${normalizeConfidence(deal.confiance) === 'high' ? 'text-green-700' : normalizeConfidence(deal.confiance) === 'medium' ? 'text-yellow-700' : 'text-red-700'}">Justification confiance</span>
+                            <p class="mt-1 ${normalizeConfidence(deal.confiance) === 'high' ? 'text-green-800' : normalizeConfidence(deal.confiance) === 'medium' ? 'text-yellow-800' : 'text-red-800'}">${deal.confiance_justification}</p>
                         </div>
                     ` : ''}
 
@@ -801,12 +811,17 @@
 
             const url = `${API_BASE}/export/xlsx?watchlist_id=${watchlistId}`;
             fetch(url, { headers: { 'workspace-api-key': API_KEY } })
-                .then(res => res.blob())
-                .then(blob => {
+                .then(res => {
+                    const cd = res.headers.get('Content-Disposition') || '';
+                    const match = cd.match(/filename="?(.+?)"?$/);
+                    const filename = match ? match[1] : `radar_export_${new Date().toISOString().split('T')[0]}.csv`;
+                    return res.blob().then(blob => ({ blob, filename }));
+                })
+                .then(({ blob, filename }) => {
                     const blobUrl = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = blobUrl;
-                    link.download = `radar_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+                    link.download = filename;
                     link.click();
                     URL.revokeObjectURL(blobUrl);
                 })

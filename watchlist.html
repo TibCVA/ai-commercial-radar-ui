@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Commercial Radar - Nouvelle Watchlist</title>
+    <title>AI Commercial Radar - Watchlist</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -204,10 +204,10 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
-                <span class="text-gray-900">Nouvelle Watchlist</span>
+                <span id="breadcrumbLabel" class="text-gray-900">Nouvelle Watchlist</span>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900">Creer une nouvelle watchlist</h2>
-            <p class="text-gray-500 mt-1">Definissez precisement vos criteres de veille M&A</p>
+            <h2 id="pageTitle" class="text-2xl font-bold text-gray-900">Creer une nouvelle watchlist</h2>
+            <p id="pageSubtitle" class="text-gray-500 mt-1">Definissez precisement vos criteres de veille M&A</p>
         </div>
 
         <form id="watchlistForm" class="space-y-6">
@@ -622,6 +622,11 @@
         const API_KEY = localStorage.getItem('radar_api_key') || '';
         const API_BASE = localStorage.getItem('radar_api_base') || '';
 
+        // Edit mode detection
+        const urlParams = new URLSearchParams(window.location.search);
+        const editWatchlistId = urlParams.get('edit');
+        const isEditMode = !!editWatchlistId;
+
         // Tags management
         const tagsData = {
             sectorTags: [],
@@ -645,14 +650,14 @@
             if (!tagsData[tagType].includes(value)) {
                 tagsData[tagType].push(value);
                 renderTags(tagType);
-                document.getElementById(tagType).value = tagsData[tagType].join(',');
+                document.getElementById(tagType).value = JSON.stringify(tagsData[tagType]);
             }
         }
 
         function removeTag(tagType, value) {
             tagsData[tagType] = tagsData[tagType].filter(t => t !== value);
             renderTags(tagType);
-            document.getElementById(tagType).value = tagsData[tagType].join(',');
+            document.getElementById(tagType).value = JSON.stringify(tagsData[tagType]);
         }
 
         function renderTags(tagType) {
@@ -669,6 +674,17 @@
             });
         }
 
+        // Safe parse: handle JSON strings, arrays, and comma-separated strings
+        function safeParse(val) {
+            if (Array.isArray(val)) return val;
+            if (!val || val === '[]') return [];
+            try { return JSON.parse(val); } catch(e) {
+                if (typeof val === 'string' && val.includes(',')) return val.split(',').map(s => s.trim()).filter(Boolean);
+                if (typeof val === 'string' && val.length > 0) return [val];
+                return [];
+            }
+        }
+
         // Toast
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
@@ -680,10 +696,115 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
+        // Pre-fill form from watchlist data (edit mode)
+        function prefillForm(wl) {
+            document.getElementById('name').value = wl.name || '';
+            document.getElementById('sector').value = wl.sector || '';
+
+            // Tags
+            const tagFields = {
+                sectorTags: wl.sector_tags,
+                targetCompanies: wl.target_companies,
+                excludeCompanies: wl.exclude_companies,
+                preferredSources: wl.preferred_sources
+            };
+            for (const [key, val] of Object.entries(tagFields)) {
+                const parsed = safeParse(val);
+                parsed.forEach(v => addTag(key, v));
+            }
+
+            // Geographies (checkboxes)
+            const geos = safeParse(wl.geographies);
+            const knownGeos = ['FR','DE','UK','ES','IT','NL','BE','CH','PL','Nordics','EU','US'];
+            const customGeos = [];
+            document.querySelectorAll('input[name="geographies"]').forEach(cb => { cb.checked = false; });
+            geos.forEach(g => {
+                const cb = document.querySelector(`input[name="geographies"][value="${g}"]`);
+                if (cb) { cb.checked = true; }
+                else { customGeos.push(g); }
+            });
+            if (wl.custom_geographies) {
+                const extra = wl.custom_geographies.split(',').map(s => s.trim()).filter(Boolean);
+                customGeos.push(...extra);
+            }
+            document.getElementById('customGeographies').value = customGeos.join(', ');
+
+            // Operation types (checkboxes)
+            const ops = safeParse(wl.operation_types);
+            document.querySelectorAll('input[name="operation_types"]').forEach(cb => { cb.checked = false; });
+            ops.forEach(op => {
+                const cb = document.querySelector(`input[name="operation_types"][value="${op}"]`);
+                if (cb) cb.checked = true;
+            });
+
+            // Actor types
+            const actors = safeParse(wl.actor_types);
+            document.querySelectorAll('input[name="actor_types"]').forEach(cb => { cb.checked = false; });
+            actors.forEach(a => {
+                const cb = document.querySelector(`input[name="actor_types"][value="${a}"]`);
+                if (cb) cb.checked = true;
+            });
+
+            // Scan params
+            if (wl.freshness_days) document.getElementById('freshness_days').value = String(wl.freshness_days);
+            if (wl.refresh_frequency) document.getElementById('refresh_frequency').value = wl.refresh_frequency;
+            if (wl.refresh_hour) document.getElementById('refresh_hour').value = wl.refresh_hour;
+
+            // Confidence threshold
+            if (wl.confidence_threshold) {
+                const radio = document.querySelector(`input[name="confidence_threshold"][value="${wl.confidence_threshold}"]`);
+                if (radio) radio.checked = true;
+            }
+
+            // Custom instructions
+            if (wl.custom_instructions) document.getElementById('customInstructions').value = wl.custom_instructions;
+
+            // Deal size
+            if (wl.deal_size_min) document.getElementById('dealSizeMin').value = wl.deal_size_min;
+            if (wl.deal_size_max) document.getElementById('dealSizeMax').value = wl.deal_size_max;
+        }
+
+        // Load watchlist for editing
+        async function loadWatchlistForEdit(watchlistId) {
+            try {
+                const response = await fetch(`${API_BASE}/watchlist/list`, {
+                    headers: { 'workspace-api-key': API_KEY }
+                });
+                const data = await response.json();
+                const wl = (data.watchlists || []).find(w => w.watchlist_id === watchlistId);
+                if (!wl) {
+                    showToast('Watchlist introuvable: ' + watchlistId, 'error');
+                    return;
+                }
+                prefillForm(wl);
+                showToast('Watchlist chargee pour modification', 'info');
+            } catch (error) {
+                console.error('Load error:', error);
+                showToast('Erreur chargement watchlist', 'error');
+            }
+        }
+
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             if (!API_KEY || !API_BASE) {
                 window.location.href = 'index.html';
+                return;
+            }
+
+            if (isEditMode) {
+                // Update UI for edit mode
+                document.getElementById('breadcrumbLabel').textContent = 'Modifier Watchlist';
+                document.getElementById('pageTitle').textContent = 'Modifier la watchlist';
+                document.getElementById('pageSubtitle').textContent = 'Modifiez les criteres de veille M&A';
+                document.getElementById('submitBtn').innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Enregistrer les modifications
+                `;
+                document.title = 'AI Commercial Radar - Modifier Watchlist';
+                // Load existing data
+                loadWatchlistForEdit(editWatchlistId);
             }
         });
 
@@ -702,15 +823,15 @@
             const formData = {
                 name: document.getElementById('name').value,
                 sector: document.getElementById('sector').value,
-                sector_tags: tagsData.sectorTags.join(','),
+                sector_tags: tagsData.sectorTags,
                 geographies: allGeographies,
+                custom_geographies: document.getElementById('customGeographies').value,
                 operation_types: Array.from(document.querySelectorAll('input[name="operation_types"]:checked')).map(c => c.value),
                 actor_types: Array.from(document.querySelectorAll('input[name="actor_types"]:checked')).map(c => c.value),
                 freshness_days: parseInt(document.getElementById('freshness_days').value),
                 refresh_frequency: document.getElementById('refresh_frequency').value,
                 refresh_hour: document.getElementById('refresh_hour').value,
                 confidence_threshold: document.querySelector('input[name="confidence_threshold"]:checked').value,
-                // Advanced options
                 target_companies: tagsData.targetCompanies,
                 exclude_companies: tagsData.excludeCompanies,
                 preferred_sources: tagsData.preferredSources,
@@ -718,6 +839,11 @@
                 deal_size_min: document.getElementById('dealSizeMin').value ? parseInt(document.getElementById('dealSizeMin').value) : null,
                 deal_size_max: document.getElementById('dealSizeMax').value ? parseInt(document.getElementById('dealSizeMax').value) : null
             };
+
+            // Add watchlist_id for update
+            if (isEditMode) {
+                formData.watchlist_id = editWatchlistId;
+            }
 
             // Validation
             if (allGeographies.length === 0) {
@@ -731,6 +857,7 @@
 
             const btn = document.getElementById('submitBtn');
             const originalContent = btn.innerHTML;
+            const actionLabel = isEditMode ? 'Mise a jour' : 'Creation';
 
             try {
                 btn.disabled = true;
@@ -739,11 +866,14 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Creation en cours...
+                    ${actionLabel} en cours...
                 `;
 
-                const response = await fetch(`${API_BASE}/watchlist/create`, {
-                    method: 'POST',
+                const endpoint = isEditMode ? `${API_BASE}/watchlist/update` : `${API_BASE}/watchlist/create`;
+                const method = isEditMode ? 'PUT' : 'POST';
+
+                const response = await fetch(endpoint, {
+                    method: method,
                     headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
                 });
@@ -751,15 +881,16 @@
                 const result = await response.json();
 
                 if (result.success) {
+                    const successLabel = isEditMode ? 'Modifications enregistrees!' : 'Watchlist creee!';
                     btn.innerHTML = `
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                         </svg>
-                        Watchlist creee!
+                        ${successLabel}
                     `;
                     btn.classList.remove('bg-radar-600', 'hover:bg-radar-700', 'shadow-radar-600/25');
                     btn.classList.add('bg-emerald-500');
-                    showToast('Watchlist creee avec succes', 'success');
+                    showToast(isEditMode ? 'Watchlist mise a jour' : 'Watchlist creee avec succes', 'success');
                     setTimeout(() => window.location.href = 'index.html', 1500);
                 } else {
                     throw new Error(result.error || 'Erreur inconnue');
