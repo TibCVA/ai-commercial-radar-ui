@@ -569,9 +569,21 @@
         async function loadDashboard() {
             try {
                 const data = await apiCall('watchlist/list');
-                renderWatchlists(data.watchlists || []);
-                updateStats(data.watchlists || []);
-                renderActivityFeed(data.watchlists || []);
+                const watchlists = data.watchlists || [];
+
+                // Fetch cumulative results for each watchlist
+                const resultsPromises = watchlists.map(w =>
+                    apiCall(`watchlist/results?watchlist_id=${w.watchlist_id}`)
+                        .then(r => ({ id: w.watchlist_id, deals: r.deals?.length || 0, actors: r.actors?.length || 0 }))
+                        .catch(() => ({ id: w.watchlist_id, deals: 0, actors: 0 }))
+                );
+                const resultsData = await Promise.all(resultsPromises);
+                const resultsMap = {};
+                for (const r of resultsData) resultsMap[r.id] = r;
+
+                renderWatchlists(watchlists, resultsMap);
+                updateStats(watchlists, resultsMap);
+                renderActivityFeed(watchlists);
                 updateConnectionStatus(true);
             } catch (error) {
                 console.error('Error:', error);
@@ -628,7 +640,7 @@
             requestAnimationFrame(update);
         }
 
-        function updateStats(watchlists) {
+        function updateStats(watchlists, resultsMap) {
             const statWatchlists = document.getElementById('stat-watchlists');
             const statDeals = document.getElementById('stat-deals');
             const statActors = document.getElementById('stat-actors');
@@ -636,14 +648,17 @@
 
             animateCounter(statWatchlists, watchlists.length);
 
-            const totalDeals = watchlists.reduce((sum, w) => sum + (w.last_run?.deals_new || 0), 0);
-            const totalActors = watchlists.reduce((sum, w) => sum + (w.last_run?.actors_new || 0), 0);
+            // Use cumulative totals from results API
+            const totalDeals = watchlists.reduce((sum, w) => sum + (resultsMap[w.watchlist_id]?.deals || 0), 0);
+            const totalActors = watchlists.reduce((sum, w) => sum + (resultsMap[w.watchlist_id]?.actors || 0), 0);
             animateCounter(statDeals, totalDeals);
             animateCounter(statActors, totalActors);
 
-            if (totalDeals > 0) {
+            // Show new deals from last run as trend
+            const newDeals = watchlists.reduce((sum, w) => sum + (w.last_run?.deals_new || 0), 0);
+            if (newDeals > 0) {
                 const dealsTrend = document.getElementById('deals-trend');
-                dealsTrend.textContent = `+${totalDeals} new`;
+                dealsTrend.textContent = `+${newDeals} new`;
                 dealsTrend.classList.remove('hidden');
             }
 
@@ -657,7 +672,7 @@
             }
         }
 
-        function renderWatchlists(watchlists) {
+        function renderWatchlists(watchlists, resultsMap) {
             const container = document.getElementById('watchlists-container');
 
             if (watchlists.length === 0) {
@@ -715,22 +730,22 @@
                                     <span>${(w.geographies || []).slice(0, 2).join(', ')}${w.geographies?.length > 2 ? '...' : ''}</span>
                                     ${relativeTime ? `<span class="w-1 h-1 bg-gray-300 rounded-full"></span><span>${relativeTime}</span>` : ''}
                                 </div>
-                                ${w.last_run ? `
+                                ${(resultsMap[w.watchlist_id]?.deals || resultsMap[w.watchlist_id]?.actors) ? `
                                     <div class="flex items-center gap-4 text-sm">
                                         <span class="flex items-center gap-1.5 text-emerald-600 font-medium">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                                             </svg>
-                                            ${w.last_run.deals_new || 0} deals
+                                            ${resultsMap[w.watchlist_id]?.deals || 0} deals
                                         </span>
                                         <span class="flex items-center gap-1.5 text-amber-600 font-medium">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             </svg>
-                                            ${w.last_run.actors_new || 0} acteurs
+                                            ${resultsMap[w.watchlist_id]?.actors || 0} acteurs
                                         </span>
                                     </div>
-                                ` : ''}
+                                ` : w.last_run ? '<div class="text-sm text-gray-400">Aucun resultat</div>' : ''}
                             </div>
                             <div class="flex items-center gap-2 flex-shrink-0">
                                 <button onclick="runNow('${w.watchlist_id}', this)" class="p-2 text-radar-600 hover:bg-radar-50 rounded-lg transition-colors" title="Lancer un scan">
@@ -952,12 +967,17 @@
             fetch(`${API_BASE}/export/xlsx?watchlist_id=${watchlistId}`, {
                 headers: { 'workspace-api-key': API_KEY }
             })
-            .then(res => res.blob())
-            .then(blob => {
+            .then(res => {
+                const cd = res.headers.get('Content-Disposition') || '';
+                const match = cd.match(/filename="?(.+?)"?$/);
+                const filename = match ? match[1] : `radar_export_${new Date().toISOString().split('T')[0]}.csv`;
+                return res.blob().then(blob => ({ blob, filename }));
+            })
+            .then(({ blob, filename }) => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `radar_export_${new Date().toISOString().split('T')[0]}.xlsx`;
+                a.download = filename;
                 a.click();
                 URL.revokeObjectURL(url);
                 showToast('Export telecharge', 'success');
