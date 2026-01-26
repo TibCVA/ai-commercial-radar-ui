@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Commercial Radar - Guide utilisateur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+                    },
+                    colors: {
+                        'radar': {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #3730a3 100%);
+        }
+        .mesh-gradient {
+            background-color: #f8fafc;
+            background-image:
+                radial-gradient(at 40% 20%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 50%, rgba(236, 72, 153, 0.05) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(99, 102, 241, 0.1) 0px, transparent 50%);
+        }
+
+        .step-card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .step-card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .toc-link {
+            transition: all 0.2s;
+        }
+        .toc-link:hover {
+            color: #4f46e5;
+            padding-left: 4px;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .field-row:last-child { border-bottom: none; }
+
+        @media (max-width: 640px) {
+            .field-row {
+                grid-template-columns: 1fr;
+                gap: 4px;
+            }
+        }
+    </style>
+</head>
+<body class="mesh-gradient min-h-screen">
+    <!-- Header -->
+    <header class="header-gradient text-white sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/10">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight">AI Commercial Radar</span>
+                </div>
+
+                <nav class="hidden md:flex items-center gap-1">
+                    <a href="guide.html" class="px-4 py-2 rounded-lg bg-white/10 text-sm font-medium">Guide</a>
+                    <a href="index.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Dashboard</a>
+                    <a href="watchlist.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Watchlists</a>
+                    <a href="results.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Resultats</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        <!-- Hero -->
+        <div class="text-center mb-14">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-radar-100 text-radar-700 rounded-full text-sm font-medium mb-5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                Guide utilisateur
+            </div>
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+                AI Commercial Radar
+            </h1>
+            <p class="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+                Plateforme d'intelligence M&A propulsee par l'IA pour detecter des opportunites d'investissement <strong class="text-gray-700">avant qu'elles ne deviennent publiques</strong>.
+            </p>
+        </div>
+
+        <!-- What it does -->
+        <section class="mb-14">
+            <div class="step-card rounded-2xl p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                    <div class="feature-icon bg-radar-100 text-radar-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    Qu'est-ce que c'est ?
+                </h2>
+                <p class="text-gray-600 leading-relaxed mb-6">
+                    AI Commercial Radar est un outil de veille automatisee qui scanne en continu des centaines de sources (presse specialisee, flux RSS, medias financiers, communiques) pour identifier des <strong>signaux precoces</strong> dans le monde du M&A et de l'investissement en infrastructure.
+                </p>
+                <div class="grid sm:grid-cols-3 gap-5">
+                    <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-5">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center mb-3">
+                            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-1">Deals M&A</h3>
+                        <p class="text-sm text-gray-600">Rumeurs d'acquisitions, cessions, partenariats, JV, carve-outs, spin-offs — detectes avant l'annonce officielle.</p>
+                    </div>
+                    <div class="rounded-xl bg-blue-50 border border-blue-100 p-5">
+                        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center mb-3">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-1">Acteurs cles</h3>
+                        <p class="text-sm text-gray-600">Developpeurs, fonds infra, corporates, operateurs — avec leurs signaux recents, pipeline et dirigeants.</p>
+                    </div>
+                    <div class="rounded-xl bg-purple-50 border border-purple-100 p-5">
+                        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center mb-3">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-1">Signaux strategiques</h3>
+                        <p class="text-sm text-gray-600">Changements de management, permis, levees de fonds, mandats de conseil, expansions — classes par confiance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Table of Contents -->
+        <section class="mb-14">
+            <div class="step-card rounded-2xl p-6">
+                <h2 class="text-lg font-bold text-gray-900 mb-4">Sommaire</h2>
+                <div class="grid sm:grid-cols-2 gap-x-8 gap-y-2">
+                    <a href="#creer" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                        Creer une watchlist
+                    </a>
+                    <a href="#scanner" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                        Lancer un scan
+                    </a>
+                    <a href="#resultats" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                        Consulter les resultats
+                    </a>
+                    <a href="#modifier" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
+                        Modifier une watchlist
+                    </a>
+                    <a href="#exporter" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">5</span>
+                        Exporter les donnees
+                    </a>
+                    <a href="#dashboard" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">6</span>
+                        Comprendre le dashboard
+                    </a>
+                    <a href="#confiance" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">7</span>
+                        Niveaux de confiance
+                    </a>
+                    <a href="#faq" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">8</span>
+                        FAQ
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. Creer une watchlist -->
+        <section id="creer" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-radar-600 to-radar-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">1</span>
+                        Creer une watchlist
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <p class="text-gray-600 mb-6">
+                        Une <strong>watchlist</strong> represente un perimetre de veille. Chaque watchlist definit precisement ce que vous cherchez : secteur, geographies, types d'operations, etc. Vous pouvez creer autant de watchlists que necessaire.
+                    </p>
+
+                    <div class="flex items-center gap-3 mb-6 p-4 bg-radar-50 rounded-xl border border-radar-100">
+                        <svg class="w-5 h-5 text-radar-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="text-sm text-radar-700"><strong>Acces :</strong> Dashboard &rarr; <em>Nouvelle watchlist</em>&ensp;ou&ensp;onglet <em>Watchlists</em></span>
+                    </div>
+
+                    <h3 class="font-semibold text-gray-900 mb-4">Champs du formulaire</h3>
+
+                    <div class="rounded-xl border border-gray-100 overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="text-left px-5 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider w-48">Champ</th>
+                                    <th class="text-left px-5 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Nom</td>
+                                    <td class="px-5 py-3 text-gray-600">Nom libre pour identifier la watchlist (ex: "Infra Europe Datacenter")</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Secteur</td>
+                                    <td class="px-5 py-3 text-gray-600">Secteur principal de recherche (Datacenters, Energie renouvelable, Transport, Telecom, etc.)</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Tags secteur</td>
+                                    <td class="px-5 py-3 text-gray-600">Mots-cles complementaires pour affiner la recherche (ex: "cloud", "fiber optic", "solar"). Tapez puis Entree pour ajouter.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Geographies</td>
+                                    <td class="px-5 py-3 text-gray-600">Pays/regions cibles. Cochez les zones souhaitees et/ou ajoutez des geographies personnalisees.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Types d'operation</td>
+                                    <td class="px-5 py-3 text-gray-600">M&A rumeur, asset deal, JV/partenariat, greenfield, refinancement, carve-out, spin-off, take-private.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Types d'acteurs</td>
+                                    <td class="px-5 py-3 text-gray-600">Developpeurs, fonds infra, corporates, operateurs, advisors, gouvernements.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Fraicheur (jours)</td>
+                                    <td class="px-5 py-3 text-gray-600">Fenetre temporelle de recherche. Par defaut 30 jours. Augmentez pour un historique plus large.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Frequence de scan</td>
+                                    <td class="px-5 py-3 text-gray-600">Manuel, quotidien ou hebdomadaire. En mode manuel, lancez les scans a la demande depuis le dashboard.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Seuil de confiance</td>
+                                    <td class="px-5 py-3 text-gray-600">Filtre les resultats par niveau de fiabilite minimum (voir section <a href="#confiance" class="text-radar-600 hover:underline">Niveaux de confiance</a>).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 class="font-semibold text-gray-900 mt-8 mb-4">Options avancees</h3>
+                    <div class="rounded-xl border border-gray-100 overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="text-left px-5 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider w-48">Champ</th>
+                                    <th class="text-left px-5 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Entreprises cibles</td>
+                                    <td class="px-5 py-3 text-gray-600">Noms de societes a surveiller en priorite. L'IA les recherchera en premier.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Entreprises exclues</td>
+                                    <td class="px-5 py-3 text-gray-600">Noms de societes a ignorer (ex: deals deja connus ou sans interet).</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Sources preferees</td>
+                                    <td class="px-5 py-3 text-gray-600">Medias ou sites a prioriser (ex: "Handelsblatt", "Infrastructure Investor").</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Taille de deal (min/max)</td>
+                                    <td class="px-5 py-3 text-gray-600">Fourchette en euros pour filtrer par valeur estimee du deal.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Instructions libres</td>
+                                    <td class="px-5 py-3 text-gray-600">Consignes en texte libre transmises directement au LLM (ex: "Focus sur les actifs brownfield de plus de 100MW").</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Lancer un scan -->
+        <section id="scanner" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-emerald-600 to-emerald-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">2</span>
+                        Lancer un scan
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <p class="text-gray-600 mb-6">
+                        Un <strong>scan</strong> lance une recherche IA approfondie sur toutes les sources pertinentes pour votre watchlist. Le processus peut prendre plusieurs minutes car l'IA effectue une recherche exhaustive.
+                    </p>
+
+                    <div class="space-y-4 mb-8">
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-radar-100 text-radar-600 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">a</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Scan individuel</p>
+                                <p class="text-sm text-gray-600 mt-1">Sur le dashboard, cliquez le bouton <strong>lecture</strong> (triangle) sur la carte de la watchlist concernee.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-radar-100 text-radar-600 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">b</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Scan global</p>
+                                <p class="text-sm text-gray-600 mt-1">Cliquez <strong>"Scanner toutes les watchlists"</strong> en haut du dashboard pour lancer un scan simultane sur toutes vos watchlists actives.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                        <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <div class="text-sm text-amber-800">
+                            <strong>Patience :</strong> Un scan approfondi (deep research) peut prendre jusqu'a 15-30 minutes. L'IA recherche dans les medias locaux de chaque geographie ciblee, en langue locale. Ne fermez pas la page pendant le scan.
+                        </div>
+                    </div>
+
+                    <h3 class="font-semibold text-gray-900 mt-8 mb-3">Ce qui se passe en coulisses</h3>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-2 h-2 rounded-full bg-radar-400"></div>
+                            Collecte des sources RSS et medias specialises
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-2 h-2 rounded-full bg-radar-400"></div>
+                            Deep research IA (o4-mini) sur le web avec tous vos criteres
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-2 h-2 rounded-full bg-radar-400"></div>
+                            Extraction structuree des signaux (gpt-5.2, raisonnement avance)
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-2 h-2 rounded-full bg-radar-400"></div>
+                            Deduplication croisee avec les resultats des scans precedents
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-2 h-2 rounded-full bg-radar-400"></div>
+                            Enregistrement des nouveaux deals et acteurs identifies
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Resultats -->
+        <section id="resultats" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">3</span>
+                        Consulter les resultats
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <div class="flex items-center gap-3 mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                        <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span class="text-sm text-blue-700"><strong>Acces :</strong> onglet <em>Resultats</em>&ensp;ou&ensp;cliquez <strong>"Voir &rarr;"</strong> dans le tableau d'historique du dashboard</span>
+                    </div>
+
+                    <p class="text-gray-600 mb-6">La page Resultats affiche deux onglets :</p>
+
+                    <div class="grid sm:grid-cols-2 gap-5 mb-6">
+                        <div class="rounded-xl border border-emerald-100 bg-emerald-50/50 p-5">
+                            <h3 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                Onglet Deals
+                            </h3>
+                            <p class="text-sm text-gray-600">Chaque deal affiche : titre, type d'operation, stade, parties impliquees (acquereurs, cibles, vendeurs), geographie, valeur estimee, sources, et niveau de confiance avec justification.</p>
+                        </div>
+                        <div class="rounded-xl border border-blue-100 bg-blue-50/50 p-5">
+                            <h3 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                Onglet Acteurs
+                            </h3>
+                            <p class="text-sm text-gray-600">Chaque acteur affiche : nom, type (developpeur, fonds, corporate...), geographie, signaux recents, pipeline de projets, contacts publics et sources.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="font-semibold text-gray-900 mb-3">Filtres disponibles</h3>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="flex gap-3 items-start text-sm">
+                            <div class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Par watchlist</p>
+                                <p class="text-gray-500">Selectionnez une watchlist specifique ou voyez tous les resultats.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start text-sm">
+                            <div class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Par confiance</p>
+                                <p class="text-gray-500">Elevee, moyenne ou faible.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start text-sm">
+                            <div class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Par type d'operation</p>
+                                <p class="text-gray-500">M&A rumeur, asset deal, financement, signal de croissance, etc.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 items-start text-sm">
+                            <div class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Par fraicheur</p>
+                                <p class="text-gray-500">Dernieres 24h, 7 jours ou 30 jours.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-sm text-gray-500 mt-6">Cliquez sur un deal ou acteur pour voir sa <strong>fiche detaillee</strong> avec toutes les sources, la justification de confiance, et les informations completes.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Modifier une watchlist -->
+        <section id="modifier" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">4</span>
+                        Modifier une watchlist
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <p class="text-gray-600 mb-6">
+                        Vous pouvez modifier les criteres de recherche d'une watchlist existante a tout moment. Les modifications s'appliqueront au prochain scan.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold flex-shrink-0 mt-0.5">1</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Cliquez le bouton crayon</p>
+                                <p class="text-sm text-gray-600 mt-1">Sur le dashboard, chaque carte watchlist possede un bouton <strong>crayon</strong> (icone d'edition) a droite des boutons d'action.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold flex-shrink-0 mt-0.5">2</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Modifiez les champs</p>
+                                <p class="text-sm text-gray-600 mt-1">Le formulaire s'ouvre pre-rempli avec les valeurs actuelles. Modifiez uniquement ce que vous souhaitez changer.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold flex-shrink-0 mt-0.5">3</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Enregistrez</p>
+                                <p class="text-sm text-gray-600 mt-1">Cliquez <strong>"Enregistrer les modifications"</strong>. Les nouveaux criteres seront utilises lors du prochain scan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Exporter -->
+        <section id="exporter" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-teal-600 to-teal-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">5</span>
+                        Exporter les donnees
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <p class="text-gray-600 mb-6">
+                        Exportez les deals et acteurs identifies au format <strong>CSV</strong> (compatible Excel) pour une analyse offline ou un partage en equipe.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <svg class="w-6 h-6 text-teal-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <div>
+                                <p class="font-medium text-gray-900">Depuis la page Resultats</p>
+                                <p class="text-sm text-gray-600 mt-1">Selectionnez une watchlist puis cliquez le bouton vert <strong>"Export XLSX"</strong>. Le fichier CSV se telecharge automatiquement avec toutes les donnees de la watchlist (deals + acteurs).</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <svg class="w-6 h-6 text-teal-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <div>
+                                <p class="font-medium text-gray-900">Depuis le dashboard</p>
+                                <p class="text-sm text-gray-600 mt-1">Le bouton export (fleche vers le bas) sur chaque carte watchlist declenche le meme telechargement CSV.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-teal-50 rounded-xl border border-teal-100 text-sm text-teal-800">
+                        <strong>Format :</strong> CSV avec separateur point-virgule (<code>;</code>), encodage UTF-8 avec BOM pour une compatibilite optimale avec Excel. Contient deux sections : deals et acteurs.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Dashboard -->
+        <section id="dashboard" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-gray-700 to-gray-600 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">6</span>
+                        Comprendre le dashboard
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <p class="text-gray-600 mb-6">Le dashboard est votre vue d'ensemble. Il affiche en temps reel l'etat de toutes vos watchlists.</p>
+
+                    <div class="space-y-5">
+                        <div class="flex gap-4 items-start">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Compteurs en haut</p>
+                                <p class="text-sm text-gray-600 mt-1">Nombre total de watchlists actives, deals detectes (cumul), acteurs identifies (cumul), et date du dernier scan.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Cartes watchlists</p>
+                                <p class="text-sm text-gray-600 mt-1">Chaque carte montre le nom, le secteur, les geographies, la date du dernier scan, et le nombre cumule de deals et acteurs. Les boutons d'action permettent de scanner, modifier, voir les resultats, exporter ou supprimer.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Activite recente & historique</p>
+                                <p class="text-sm text-gray-600 mt-1">Le panneau lateral montre l'activite recente, et le tableau en bas recapitule l'historique des scans avec leur statut et le nombre total de resultats.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Confiance -->
+        <section id="confiance" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-rose-600 to-pink-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">7</span>
+                        Niveaux de confiance
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <p class="text-gray-600 mb-6">
+                        Chaque deal et acteur est accompagne d'un <strong>niveau de confiance</strong> attribue par l'IA, base sur la qualite et la quantite des sources trouvees.
+                    </p>
+
+                    <div class="space-y-4">
+                        <div class="flex gap-4 items-start p-5 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                <span class="text-emerald-700 font-bold text-lg">H</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-emerald-800 text-lg">Elevee (High)</p>
+                                <p class="text-sm text-emerald-700 mt-1">Plusieurs sources credibles convergentes ou annonce directe d'une partie prenante. Signal fort, fiable.</p>
+                                <p class="text-xs text-emerald-600 mt-2 italic">Ex: article Handelsblatt + communique de l'advisor + confirmation par Reuters</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-5 rounded-xl bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200">
+                            <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+                                <span class="text-amber-700 font-bold text-lg">M</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-amber-800 text-lg">Moyenne (Medium)</p>
+                                <p class="text-sm text-amber-700 mt-1">Signaux indirects multiples ou une source credible unique. Merite une investigation supplementaire.</p>
+                                <p class="text-xs text-amber-600 mt-2 italic">Ex: article dans un media specialise mentionnant des discussions exploratoires</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-5 rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border border-red-200">
+                            <div class="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+                                <span class="text-red-700 font-bold text-lg">L</span>
+                            </div>
+                            <div>
+                                <p class="font-bold text-red-800 text-lg">Faible (Low)</p>
+                                <p class="text-sm text-red-700 mt-1">Signal faible, source unique non verifiee ou speculation de marche. A suivre mais non actionnable en l'etat.</p>
+                                <p class="text-xs text-red-600 mt-2 italic">Ex: post sur un forum specialise ou mention indirecte dans un article general</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-gray-50 rounded-xl text-sm text-gray-600">
+                        <strong>Seuil de confiance (watchlist) :</strong> Lorsque vous configurez un seuil de confiance dans votre watchlist (ex: "medium"), l'IA ne remontera que les signaux dont le niveau de confiance est egal ou superieur a ce seuil.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. FAQ -->
+        <section id="faq" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-violet-600 to-purple-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">8</span>
+                        Questions frequentes
+                    </h2>
+                </div>
+                <div class="p-8 space-y-6">
+                    <div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Combien de watchlists puis-je creer ?</h3>
+                        <p class="text-gray-600 text-sm">Il n'y a pas de limite. Vous pouvez creer autant de watchlists que necessaire pour couvrir vos differents perimetres de veille.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Que se passe-t-il quand je relance un scan ?</h3>
+                        <p class="text-gray-600 text-sm">Le systeme effectue une <strong>deduplication croisee</strong> automatique. Les deals et acteurs deja identifies lors de scans precedents ne sont pas dupliques. Si un signal existant est de nouveau detecte, sa date de <em>derniere observation</em> est mise a jour.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Puis-je supprimer une watchlist ?</h3>
+                        <p class="text-gray-600 text-sm">Oui. Cliquez l'icone corbeille sur la carte watchlist dans le dashboard. La suppression est un <em>soft delete</em> : la watchlist est desactivee mais les resultats historiques sont conserves.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Les scans automatiques fonctionnent-ils ?</h3>
+                        <p class="text-gray-600 text-sm">Si vous configurez une frequence "quotidien" ou "hebdomadaire", un scheduler n8n declenchera automatiquement les scans a l'heure configuree. En mode "manuel", lancez les scans vous-meme depuis le dashboard.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Quelles sources sont utilisees ?</h3>
+                        <p class="text-gray-600 text-sm">L'IA utilise une combinaison de flux RSS specialises (Infrastructure Investor, DataCenter Dynamics, etc.) et de recherche web approfondie via le modele o4-mini-deep-research d'OpenAI, qui explore le web en temps reel dans les langues locales de chaque geographie ciblee.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Comment configurer l'outil pour la premiere fois ?</h3>
+                        <p class="text-gray-600 text-sm">Au premier chargement du dashboard, un formulaire de configuration apparait. Renseignez l'<strong>URL de base</strong> de l'API (fournie par l'administrateur) et la <strong>cle API</strong>. Ces informations sont stockees localement dans votre navigateur.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <div class="text-center py-8">
+            <a href="index.html" class="inline-flex items-center gap-2 px-8 py-3.5 bg-radar-600 text-white rounded-xl font-semibold hover:bg-radar-700 transition-all shadow-lg shadow-radar-600/25 text-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                Acceder au dashboard
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+        <p class="text-sm text-gray-400">AI Commercial Radar v1.0 — M&A Intelligence pour fonds d'infrastructure</p>
+    </footer>
+</body>
+</html>
