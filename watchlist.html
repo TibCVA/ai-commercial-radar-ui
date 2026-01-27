@@ -229,6 +229,28 @@
                             placeholder="Ex: Rumeurs M&A Datacenters Europe">
                         <p class="text-xs text-gray-400 mt-1.5">Un nom unique et descriptif pour identifier cette veille</p>
                     </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Responsable <span class="text-red-500">*</span>
+                        </label>
+                        <select id="ownerSelect" required
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all"
+                            onchange="toggleCustomOwner()">
+                            <option value="">-- Choisir --</option>
+                            <option value="Thibaut">Thibaut</option>
+                            <option value="Robin">Robin</option>
+                            <option value="Joel">Joel</option>
+                            <option value="Matthieu">Matthieu</option>
+                            <option value="Cornelius">Cornelius</option>
+                            <option value="Abraham">Abraham</option>
+                            <option value="__other__">Autre...</option>
+                        </select>
+                        <input type="text" id="ownerCustom"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 mt-2 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all hidden"
+                            placeholder="Nom du responsable">
+                        <p class="text-xs text-gray-400 mt-1.5">Personne responsable de cette watchlist</p>
+                    </div>
                 </div>
             </section>
 
@@ -628,6 +650,29 @@
         const editWatchlistId = urlParams.get('edit');
         const isEditMode = !!editWatchlistId;
 
+        // Owner toggle
+        function toggleCustomOwner() {
+            const sel = document.getElementById('ownerSelect');
+            const custom = document.getElementById('ownerCustom');
+            if (sel.value === '__other__') {
+                custom.classList.remove('hidden');
+                custom.required = true;
+                custom.focus();
+            } else {
+                custom.classList.add('hidden');
+                custom.required = false;
+                custom.value = '';
+            }
+        }
+
+        function getOwnerValue() {
+            const sel = document.getElementById('ownerSelect');
+            if (sel.value === '__other__') {
+                return document.getElementById('ownerCustom').value.trim();
+            }
+            return sel.value;
+        }
+
         // Tags management
         const tagsData = {
             sectorTags: [],
@@ -709,6 +754,19 @@
         function prefillForm(wl) {
             document.getElementById('name').value = wl.name || '';
             document.getElementById('sector').value = wl.sector || '';
+
+            // Owner
+            if (wl.owner) {
+                const sel = document.getElementById('ownerSelect');
+                const knownOwners = ['Thibaut', 'Robin', 'Joel', 'Matthieu', 'Cornelius', 'Abraham'];
+                if (knownOwners.includes(wl.owner)) {
+                    sel.value = wl.owner;
+                } else {
+                    sel.value = '__other__';
+                    document.getElementById('ownerCustom').value = wl.owner;
+                    toggleCustomOwner();
+                }
+            }
 
             // Tags
             const tagFields = {
@@ -831,6 +889,7 @@
 
             const formData = {
                 name: document.getElementById('name').value,
+                owner: getOwnerValue(),
                 sector: document.getElementById('sector').value,
                 sector_tags: tagsData.sectorTags,
                 geographies: allGeographies,

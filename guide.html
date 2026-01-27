@@ -250,6 +250,10 @@
                                     <td class="px-5 py-3 text-gray-600">Nom libre pour identifier la watchlist (ex: "Infra Europe Datacenter")</td>
                                 </tr>
                                 <tr>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Responsable</td>
+                                    <td class="px-5 py-3 text-gray-600">Personne responsable de la watchlist. Choisissez dans la liste (Thibaut, Robin, Joel, Matthieu, Cornelius, Abraham) ou saisissez un nom personnalise via "Autre". Le responsable est visible sur tous les ecrans et permet de filtrer les watchlists.</td>
+                                </tr>
+                                <tr>
                                     <td class="px-5 py-3 font-medium text-gray-900">Secteur</td>
                                     <td class="px-5 py-3 text-gray-600">Secteur principal de recherche (Datacenters, Energie renouvelable, Transport, Telecom, etc.)</td>
                                 </tr>
@@ -376,7 +380,15 @@
                         </div>
                         <div class="flex items-center gap-3 text-sm text-gray-600">
                             <div class="w-2 h-2 rounded-full bg-radar-400"></div>
-                            Deduplication croisee avec les resultats des scans precedents
+                            Validation post-LLM (types, stades, devises, URLs) et normalisation geographique ISO
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-2 h-2 rounded-full bg-radar-400"></div>
+                            Calcul du score de confiance automatique (0-100) sur 5 criteres
+                        </div>
+                        <div class="flex items-center gap-3 text-sm text-gray-600">
+                            <div class="w-2 h-2 rounded-full bg-radar-400"></div>
+                            Deduplication SHA-256 croisee avec enrichissement des resultats existants
                         </div>
                         <div class="flex items-center gap-3 text-sm text-gray-600">
                             <div class="w-2 h-2 rounded-full bg-radar-400"></div>
@@ -573,7 +585,16 @@
                             </div>
                             <div>
                                 <p class="font-medium text-gray-900">Cartes watchlists</p>
-                                <p class="text-sm text-gray-600 mt-1">Chaque carte montre le nom, le secteur, les geographies, la date du dernier scan, et le nombre cumule de deals et acteurs. Les boutons d'action permettent de scanner, modifier, voir les resultats, exporter ou supprimer.</p>
+                                <p class="text-sm text-gray-600 mt-1">Chaque carte montre le <strong>responsable</strong> (badge violet), le secteur, les geographies, la date du dernier scan, et le nombre cumule de deals et acteurs. Les boutons d'action permettent de scanner, modifier, voir les resultats, exporter ou supprimer.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Filtre par responsable</p>
+                                <p class="text-sm text-gray-600 mt-1">Utilisez le menu deroulant en haut de la liste pour ne voir que les watchlists d'un responsable specifique, ou selectionnez "Tous" pour tout afficher.</p>
                             </div>
                         </div>
                         <div class="flex gap-4 items-start">
@@ -637,6 +658,36 @@
                         </div>
                     </div>
 
+                    <h3 class="font-semibold text-gray-900 mt-8 mb-4">Score de confiance (0-100)</h3>
+                    <p class="text-gray-600 mb-4">
+                        En plus du niveau qualitatif (elevee/moyenne/faible), chaque deal recoit un <strong>score numerique de 0 a 100</strong>, calcule automatiquement sur 5 criteres :
+                    </p>
+                    <div class="grid sm:grid-cols-2 gap-3 mb-4">
+                        <div class="flex items-start gap-2 text-sm p-3 bg-gray-50 rounded-lg">
+                            <span class="font-mono text-radar-600 font-bold w-8 text-right flex-shrink-0">30</span>
+                            <span class="text-gray-700">Nombre de sources valides</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm p-3 bg-gray-50 rounded-lg">
+                            <span class="font-mono text-radar-600 font-bold w-8 text-right flex-shrink-0">25</span>
+                            <span class="text-gray-700">Credibilite des sources (Reuters, EC, Bloomberg...)</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm p-3 bg-gray-50 rounded-lg">
+                            <span class="font-mono text-radar-600 font-bold w-8 text-right flex-shrink-0">20</span>
+                            <span class="text-gray-700">Recence (sources &lt; 7 jours)</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm p-3 bg-gray-50 rounded-lg">
+                            <span class="font-mono text-radar-600 font-bold w-8 text-right flex-shrink-0">15</span>
+                            <span class="text-gray-700">Parties identifiees (acquereurs + cibles nommes)</span>
+                        </div>
+                        <div class="flex items-start gap-2 text-sm p-3 bg-gray-50 rounded-lg col-span-2 sm:col-span-1">
+                            <span class="font-mono text-radar-600 font-bold w-8 text-right flex-shrink-0">10</span>
+                            <span class="text-gray-700">Corroboration (deja vu dans un scan precedent)</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Le score est affiche sous forme de <strong>barre de progression coloree</strong> sur chaque deal : <span class="text-green-600 font-medium">vert (&ge; 60)</span>, <span class="text-yellow-600 font-medium">orange (&ge; 30)</span>, <span class="text-red-600 font-medium">rouge (&lt; 30)</span>.
+                    </p>
+
                     <div class="mt-6 p-4 bg-gray-50 rounded-xl text-sm text-gray-600">
                         <strong>Seuil de confiance (watchlist) :</strong> Lorsque vous configurez un seuil de confiance dans votre watchlist (ex: "medium"), l'IA ne remontera que les signaux dont le niveau de confiance est egal ou superieur a ce seuil.
                     </div>
@@ -678,6 +729,18 @@
                         <h3 class="font-semibold text-gray-900 mb-2">Comment configurer l'outil pour la premiere fois ?</h3>
                         <p class="text-gray-600 text-sm">Au premier chargement du dashboard, un formulaire de configuration apparait. Renseignez l'<strong>URL de base</strong> de l'API (fournie par l'administrateur) et la <strong>cle API</strong>. Ces informations sont stockees localement dans votre navigateur.</p>
                     </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Comment fonctionne la deduplication ?</h3>
+                        <p class="text-gray-600 text-sm">Chaque deal et acteur est identifie par un hash SHA-256 unique, calcule a partir du titre, des parties, du type d'operation et de la geographie. Les noms de societes sont normalises (suppression des suffixes juridiques comme GmbH, Inc, SA). Si un deal est detecte a nouveau lors d'un scan ulterieur, il est <strong>enrichi</strong> (sources fusionnees, stade avance, champs vides remplis) au lieu d'etre duplique.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Que signifie "MAJ il y a X" sur un deal ou acteur ?</h3>
+                        <p class="text-gray-600 text-sm">Cet indicateur apparait lorsqu'un deal ou acteur a ete <strong>revu lors d'un scan ulterieur</strong>. La date de premiere detection reste affichee, et "MAJ" indique quand la derniere observation a eu lieu. Cela signifie que le signal est toujours actif et confirme par des sources recentes.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Puis-je filtrer les watchlists par responsable ?</h3>
+                        <p class="text-gray-600 text-sm">Oui. Sur le dashboard, un menu deroulant au-dessus de la liste des watchlists permet de filtrer par responsable. Selectionnez un nom pour ne voir que ses watchlists, ou "Tous" pour tout afficher. Le responsable (badge violet) est egalement visible sur chaque carte watchlist et dans le tableau d'historique des scans.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -693,7 +756,7 @@
 
     <!-- Footer -->
     <footer class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-        <p class="text-sm text-gray-400">AI Commercial Radar v1.0 — M&A Intelligence pour fonds d'infrastructure</p>
+        <p class="text-sm text-gray-400">AI Commercial Radar v1.1 — M&A Intelligence pour fonds d'infrastructure — Derniere MAJ : 27 janv. 2026</p>
     </footer>
 </body>
 </html>

@@ -363,19 +363,30 @@
             <div class="lg:col-span-2">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-semibold text-gray-900">Mes Watchlists</h3>
-                    <div class="flex items-center gap-3 text-xs text-gray-500">
-                        <span class="flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                            &lt;24h
-                        </span>
-                        <span class="flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                            &lt;7j
-                        </span>
-                        <span class="flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-gray-400"></span>
-                            &gt;7j
-                        </span>
+                    <div class="flex items-center gap-4">
+                        <select id="ownerFilter" onchange="filterByOwner()" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">Tous</option>
+                            <option value="Thibaut">Thibaut</option>
+                            <option value="Robin">Robin</option>
+                            <option value="Joel">Joel</option>
+                            <option value="Matthieu">Matthieu</option>
+                            <option value="Cornelius">Cornelius</option>
+                            <option value="Abraham">Abraham</option>
+                        </select>
+                        <div class="flex items-center gap-3 text-xs text-gray-500">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                &lt;24h
+                            </span>
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                &lt;7j
+                            </span>
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                                &gt;7j
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div id="watchlists-container" class="space-y-3">
@@ -486,6 +497,8 @@
         // ===== Configuration =====
         let API_KEY = localStorage.getItem('radar_api_key') || '';
         let API_BASE = localStorage.getItem('radar_api_base') || '';
+        let _allWatchlists = [];
+        let _allResultsMap = {};
 
         // ===== Security Helpers =====
         function escapeHtml(str) {
@@ -545,6 +558,36 @@
             }
         }
 
+        // ===== Owner Filter =====
+        function populateOwnerFilter(watchlists) {
+            const select = document.getElementById('ownerFilter');
+            const knownOwners = ['Thibaut', 'Robin', 'Joel', 'Matthieu', 'Cornelius', 'Abraham'];
+            const extraOwners = new Set();
+            watchlists.forEach(w => {
+                if (w.owner && !knownOwners.includes(w.owner)) extraOwners.add(w.owner);
+            });
+            // Remove previously added extra options
+            select.querySelectorAll('option[data-extra]').forEach(o => o.remove());
+            extraOwners.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                opt.setAttribute('data-extra', '1');
+                select.appendChild(opt);
+            });
+        }
+
+        function applyOwnerFilter(watchlists) {
+            const owner = document.getElementById('ownerFilter').value;
+            if (!owner) return watchlists;
+            return watchlists.filter(w => w.owner === owner);
+        }
+
+        function filterByOwner() {
+            const filtered = applyOwnerFilter(_allWatchlists);
+            renderWatchlists(filtered, _allResultsMap);
+        }
+
         // ===== API =====
         async function apiCall(endpoint, method = 'GET', body = null) {
             const options = {
@@ -589,7 +632,14 @@
                 const resultsMap = {};
                 for (const r of resultsData) resultsMap[r.id] = r;
 
-                renderWatchlists(watchlists, resultsMap);
+                _allWatchlists = watchlists;
+                _allResultsMap = resultsMap;
+
+                // Populate owner filter with any extra owners found
+                populateOwnerFilter(watchlists);
+
+                const filtered = applyOwnerFilter(watchlists);
+                renderWatchlists(filtered, resultsMap);
                 updateStats(watchlists, resultsMap);
                 renderActivityFeed(watchlists, resultsMap);
                 updateConnectionStatus(true);
@@ -733,6 +783,7 @@
                                     }
                                 </div>
                                 <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
+                                    ${w.owner ? `<span class="px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full">${escapeHtml(w.owner)}</span><span class="w-1 h-1 bg-gray-300 rounded-full"></span>` : ''}
                                     <span>${escapeHtml(w.sector)}</span>
                                     <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
                                     <span>${(w.geographies || []).slice(0, 2).join(', ')}${w.geographies?.length > 2 ? '...' : ''}</span>
@@ -842,7 +893,7 @@
         function renderRunsTable(watchlists, resultsMap) {
             const runs = watchlists
                 .filter(w => w.last_run)
-                .map(w => ({ ...w.last_run, watchlist_name: w.name, watchlist_id: w.watchlist_id }))
+                .map(w => ({ ...w.last_run, watchlist_name: w.name, watchlist_id: w.watchlist_id, owner: w.owner }))
                 .sort((a, b) => new Date(b.started_at) - new Date(a.started_at))
                 .slice(0, 10);
 
@@ -863,6 +914,7 @@
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="px-5 py-4">
                         <span class="font-medium text-gray-900">${escapeHtml(r.watchlist_name)}</span>
+                        ${r.owner ? `<span class="ml-2 px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full">${escapeHtml(r.owner)}</span>` : ''}
                     </td>
                     <td class="px-5 py-4 text-sm text-gray-600">
                         ${new Date(r.started_at).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
