@@ -88,7 +88,7 @@
                     <a href="guide.html" class="px-5 py-2.5 hover:bg-white/10 rounded-xl transition-colors">Guide</a>
                     <a href="index.html" class="px-5 py-2.5 hover:bg-white/10 rounded-xl transition-colors">Dashboard</a>
                     <a href="watchlist.html" class="px-5 py-2.5 hover:bg-white/10 rounded-xl transition-colors">+ Watchlist</a>
-                    <a href="results.html" class="px-5 py-2.5 bg-white/20 rounded-xl font-medium backdrop-blur-sm border border-white/10">Resultats</a>
+                    <a href="results.html" class="px-5 py-2.5 bg-white/20 rounded-xl font-medium backdrop-blur-sm border border-white/10">Results</a>
                 </nav>
             </div>
         </div>
@@ -200,7 +200,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                Export XLSX
+                Export CSV
             </button>
         </div>
 
@@ -1107,7 +1107,7 @@
                         </div>
                         <div>
                             <span class="px-3 py-1 bg-radar-100 text-radar-700 text-sm font-medium rounded-full">${escapeHtml(actor.type_acteur) || 'N/A'}</span>
-                            <p class="text-gray-600 mt-1">${escapeHtml(actor.geographie) || 'Geographie non specifiee'}</p>
+                            <p class="text-gray-600 mt-1">${escapeHtml(actor.geographie) || 'Geography not specified'}</p>
                         </div>
                     </div>
 
@@ -1266,11 +1266,12 @@
                 });
         }
 
-        // Close modal on escape or click outside
+        // Close modals on escape or click outside
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 closeModal();
                 closeOutreachModal();
+                closeSummaryModal();
             }
         });
         document.getElementById('dealModal').addEventListener('click', (e) => {
@@ -1677,13 +1678,6 @@
                 </li>
             `).join('');
         }
-
-        // Add escape key handler for summary modal
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeSummaryModal();
-            }
-        });
 
         // Close summary modal on click outside
         document.getElementById('summaryModal')?.addEventListener('click', (e) => {
