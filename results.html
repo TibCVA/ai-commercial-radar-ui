@@ -182,6 +182,13 @@
                 Actors (<span id="actorsCount">0</span>)
             </button>
             <div class="flex-1"></div>
+            <!-- AI Summary Button -->
+            <button id="btnAISummary" onclick="openSummaryModal()" class="flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl font-medium hover:bg-amber-600 transition-colors shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+                AI Summary
+            </button>
             <!-- Generate Outreach Button (visible when actors selected) -->
             <button id="btnGenerateOutreach" onclick="openOutreachModal()" class="hidden flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white rounded-xl font-medium hover:bg-violet-700 transition-colors shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,6 +315,143 @@
                             New generation
                         </button>
                         <button onclick="closeOutreachModal()" class="flex-1 px-4 py-2.5 bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors font-medium">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Summary Modal -->
+    <div id="summaryModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="glass-card rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="sticky top-0 bg-white/95 backdrop-blur-sm px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-900">AI Summary</h2>
+                <button onclick="closeSummaryModal()" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <!-- Pre-generation view -->
+                <div id="summaryPreGen">
+                    <p class="text-gray-600 mb-4">Generate an AI-powered summary of the current watchlist results.</p>
+
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Time scope</label>
+                        <div class="flex gap-3">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="summaryScope" value="last_30_days" checked class="text-amber-500 focus:ring-amber-500">
+                                <span class="text-sm text-gray-700">Last 30 days</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="summaryScope" value="all_results" class="text-amber-500 focus:ring-amber-500">
+                                <span class="text-sm text-gray-700">All results</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl mb-5">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div class="text-sm text-amber-800">
+                                <span class="font-medium">AI Analysis:</span> The summary includes key takeaways, top deals, notable actors, and emerging themes.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="closeSummaryModal()" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors font-medium">
+                            Cancel
+                        </button>
+                        <button id="btnGenerateSummary" onclick="generateSummary()" class="flex-1 px-4 py-2.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors font-medium flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                            Generate Summary
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Generation progress view -->
+                <div id="summaryProgress" class="hidden">
+                    <div class="text-center py-8">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-amber-500 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="text-gray-600 mb-2">Generating AI summary...</p>
+                        <p class="text-sm text-gray-400">Analyzing deals and actors with web search</p>
+                    </div>
+                </div>
+
+                <!-- Results view -->
+                <div id="summaryResults" class="hidden">
+                    <!-- Key Takeaways -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            Key Takeaways
+                        </h3>
+                        <ul id="summaryTakeaways" class="space-y-2"></ul>
+                    </div>
+
+                    <!-- Top Deals -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                            Top Deals
+                        </h3>
+                        <div id="summaryDeals" class="space-y-3"></div>
+                    </div>
+
+                    <!-- Notable Actors -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            Notable Actors
+                        </h3>
+                        <div id="summaryActors" class="space-y-3"></div>
+                    </div>
+
+                    <!-- Themes -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                            </svg>
+                            Emerging Themes
+                        </h3>
+                        <div id="summaryThemes" class="flex flex-wrap gap-2"></div>
+                    </div>
+
+                    <!-- What to Monitor -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            What to Monitor
+                        </h3>
+                        <ul id="summaryMonitor" class="space-y-2"></ul>
+                    </div>
+
+                    <div class="mt-5 flex gap-3">
+                        <button onclick="resetSummaryModal()" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors font-medium">
+                            New summary
+                        </button>
+                        <button onclick="closeSummaryModal()" class="flex-1 px-4 py-2.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors font-medium">
                             Close
                         </button>
                     </div>
@@ -744,7 +888,7 @@
                                 </div>
                             ` : ''}
 
-                            <button class="text-radar-600 text-sm font-medium hover:text-radar-700 text-left flex items-center gap-1 mt-auto">
+                            <button onclick="showActorDetail('${escapeHtml(actor.actor_id)}')" class="text-radar-600 text-sm font-medium hover:text-radar-700 text-left flex items-center gap-1 mt-auto">
                                 View profile
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -1350,6 +1494,201 @@
                 alert('Copy error');
             });
         }
+
+        // ==========================================
+        // AI Summary Modal
+        // ==========================================
+
+        function openSummaryModal() {
+            const watchlistId = document.getElementById('watchlistSelect').value;
+            if (!watchlistId) {
+                alert('Select a watchlist first');
+                return;
+            }
+
+            // Reset modal state
+            document.getElementById('summaryPreGen').classList.remove('hidden');
+            document.getElementById('summaryProgress').classList.add('hidden');
+            document.getElementById('summaryResults').classList.add('hidden');
+
+            document.getElementById('summaryModal').classList.remove('hidden');
+        }
+
+        function closeSummaryModal() {
+            document.getElementById('summaryModal').classList.add('hidden');
+        }
+
+        function resetSummaryModal() {
+            document.getElementById('summaryPreGen').classList.remove('hidden');
+            document.getElementById('summaryProgress').classList.add('hidden');
+            document.getElementById('summaryResults').classList.add('hidden');
+        }
+
+        async function generateSummary() {
+            const watchlistId = document.getElementById('watchlistSelect').value;
+            const scope = document.querySelector('input[name="summaryScope"]:checked')?.value || 'last_30_days';
+
+            // Show progress
+            document.getElementById('summaryPreGen').classList.add('hidden');
+            document.getElementById('summaryProgress').classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/watchlist/${watchlistId}/report`, {
+                    method: 'POST',
+                    headers: {
+                        'workspace-api-key': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ scope, format: 'json' })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || `HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+                displaySummaryResults(result);
+            } catch (error) {
+                console.error('Summary generation error:', error);
+                // Fallback: generate local summary from current data
+                generateLocalSummary();
+            }
+        }
+
+        function generateLocalSummary() {
+            // Generate a simple summary from the loaded data
+            const deals = currentData.deals || [];
+            const actors = currentData.actors || [];
+
+            const summary = {
+                key_takeaways: [],
+                deal_cards: [],
+                actor_cards: [],
+                themes: [],
+                monitor_next: []
+            };
+
+            // Key takeaways
+            if (deals.length > 0) {
+                const highConfDeals = deals.filter(d => normalizeConfidence(d.confiance) === 'high').length;
+                summary.key_takeaways.push(`${deals.length} deals detected, ${highConfDeals} with high confidence`);
+            }
+            if (actors.length > 0) {
+                summary.key_takeaways.push(`${actors.length} actors identified in the market`);
+            }
+            const now = new Date();
+            const recentDeals = deals.filter(d => (now - new Date(d.first_seen_at)) < 7 * 86400000).length;
+            if (recentDeals > 0) {
+                summary.key_takeaways.push(`${recentDeals} new deals in the last 7 days`);
+            }
+
+            // Top deals (by confidence)
+            const sortedDeals = [...deals].sort((a, b) => {
+                const scoreA = typeof a.confiance_score === 'number' ? a.confiance_score : 50;
+                const scoreB = typeof b.confiance_score === 'number' ? b.confiance_score : 50;
+                return scoreB - scoreA;
+            });
+            summary.deal_cards = sortedDeals.slice(0, 5).map(d => ({
+                headline: d.titre,
+                parties: [...ensureArray(d.parties_acquereurs), ...ensureArray(d.parties_cibles)].join(' → '),
+                geography: d.geographie_pays,
+                stage: d.stade,
+                confidence_score: d.confiance_score
+            }));
+
+            // Top actors
+            summary.actor_cards = actors.slice(0, 5).map(a => ({
+                actor_name: a.nom,
+                actor_type: a.type_acteur,
+                signal_summary: ensureArray(a.signaux_recents).slice(0, 2).join('; ')
+            }));
+
+            // Themes from sectors
+            const sectors = new Set();
+            deals.forEach(d => ensureArray(d.secteur_tags).forEach(t => sectors.add(t)));
+            summary.themes = [...sectors].slice(0, 5);
+
+            // What to monitor
+            const pendingDeals = deals.filter(d => d.stade === 'discussions' || d.stade === 'rumeur');
+            if (pendingDeals.length > 0) {
+                summary.monitor_next.push(`${pendingDeals.length} deals in early stages (rumors/discussions)`);
+            }
+            summary.monitor_next.push('New actors entering the market');
+            summary.monitor_next.push('Deal stage progressions');
+
+            displaySummaryResults(summary);
+        }
+
+        function displaySummaryResults(result) {
+            document.getElementById('summaryProgress').classList.add('hidden');
+            document.getElementById('summaryResults').classList.remove('hidden');
+
+            // Key Takeaways
+            const takeaways = result.key_takeaways || [];
+            document.getElementById('summaryTakeaways').innerHTML = takeaways.map(t => `
+                <li class="flex items-start gap-2 p-3 bg-amber-50 rounded-lg">
+                    <svg class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <span class="text-gray-800">${escapeHtml(t)}</span>
+                </li>
+            `).join('');
+
+            // Top Deals
+            const deals = result.deal_cards || [];
+            document.getElementById('summaryDeals').innerHTML = deals.length ? deals.map(d => `
+                <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div class="font-medium text-gray-900">${escapeHtml(d.headline || 'Untitled')}</div>
+                    <div class="text-sm text-gray-600 mt-1">${escapeHtml(d.parties || '')}</div>
+                    <div class="flex gap-2 mt-2">
+                        ${d.geography ? `<span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">${escapeHtml(d.geography)}</span>` : ''}
+                        ${d.stage ? `<span class="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full">${escapeHtml(d.stage)}</span>` : ''}
+                        ${d.confidence_score ? `<span class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">${d.confidence_score}/100</span>` : ''}
+                    </div>
+                </div>
+            `).join('') : '<p class="text-gray-500 text-sm">No deals to display</p>';
+
+            // Notable Actors
+            const actors = result.actor_cards || [];
+            document.getElementById('summaryActors').innerHTML = actors.length ? actors.map(a => `
+                <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div class="font-medium text-gray-900">${escapeHtml(a.actor_name || 'Unknown')}</div>
+                    <div class="text-sm text-gray-600">${escapeHtml(a.actor_type || '')}</div>
+                    ${a.signal_summary ? `<div class="text-sm text-gray-500 mt-1 italic">${escapeHtml(a.signal_summary)}</div>` : ''}
+                </div>
+            `).join('') : '<p class="text-gray-500 text-sm">No actors to display</p>';
+
+            // Themes
+            const themes = result.themes || [];
+            document.getElementById('summaryThemes').innerHTML = themes.length ? themes.map(t => `
+                <span class="px-3 py-1.5 bg-purple-100 text-purple-700 text-sm font-medium rounded-full">${escapeHtml(t)}</span>
+            `).join('') : '<p class="text-gray-500 text-sm">No themes identified</p>';
+
+            // What to Monitor
+            const monitor = result.monitor_next || [];
+            document.getElementById('summaryMonitor').innerHTML = monitor.map(m => `
+                <li class="flex items-start gap-2 p-3 bg-orange-50 rounded-lg">
+                    <svg class="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    <span class="text-gray-800">${escapeHtml(m)}</span>
+                </li>
+            `).join('');
+        }
+
+        // Add escape key handler for summary modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSummaryModal();
+            }
+        });
+
+        // Close summary modal on click outside
+        document.getElementById('summaryModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'summaryModal') closeSummaryModal();
+        });
     </script>
 </body>
 </html>
