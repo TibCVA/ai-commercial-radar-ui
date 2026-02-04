@@ -1377,13 +1377,13 @@
             document.getElementById('outreachProgress').classList.remove('hidden');
 
             try {
-                const response = await fetch(`${API_BASE}/watchlist/${watchlistId}/outreach-emails`, {
+                const response = await fetch(`${API_BASE}/watchlist/outreach`, {
                     method: 'POST',
                     headers: {
                         'workspace-api-key': API_KEY,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ actor_refs: actorRefs })
+                    body: JSON.stringify({ watchlist_id: watchlistId, actor_refs: actorRefs })
                 });
 
                 if (!response.ok) {
@@ -1534,13 +1534,13 @@
             document.getElementById('summaryProgress').classList.remove('hidden');
 
             try {
-                const response = await fetch(`${API_BASE}/watchlist/${watchlistId}/report`, {
+                const response = await fetch(`${API_BASE}/watchlist/report`, {
                     method: 'POST',
                     headers: {
                         'workspace-api-key': API_KEY,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ scope, format: 'json' })
+                    body: JSON.stringify({ watchlist_id: watchlistId, scope, format: 'json' })
                 });
 
                 if (!response.ok) {
