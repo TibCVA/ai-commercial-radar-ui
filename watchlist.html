@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -190,7 +190,7 @@
                     <a href="guide.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Guide</a>
                     <a href="index.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Dashboard</a>
                     <a href="watchlist.html" class="px-4 py-2 rounded-lg bg-white/10 text-sm font-medium">Watchlists</a>
-                    <a href="results.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Resultats</a>
+                    <a href="results.html" class="px-4 py-2 rounded-lg hover:bg-white/5 text-sm font-medium text-indigo-200 hover:text-white transition-colors">Results</a>
                 </nav>
             </div>
         </div>
@@ -205,10 +205,10 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
-                <span id="breadcrumbLabel" class="text-gray-900">Nouvelle Watchlist</span>
+                <span id="breadcrumbLabel" class="text-gray-900">New Watchlist</span>
             </div>
-            <h2 id="pageTitle" class="text-2xl font-bold text-gray-900">Creer une nouvelle watchlist</h2>
-            <p id="pageSubtitle" class="text-gray-500 mt-1">Definissez precisement vos criteres de veille M&A</p>
+            <h2 id="pageTitle" class="text-2xl font-bold text-gray-900">Create a new watchlist</h2>
+            <p id="pageSubtitle" class="text-gray-500 mt-1">Define your M&A monitoring criteria</p>
         </div>
 
         <form id="watchlistForm" class="space-y-6">
@@ -222,49 +222,49 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Nom de la watchlist <span class="text-red-500">*</span>
+                            Watchlist name <span class="text-red-500">*</span>
                         </label>
                         <input type="text" id="name" required
                             class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all"
-                            placeholder="Ex: Rumeurs M&A Datacenters Europe">
-                        <p class="text-xs text-gray-400 mt-1.5">Un nom unique et descriptif pour identifier cette veille</p>
+                            placeholder="Ex: M&A Rumors Europe Datacenters">
+                        <p class="text-xs text-gray-400 mt-1.5">A unique, descriptive name to identify this watchlist</p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Responsable <span class="text-red-500">*</span>
+                            Owner <span class="text-red-500">*</span>
                         </label>
                         <select id="ownerSelect" required
                             class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all"
                             onchange="toggleCustomOwner()">
-                            <option value="">-- Choisir --</option>
+                            <option value="">-- Select --</option>
                             <option value="Thibaut">Thibaut</option>
                             <option value="Robin">Robin</option>
                             <option value="Joel">Joel</option>
                             <option value="Matthieu">Matthieu</option>
                             <option value="Cornelius">Cornelius</option>
                             <option value="Abraham">Abraham</option>
-                            <option value="__other__">Autre...</option>
+                            <option value="__other__">Other...</option>
                         </select>
                         <input type="text" id="ownerCustom"
                             class="w-full border border-gray-200 rounded-xl px-4 py-3 mt-2 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all hidden"
-                            placeholder="Nom du responsable">
-                        <p class="text-xs text-gray-400 mt-1.5">Personne responsable de cette watchlist</p>
+                            placeholder="Owner name">
+                        <p class="text-xs text-gray-400 mt-1.5">Person responsible for this watchlist</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Section 2: Secteur & Perimetre -->
+            <!-- Section 2: Sector & Scope -->
             <section class="card rounded-2xl p-6 section-indicator">
                 <div class="flex items-center gap-2 mb-5">
                     <span class="flex items-center justify-center w-7 h-7 rounded-full bg-radar-100 text-radar-700 text-sm font-bold">2</span>
-                    <h3 class="text-lg font-semibold text-gray-900">Secteur & Perimetre</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">Sector & Scope</h3>
                 </div>
 
                 <div class="space-y-5">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Secteur principal <span class="text-red-500">*</span>
+                            Main sector <span class="text-red-500">*</span>
                         </label>
                         <input type="text" id="sector" required list="sectorSuggestions"
                             class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all"
@@ -283,15 +283,15 @@
                             <option value="Healthcare Infrastructure">
                             <option value="Education Infrastructure">
                         </datalist>
-                        <p class="text-xs text-gray-400 mt-1.5">Saisissez librement ou selectionnez une suggestion</p>
+                        <p class="text-xs text-gray-400 mt-1.5">Type freely or select a suggestion</p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Mots-cles du secteur
+                            Sector keywords
                         </label>
                         <div id="sectorTagsInput" class="tag-input" onclick="this.querySelector('input').focus()">
-                            <input type="text" placeholder="Ajoutez des mots-cles (Entree pour valider)..."
+                            <input type="text" placeholder="Add keywords (Enter to confirm)..."
                                 onkeydown="handleTagInput(event, 'sectorTags')">
                         </div>
                         <input type="hidden" id="sectorTags" name="sector_tags">
@@ -307,7 +307,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Geographies cibles</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Target geographies</label>
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="FR" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
@@ -315,7 +315,7 @@
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="DE" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
-                                <span class="text-sm text-gray-700">Allemagne</span>
+                                <span class="text-sm text-gray-700">Germany</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="UK" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
@@ -323,27 +323,27 @@
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="ES" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
-                                <span class="text-sm text-gray-700">Espagne</span>
+                                <span class="text-sm text-gray-700">Spain</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="IT" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
-                                <span class="text-sm text-gray-700">Italie</span>
+                                <span class="text-sm text-gray-700">Italy</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="NL" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
-                                <span class="text-sm text-gray-700">Pays-Bas</span>
+                                <span class="text-sm text-gray-700">Netherlands</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="BE" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
-                                <span class="text-sm text-gray-700">Belgique</span>
+                                <span class="text-sm text-gray-700">Belgium</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="CH" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
-                                <span class="text-sm text-gray-700">Suisse</span>
+                                <span class="text-sm text-gray-700">Switzerland</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="PL" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
-                                <span class="text-sm text-gray-700">Pologne</span>
+                                <span class="text-sm text-gray-700">Poland</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="Nordics" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
@@ -351,7 +351,7 @@
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer bg-radar-50 border-radar-200">
                                 <input type="checkbox" name="geographies" value="EU" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
-                                <span class="text-sm text-radar-700 font-medium">Toute l'UE</span>
+                                <span class="text-sm text-radar-700 font-medium">All EU</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="geographies" value="US" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
@@ -359,90 +359,90 @@
                             </label>
                         </div>
                         <div class="mt-3">
-                            <label class="block text-xs text-gray-500 mb-1">Geographies supplementaires (separez par virgules)</label>
+                            <label class="block text-xs text-gray-500 mb-1">Additional geographies (comma separated)</label>
                             <input type="text" id="customGeographies"
                                 class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-radar-500 focus:border-transparent"
-                                placeholder="Ex: Canada, Australie, Singapour...">
+                                placeholder="Ex: Canada, Australia, Singapore...">
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Section 3: Criteres de recherche -->
+            <!-- Section 3: Search Criteria -->
             <section class="card rounded-2xl p-6 section-indicator">
                 <div class="flex items-center gap-2 mb-5">
                     <span class="flex items-center justify-center w-7 h-7 rounded-full bg-radar-100 text-radar-700 text-sm font-bold">3</span>
-                    <h3 class="text-lg font-semibold text-gray-900">Criteres de recherche</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">Search Criteria</h3>
                 </div>
 
                 <div class="space-y-5">
                     <!-- Types d'operations -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Types d'operations a surveiller</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Operation types to monitor</label>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="operation_types" value="ma_rumor" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
                                 <div>
                                     <span class="text-sm font-medium text-gray-800 flex items-center gap-2">
-                                        M&A - Rumeurs
-                                        <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] rounded">PRIORITE</span>
+                                        M&A - Rumors
+                                        <span class="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-[10px] rounded">PRIORITY</span>
                                     </span>
-                                    <span class="block text-xs text-gray-500">Signaux precoces, advisors mandates</span>
+                                    <span class="block text-xs text-gray-500">Early signals, advisor mandates</span>
                                 </div>
                             </label>
                             <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="operation_types" value="ma_discussions" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
                                 <div>
                                     <span class="text-sm font-medium text-gray-800">M&A - Discussions</span>
-                                    <span class="block text-xs text-gray-500">Negociations confirmees</span>
+                                    <span class="block text-xs text-gray-500">Confirmed negotiations</span>
                                 </div>
                             </label>
                             <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="operation_types" value="financing" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
                                 <div>
                                     <span class="text-sm font-medium text-gray-800 flex items-center gap-2">
-                                        Financement
-                                        <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded">CLE</span>
+                                        Financing
+                                        <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded">KEY</span>
                                     </span>
-                                    <span class="block text-xs text-gray-500">Levees, project finance</span>
+                                    <span class="block text-xs text-gray-500">Fundraising, project finance</span>
                                 </div>
                             </label>
                             <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="operation_types" value="growth_signal" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
                                 <div>
                                     <span class="text-sm font-medium text-gray-800 flex items-center gap-2">
-                                        Signal croissance
+                                        Growth signal
                                         <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded">EARLY</span>
                                     </span>
-                                    <span class="block text-xs text-gray-500">Expansion, recrutement C-level</span>
+                                    <span class="block text-xs text-gray-500">Expansion, C-level recruitment</span>
                                 </div>
                             </label>
                             <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="operation_types" value="asset_deal" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
                                 <div>
                                     <span class="text-sm font-medium text-gray-800">Asset Deal</span>
-                                    <span class="block text-xs text-gray-500">Cession d'actifs specifiques</span>
+                                    <span class="block text-xs text-gray-500">Specific asset disposals</span>
                                 </div>
                             </label>
                             <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="operation_types" value="ma_announced" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5">
                                 <div>
                                     <span class="text-sm font-medium text-gray-800">M&A Annonce</span>
-                                    <span class="block text-xs text-gray-500">Deals deja publics</span>
+                                    <span class="block text-xs text-gray-500">Already announced deals</span>
                                 </div>
                             </label>
                             <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="operation_types" value="jv" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5">
                                 <div>
                                     <span class="text-sm font-medium text-gray-800">JV / Partenariat</span>
-                                    <span class="block text-xs text-gray-500">Joint-ventures strategiques</span>
+                                    <span class="block text-xs text-gray-500">Strategic joint-ventures</span>
                                 </div>
                             </label>
                             <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="operation_types" value="minority" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5">
                                 <div>
-                                    <span class="text-sm font-medium text-gray-800">Minoritaire</span>
-                                    <span class="block text-xs text-gray-500">Prises de participation &lt; 50%</span>
+                                    <span class="text-sm font-medium text-gray-800">Minority stake</span>
+                                    <span class="block text-xs text-gray-500">Stakes &lt; 50%</span>
                                 </div>
                             </label>
                         </div>
@@ -450,19 +450,19 @@
 
                     <!-- Types d'acteurs -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Types d'acteurs a identifier</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Actor types to identify</label>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="actor_types" value="developer" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
-                                <span class="text-sm text-gray-700">Developpeurs</span>
+                                <span class="text-sm text-gray-700">Developers</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="actor_types" value="fonds_infra" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
-                                <span class="text-sm text-gray-700">Fonds infra</span>
+                                <span class="text-sm text-gray-700">Infra funds</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="actor_types" value="fonds_pe" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
-                                <span class="text-sm text-gray-700">Fonds PE</span>
+                                <span class="text-sm text-gray-700">PE funds</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="actor_types" value="corporate" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
@@ -470,7 +470,7 @@
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="actor_types" value="operator" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
-                                <span class="text-sm text-gray-700">Operateurs</span>
+                                <span class="text-sm text-gray-700">Operators</span>
                             </label>
                             <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
                                 <input type="checkbox" name="actor_types" value="advisors" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
@@ -482,22 +482,22 @@
                     <!-- Criteres specifiques -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Entreprises ou acteurs specifiques a surveiller
+                            Specific companies or actors to monitor
                         </label>
                         <div id="targetCompaniesInput" class="tag-input" onclick="this.querySelector('input').focus()">
-                            <input type="text" placeholder="Ex: Equinix, Digital Realty... (Entree pour valider)"
+                            <input type="text" placeholder="Ex: Equinix, Digital Realty... (Enter to confirm)"
                                 onkeydown="handleTagInput(event, 'targetCompanies')">
                         </div>
                         <input type="hidden" id="targetCompanies" name="target_companies">
-                        <p class="text-xs text-gray-400 mt-1.5">Noms d'entreprises specifiques a inclure dans la recherche</p>
+                        <p class="text-xs text-gray-400 mt-1.5">Specific company names to include in search</p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Entreprises ou acteurs a exclure
+                            Companies or actors to exclude
                         </label>
                         <div id="excludeCompaniesInput" class="tag-input" onclick="this.querySelector('input').focus()">
-                            <input type="text" placeholder="Entreprises a ignorer... (Entree pour valider)"
+                            <input type="text" placeholder="Companies to ignore... (Enter to confirm)"
                                 onkeydown="handleTagInput(event, 'excludeCompanies')">
                         </div>
                         <input type="hidden" id="excludeCompanies" name="exclude_companies">
@@ -509,31 +509,31 @@
             <section class="card rounded-2xl p-6 section-indicator">
                 <div class="flex items-center gap-2 mb-5">
                     <span class="flex items-center justify-center w-7 h-7 rounded-full bg-radar-100 text-radar-700 text-sm font-bold">4</span>
-                    <h3 class="text-lg font-semibold text-gray-900">Instructions de recherche personnalisees</h3>
-                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">Avance</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Custom search instructions</h3>
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">Advanced</span>
                 </div>
 
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Instructions specifiques pour l'IA
+                            Specific instructions for the AI
                         </label>
                         <textarea id="customInstructions" rows="4"
                             class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all resize-none"
-                            placeholder="Decrivez precisement ce que vous recherchez. Par exemple:
-- Chercher specifiquement les rumeurs de consolidation dans le secteur
-- Focus sur les developpeurs ayant des projets en phase de construction
-- Identifier les situations ou des advisors ont ete mandates
-- Exclure les deals deja finalises (signing/closing)"></textarea>
-                        <p class="text-xs text-gray-400 mt-1.5">Ces instructions seront utilisees par l'IA pour affiner sa recherche</p>
+                            placeholder="Describe precisely what you are looking for. For example:
+- Specifically look for consolidation rumors in the sector
+- Focus on developers with projects in construction phase
+- Identify situations where advisors have been mandated
+- Exclude already finalized deals (signing/closing)"></textarea>
+                        <p class="text-xs text-gray-400 mt-1.5">These instructions will be used by the AI to refine its search</p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Sources a privilegier
+                            Preferred sources
                         </label>
                         <div id="preferredSourcesInput" class="tag-input" onclick="this.querySelector('input').focus()">
-                            <input type="text" placeholder="Ex: Infrastructure Investor, IJGlobal... (Entree pour valider)"
+                            <input type="text" placeholder="Ex: Infrastructure Investor, IJGlobal... (Enter to confirm)"
                                 onkeydown="handleTagInput(event, 'preferredSources')">
                         </div>
                         <input type="hidden" id="preferredSources" name="preferred_sources">
@@ -550,7 +550,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                            Taille de transaction cible
+                            Target transaction size
                         </label>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
@@ -574,47 +574,87 @@
             <section class="card rounded-2xl p-6 section-indicator">
                 <div class="flex items-center gap-2 mb-5">
                     <span class="flex items-center justify-center w-7 h-7 rounded-full bg-radar-100 text-radar-700 text-sm font-bold">5</span>
-                    <h3 class="text-lg font-semibold text-gray-900">Parametres de scan</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">Scan Parameters</h3>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Fraicheur des infos</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Information freshness</label>
                         <select id="freshness_days" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                            <option value="7">7 derniers jours</option>
-                            <option value="30" selected>30 derniers jours</option>
-                            <option value="90">90 derniers jours</option>
+                            <option value="7">Last 7 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 90 days</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Frequence refresh</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Scan Mode</label>
                         <select id="refresh_frequency" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                            <option value="manual">Manuel uniquement</option>
-                            <option value="daily">Quotidien</option>
-                            <option value="weekly">Hebdomadaire</option>
+                            <option value="manual" selected>Manual only</option>
                         </select>
+                        <p class="text-xs text-gray-400 mt-1">Scans are triggered manually from the dashboard</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Heure refresh</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Refresh time</label>
                         <input type="time" id="refresh_hour" value="08:00" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
                     </div>
                 </div>
 
                 <div class="p-4 bg-gray-50 rounded-xl">
-                    <label class="block text-sm font-medium text-gray-700 mb-3">Seuil de confiance minimum</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Minimum confidence threshold</label>
                     <div class="flex flex-wrap gap-4">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="confidence_threshold" value="low" class="w-4 h-4 text-radar-600 focus:ring-radar-500">
-                            <span class="text-sm text-gray-700">Faible <span class="text-gray-400">(tout inclure)</span></span>
+                            <span class="text-sm text-gray-700">Low <span class="text-gray-400">(include all)</span></span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="confidence_threshold" value="medium" class="w-4 h-4 text-radar-600 focus:ring-radar-500" checked>
-                            <span class="text-sm text-gray-700">Moyen <span class="text-gray-400">(equilibre)</span></span>
+                            <span class="text-sm text-gray-700">Medium <span class="text-gray-400">(balanced)</span></span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="confidence_threshold" value="high" class="w-4 h-4 text-radar-600 focus:ring-radar-500">
-                            <span class="text-sm text-gray-700">Eleve <span class="text-gray-400">(stricte)</span></span>
+                            <span class="text-sm text-gray-700">High <span class="text-gray-400">(strict)</span></span>
                         </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Outreach Settings -->
+            <section class="card rounded-2xl p-6 section-indicator">
+                <div class="flex items-center gap-2 mb-5">
+                    <span class="flex items-center justify-center w-7 h-7 rounded-full bg-violet-100 text-violet-700 text-sm font-bold">6</span>
+                    <h3 class="text-lg font-semibold text-gray-900">Outreach Settings</h3>
+                    <span class="px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full">Optional</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="p-4 bg-violet-50 rounded-xl border border-violet-200">
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" id="outreach_template_enabled" class="w-5 h-5 mt-0.5 rounded text-violet-600 focus:ring-violet-500">
+                            <div>
+                                <span class="text-sm font-medium text-gray-800">Enable custom email template</span>
+                                <p class="text-xs text-gray-500 mt-1">If enabled, the AI will use your template after the hook paragraph</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div id="outreachTemplateSection" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Email template (body after the hook)
+                        </label>
+                        <textarea id="outreach_template_text" rows="6"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all resize-none"
+                            placeholder="Write your email template here. The first paragraph (hook) will be automatically generated by the AI with recent news about the actor.
+
+Example:
+I am reaching out from CVA, an infrastructure-focused advisory firm. We work with leading investors in the digital infrastructure space across Europe.
+
+Given your recent activity in the sector, I would be interested in exploring potential synergies and discussing how we might support your strategic objectives.
+
+Would you be available for a brief call in the coming weeks?
+
+Best regards,
+[Your name]"></textarea>
+                        <p class="text-xs text-gray-400 mt-1.5">This text will be added after the personalized hook generated by the AI</p>
                     </div>
                 </div>
             </section>
@@ -625,10 +665,10 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
-                    Creer la Watchlist
+                    Create Watchlist
                 </button>
                 <a href="index.html" class="flex items-center justify-center gap-2 px-8 py-4 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors font-medium">
-                    Annuler
+                    Cancel
                 </a>
             </div>
         </form>
@@ -637,7 +677,7 @@
     <!-- Footer -->
     <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 border-t border-gray-200">
         <div class="text-center text-sm text-gray-500">
-            AI Commercial Radar v1.0 - M&A Intelligence pour fonds d'infrastructure
+            AI Commercial Radar v2.0 - M&A Intelligence for Infrastructure Funds
         </div>
     </footer>
 
@@ -829,6 +869,15 @@
             // Deal size
             if (wl.deal_size_min) document.getElementById('dealSizeMin').value = wl.deal_size_min;
             if (wl.deal_size_max) document.getElementById('dealSizeMax').value = wl.deal_size_max;
+
+            // Outreach settings
+            if (wl.outreach_template_enabled) {
+                document.getElementById('outreach_template_enabled').checked = true;
+                document.getElementById('outreachTemplateSection').classList.remove('hidden');
+            }
+            if (wl.outreach_template_text) {
+                document.getElementById('outreach_template_text').value = wl.outreach_template_text;
+            }
         }
 
         // Load watchlist for editing
@@ -840,14 +889,25 @@
                 const data = await response.json();
                 const wl = (data.watchlists || []).find(w => w.watchlist_id === watchlistId);
                 if (!wl) {
-                    showToast('Watchlist introuvable: ' + watchlistId, 'error');
+                    showToast('Watchlist not found: ' + watchlistId, 'error');
                     return;
                 }
                 prefillForm(wl);
-                showToast('Watchlist chargee pour modification', 'info');
+                showToast('Watchlist loaded for editing', 'info');
             } catch (error) {
                 console.error('Load error:', error);
-                showToast('Erreur chargement watchlist', 'error');
+                showToast('Error loading watchlist', 'error');
+            }
+        }
+
+        // Toggle outreach template section
+        function toggleOutreachTemplate() {
+            const enabled = document.getElementById('outreach_template_enabled').checked;
+            const section = document.getElementById('outreachTemplateSection');
+            if (enabled) {
+                section.classList.remove('hidden');
+            } else {
+                section.classList.add('hidden');
             }
         }
 
@@ -858,18 +918,21 @@
                 return;
             }
 
+            // Setup outreach template toggle
+            document.getElementById('outreach_template_enabled').addEventListener('change', toggleOutreachTemplate);
+
             if (isEditMode) {
                 // Update UI for edit mode
-                document.getElementById('breadcrumbLabel').textContent = 'Modifier Watchlist';
-                document.getElementById('pageTitle').textContent = 'Modifier la watchlist';
-                document.getElementById('pageSubtitle').textContent = 'Modifiez les criteres de veille M&A';
+                document.getElementById('breadcrumbLabel').textContent = 'Edit Watchlist';
+                document.getElementById('pageTitle').textContent = 'Edit watchlist';
+                document.getElementById('pageSubtitle').textContent = 'Edit your M&A monitoring criteria';
                 document.getElementById('submitBtn').innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
-                    Enregistrer les modifications
+                    Save changes
                 `;
-                document.title = 'AI Commercial Radar - Modifier Watchlist';
+                document.title = 'AI Commercial Radar - Edit Watchlist';
                 // Load existing data
                 loadWatchlistForEdit(editWatchlistId);
             }
@@ -905,7 +968,9 @@
                 preferred_sources: tagsData.preferredSources,
                 custom_instructions: document.getElementById('customInstructions').value,
                 deal_size_min: document.getElementById('dealSizeMin').value ? parseInt(document.getElementById('dealSizeMin').value) : null,
-                deal_size_max: document.getElementById('dealSizeMax').value ? parseInt(document.getElementById('dealSizeMax').value) : null
+                deal_size_max: document.getElementById('dealSizeMax').value ? parseInt(document.getElementById('dealSizeMax').value) : null,
+                outreach_template_enabled: document.getElementById('outreach_template_enabled').checked,
+                outreach_template_text: document.getElementById('outreach_template_text').value || ''
             };
 
             // Add watchlist_id for update
@@ -915,17 +980,17 @@
 
             // Validation
             if (allGeographies.length === 0) {
-                showToast('Selectionnez au moins une geographie', 'error');
+                showToast('Select at least one geography', 'error');
                 return;
             }
             if (formData.operation_types.length === 0) {
-                showToast('Selectionnez au moins un type d\'operation', 'error');
+                showToast('Select at least one operation type', 'error');
                 return;
             }
 
             const btn = document.getElementById('submitBtn');
             const originalContent = btn.innerHTML;
-            const actionLabel = isEditMode ? 'Mise a jour' : 'Creation';
+            const actionLabel = isEditMode ? 'Updating' : 'Creating';
 
             try {
                 btn.disabled = true;
@@ -934,7 +999,7 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    ${actionLabel} en cours...
+                    ${actionLabel} in progress...
                 `;
 
                 const endpoint = isEditMode ? `${API_BASE}/watchlist/update` : `${API_BASE}/watchlist/create`;
@@ -949,7 +1014,7 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    const successLabel = isEditMode ? 'Modifications enregistrees!' : 'Watchlist creee!';
+                    const successLabel = isEditMode ? 'Changes saved!' : 'Watchlist created!';
                     btn.innerHTML = `
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -958,14 +1023,14 @@
                     `;
                     btn.classList.remove('bg-radar-600', 'hover:bg-radar-700', 'shadow-radar-600/25');
                     btn.classList.add('bg-emerald-500');
-                    showToast(isEditMode ? 'Watchlist mise a jour' : 'Watchlist creee avec succes', 'success');
+                    showToast(isEditMode ? 'Watchlist updated' : 'Watchlist created successfully', 'success');
                     setTimeout(() => window.location.href = 'index.html', 1500);
                 } else {
-                    throw new Error(result.error || 'Erreur inconnue');
+                    throw new Error(result.error || 'Unknown error');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showToast('Erreur: ' + error.message, 'error');
+                showToast('Error: ' + error.message, 'error');
                 btn.disabled = false;
                 btn.innerHTML = originalContent;
             }

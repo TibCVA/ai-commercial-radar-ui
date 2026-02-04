@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" class="scroll-smooth">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -225,11 +225,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        <span class="tooltip absolute top-full mt-2 right-0 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap">Parametres API</span>
+                        <span class="tooltip absolute top-full mt-2 right-0 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap">API Settings</span>
                     </button>
                     <div id="connectionStatus" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-xs">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 status-live"></span>
-                        <span class="text-emerald-300">Connecte</span>
+                        <span class="text-emerald-300">Connected</span>
                     </div>
                 </div>
             </div>
@@ -248,7 +248,7 @@
                     </div>
                     <div>
                         <h2 class="text-lg font-semibold text-gray-900">Configuration API</h2>
-                        <p class="text-sm text-gray-500">Connexion a n8n</p>
+                        <p class="text-sm text-gray-500">n8n Connection</p>
                     </div>
                 </div>
                 <button onclick="closeSettings()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -259,7 +259,7 @@
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Cle API</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">API Key</label>
                     <input type="password" id="apiKeyInput" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all" placeholder="radar_xxxxx">
                 </div>
                 <div>
@@ -267,7 +267,7 @@
                     <input type="text" id="apiBaseUrl" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-all" placeholder="https://xxx.app.n8n.cloud/webhook">
                 </div>
                 <button onclick="saveApiConfig()" class="w-full bg-radar-600 text-white py-3 rounded-xl font-semibold hover:bg-radar-700 transition-colors btn-press">
-                    Sauvegarder
+                    Save
                 </button>
             </div>
         </div>
@@ -277,8 +277,8 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Welcome Section -->
         <div class="mb-8 animate-fade-in">
-            <h2 class="text-2xl font-bold text-gray-900 mb-1">Bonjour</h2>
-            <p class="text-gray-500">Voici votre tableau de bord M&A Intelligence</p>
+            <h2 class="text-2xl font-bold text-gray-900 mb-1">Welcome</h2>
+            <p class="text-gray-500">Your M&A Intelligence dashboard</p>
         </div>
 
         <!-- Stats Grid -->
@@ -306,7 +306,7 @@
                     <span id="deals-trend" class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full hidden">+0 new</span>
                 </div>
                 <div id="stat-deals" class="text-3xl font-bold text-gray-900 counter-value">-</div>
-                <div class="text-sm text-gray-500 mt-1">Deals detectes</div>
+                <div class="text-sm text-gray-500 mt-1">Deals detected</div>
             </div>
 
             <div class="card rounded-2xl p-5 animate-slide-up stagger-3">
@@ -318,7 +318,7 @@
                     </div>
                 </div>
                 <div id="stat-actors" class="text-3xl font-bold text-gray-900 counter-value">-</div>
-                <div class="text-sm text-gray-500 mt-1">Acteurs identifies</div>
+                <div class="text-sm text-gray-500 mt-1">Actors identified</div>
             </div>
 
             <div class="card rounded-2xl p-5 animate-slide-up stagger-4">
@@ -330,7 +330,7 @@
                     </div>
                 </div>
                 <div id="stat-lastrun" class="text-3xl font-bold text-gray-900 counter-value">-</div>
-                <div id="stat-lastrun-time" class="text-sm text-gray-500 mt-1">Dernier scan</div>
+                <div id="stat-lastrun-time" class="text-sm text-gray-500 mt-1">Last scan</div>
             </div>
         </div>
 
@@ -341,19 +341,19 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                Scanner toutes les watchlists
+                Scan all watchlists
             </button>
             <a href="watchlist.html" class="flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-all border border-gray-200 shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
-                Nouvelle watchlist
+                New watchlist
             </a>
             <button onclick="refreshDashboard()" class="flex items-center gap-2 px-4 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-white rounded-xl transition-all">
                 <svg id="refreshIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
-                Actualiser
+                Refresh
             </button>
         </div>
 
@@ -362,10 +362,10 @@
             <!-- Watchlists Column -->
             <div class="lg:col-span-2">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Mes Watchlists</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">My Watchlists</h3>
                     <div class="flex items-center gap-4">
                         <select id="ownerFilter" onchange="filterByOwner()" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                            <option value="">Tous</option>
+                            <option value="">All</option>
                             <option value="Thibaut">Thibaut</option>
                             <option value="Robin">Robin</option>
                             <option value="Joel">Joel</option>
@@ -417,8 +417,8 @@
             <!-- Activity Feed -->
             <div>
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Activite recente</h3>
-                    <a href="results.html" class="text-sm text-radar-600 hover:text-radar-700 font-medium">Voir tout</a>
+                    <h3 class="text-lg font-semibold text-gray-900">Recent activity</h3>
+                    <a href="results.html" class="text-sm text-radar-600 hover:text-radar-700 font-medium">View all</a>
                 </div>
                 <div id="activity-feed" class="card rounded-2xl divide-y divide-gray-100">
                     <div class="p-4">
@@ -446,7 +446,7 @@
         <!-- Recent Runs Table -->
         <div class="mt-8">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Historique des scans</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Scan history</h3>
             </div>
             <div class="card rounded-2xl overflow-hidden">
                 <div class="overflow-x-auto">
@@ -456,7 +456,7 @@
                                 <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Watchlist</th>
                                 <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
                                 <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Resultats</th>
+                                <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Results</th>
                                 <th class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"></th>
                             </tr>
                         </thead>
@@ -469,7 +469,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                                             </svg>
                                         </div>
-                                        <p class="text-gray-500">Chargement de l'historique...</p>
+                                        <p class="text-gray-500">Loading history...</p>
                                     </div>
                                 </td>
                             </tr>
@@ -485,10 +485,10 @@
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-2 text-sm text-gray-500">
                 <span class="font-medium text-gray-900">AI Commercial Radar</span>
-                <span>v1.0</span>
+                <span>v2.0</span>
             </div>
             <div class="flex items-center gap-4 text-sm text-gray-500">
-                <span>M&A Intelligence pour fonds d'infrastructure</span>
+                <span>M&A Intelligence for Infrastructure Funds</span>
             </div>
         </div>
     </footer>
@@ -551,10 +551,10 @@
                 localStorage.setItem('radar_api_key', API_KEY);
                 localStorage.setItem('radar_api_base', API_BASE);
                 closeSettings();
-                showToast('Configuration sauvegardee', 'success');
+                showToast('Configuration saved', 'success');
                 loadDashboard();
             } else {
-                showToast('Veuillez remplir tous les champs', 'error');
+                showToast('Please fill in all fields', 'error');
             }
         }
 
@@ -653,9 +653,9 @@
         function updateConnectionStatus(connected) {
             const status = document.getElementById('connectionStatus');
             if (connected) {
-                status.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 status-live"></span><span class="text-emerald-300">Connecte</span>';
+                status.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 status-live"></span><span class="text-emerald-300">Connected</span>';
             } else {
-                status.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-400"></span><span class="text-red-300">Deconnecte</span>';
+                status.innerHTML = '<span class="w-2 h-2 rounded-full bg-red-400"></span><span class="text-red-300">Disconnected</span>';
             }
         }
 
@@ -667,11 +667,11 @@
             const diffMins = Math.floor(diffMs / 60000);
             const diffHours = Math.floor(diffMs / 3600000);
             const diffDays = Math.floor(diffMs / 86400000);
-            if (diffMins < 1) return 'A l\'instant';
-            if (diffMins < 60) return `Il y a ${diffMins}min`;
-            if (diffHours < 24) return `Il y a ${diffHours}h`;
-            if (diffDays < 7) return `Il y a ${diffDays}j`;
-            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
         }
 
         function getFreshnessClass(dateStr) {
@@ -726,7 +726,7 @@
 
             if (lastRun) {
                 statLastrun.textContent = getRelativeTime(lastRun.last_run.started_at);
-                document.getElementById('stat-lastrun-time').textContent = 'Dernier scan';
+                document.getElementById('stat-lastrun-time').textContent = 'Last scan';
             }
         }
 
@@ -741,13 +741,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                             </svg>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucune watchlist</h3>
-                        <p class="text-gray-500 mb-6 max-w-sm mx-auto">Creez votre premiere watchlist pour commencer a detecter des opportunites M&A</p>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">No watchlists</h3>
+                        <p class="text-gray-500 mb-6 max-w-sm mx-auto">Create your first watchlist to start detecting M&A opportunities</p>
                         <a href="watchlist.html" class="inline-flex items-center gap-2 px-6 py-3 bg-radar-600 text-white rounded-xl font-semibold hover:bg-radar-700 transition-colors shadow-lg shadow-radar-600/25">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                             </svg>
-                            Creer ma premiere watchlist
+                            Create my first watchlist
                         </a>
                     </div>
                 `;
@@ -774,12 +774,12 @@
                                 <div class="flex items-start justify-between gap-2 mb-1">
                                     <h4 class="font-semibold text-gray-900 truncate">${escapeHtml(w.name)}</h4>
                                     ${w.last_run?.status === 'running' ?
-                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full status-live"></span>En cours</span>' :
+                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-blue-500 rounded-full status-live"></span>Running</span>' :
                                         w.last_run?.status === 'error' ?
-                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">Erreur</span>' :
+                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">Error</span>' :
                                         w.last_run ?
                                         '<span class="flex-shrink-0 px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">OK</span>' :
-                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">Nouveau</span>'
+                                        '<span class="flex-shrink-0 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">New</span>'
                                     }
                                 </div>
                                 <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
@@ -801,18 +801,18 @@
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             </svg>
-                                            ${resultsMap[w.watchlist_id]?.actors || 0} acteurs
+                                            ${resultsMap[w.watchlist_id]?.actors || 0} actors
                                         </span>
                                     </div>
-                                ` : w.last_run ? '<div class="text-sm text-gray-400">Aucun resultat</div>' : ''}
+                                ` : w.last_run ? '<div class="text-sm text-gray-400">No results</div>' : ''}
                             </div>
                             <div class="flex items-center gap-2 flex-shrink-0">
-                                <button onclick="runNow('${w.watchlist_id}', this)" class="p-2 text-radar-600 hover:bg-radar-50 rounded-lg transition-colors" title="Lancer un scan">
+                                <button onclick="runNow('${w.watchlist_id}', this)" class="p-2 text-radar-600 hover:bg-radar-50 rounded-lg transition-colors" title="Launch scan">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                                     </svg>
                                 </button>
-                                <a href="watchlist.html?edit=${w.watchlist_id}" class="p-2 text-gray-400 hover:text-radar-600 hover:bg-radar-50 rounded-lg transition-colors" title="Modifier les criteres">
+                                <a href="watchlist.html?edit=${w.watchlist_id}" class="p-2 text-gray-400 hover:text-radar-600 hover:bg-radar-50 rounded-lg transition-colors" title="Edit criteria">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
@@ -828,7 +828,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                 </button>
-                                <button data-wlid="${escapeHtml(w.watchlist_id)}" data-wlname="${escapeHtml(w.name)}" onclick="deleteWatchlist(this.dataset.wlid, this.dataset.wlname, this)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Supprimer">
+                                <button data-wlid="${escapeHtml(w.watchlist_id)}" data-wlname="${escapeHtml(w.name)}" onclick="deleteWatchlist(this.dataset.wlid, this.dataset.wlname, this)" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
@@ -861,7 +861,7 @@
             if (activities.length === 0) {
                 container.innerHTML = `
                     <div class="p-8 text-center">
-                        <p class="text-sm text-gray-500">Aucune activite recente</p>
+                        <p class="text-sm text-gray-500">No recent activity</p>
                     </div>
                 `;
                 return;
@@ -881,7 +881,7 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-sm text-gray-900">
                                 <span class="font-medium">${escapeHtml(a.name)}</span>
-                                ${a.status === 'success' ? `: ${a.deals} deals, ${a.actors} acteurs` : a.status === 'error' ? ' - Erreur' : ' - En cours...'}
+                                ${a.status === 'success' ? `: ${a.deals} deals, ${a.actors} actors` : a.status === 'error' ? ' - Error' : ' - Running...'}
                             </p>
                             <p class="text-xs text-gray-500 mt-0.5">${getRelativeTime(a.time)}</p>
                         </div>
@@ -903,7 +903,7 @@
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5" class="px-5 py-12 text-center">
-                            <p class="text-gray-500">Aucun scan effectue</p>
+                            <p class="text-gray-500">No scans performed</p>
                         </td>
                     </tr>
                 `;
@@ -917,7 +917,7 @@
                         ${r.owner ? `<span class="ml-2 px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full">${escapeHtml(r.owner)}</span>` : ''}
                     </td>
                     <td class="px-5 py-4 text-sm text-gray-600">
-                        ${new Date(r.started_at).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        ${new Date(r.started_at).toLocaleString('en-US', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                     </td>
                     <td class="px-5 py-4">
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -930,18 +930,18 @@
                                 r.status === 'running' ? 'bg-blue-500 status-live' :
                                 'bg-red-500'
                             }"></span>
-                            ${r.status === 'success' ? 'Termine' : r.status === 'running' ? 'En cours' : 'Erreur'}
+                            ${r.status === 'success' ? 'Completed' : r.status === 'running' ? 'Running' : 'Error'}
                         </span>
                     </td>
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-3 text-sm">
                             <span class="text-emerald-600 font-medium">${resultsMap[r.watchlist_id]?.deals || 0} deals</span>
-                            <span class="text-amber-600 font-medium">${resultsMap[r.watchlist_id]?.actors || 0} acteurs</span>
+                            <span class="text-amber-600 font-medium">${resultsMap[r.watchlist_id]?.actors || 0} actors</span>
                         </div>
                     </td>
                     <td class="px-5 py-4">
                         <a href="results.html?watchlist_id=${r.watchlist_id}" class="text-radar-600 hover:text-radar-700 text-sm font-medium">
-                            Voir →
+                            View →
                         </a>
                     </td>
                 </tr>
@@ -956,10 +956,10 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Erreur de connexion</h3>
-                    <p class="text-gray-500 mb-4">Impossible de se connecter a l'API</p>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Connection error</h3>
+                    <p class="text-gray-500 mb-4">Unable to connect to the API</p>
                     <button onclick="showSettings()" class="px-6 py-2 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-colors">
-                        Verifier la configuration
+                        Check configuration
                     </button>
                 </div>
             `;
@@ -971,19 +971,65 @@
             btn.disabled = true;
 
             try {
-                await apiCall('watchlist/run', 'POST', { watchlist_id: watchlistId });
-                showToast('Scan lance avec succes', 'success');
+                const result = await apiCall('watchlist/run', 'POST', { watchlist_id: watchlistId });
+                // Check for OpenAI quota/billing errors
+                if (result.error && (result.error.includes('insufficient_quota') || result.error.includes('billing') || result.error.includes('exceeded') || result.error.includes('rate_limit'))) {
+                    showInsufficientFundsError();
+                    return;
+                }
+                showToast('Scan started successfully', 'success');
                 setTimeout(() => loadDashboard(), 2000);
             } catch (error) {
-                showToast('Erreur lors du lancement', 'error');
+                const errMsg = error.message || '';
+                if (errMsg.includes('insufficient_quota') || errMsg.includes('billing') || errMsg.includes('exceeded') || errMsg.includes('429')) {
+                    showInsufficientFundsError();
+                } else {
+                    showToast('Error launching scan', 'error');
+                }
             } finally {
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
             }
         }
 
+        function showInsufficientFundsError() {
+            // Show visual modal for insufficient OpenAI funds
+            const modal = document.createElement('div');
+            modal.id = 'fundsErrorModal';
+            modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="glass rounded-2xl p-6 m-4 max-w-md w-full shadow-2xl animate-scale-in border border-red-200 bg-white">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-14 h-14 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-red-700">Insufficient OpenAI Funds</h2>
+                            <p class="text-sm text-red-600 mt-1">The scan could not complete</p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-red-50 rounded-xl border border-red-200 mb-5">
+                        <p class="text-sm text-red-800 mb-2"><strong>The OpenAI API quota has been exceeded or there are insufficient funds in the account.</strong></p>
+                        <p class="text-sm text-red-700">Please add credits to your OpenAI account or wait for the quota to reset.</p>
+                    </div>
+                    <div class="space-y-2 text-sm text-gray-600 mb-5">
+                        <p class="flex items-center gap-2"><span class="text-red-500">1.</span> Check your OpenAI billing at <a href="https://platform.openai.com/account/billing" target="_blank" class="text-radar-600 hover:underline">platform.openai.com/account/billing</a></p>
+                        <p class="flex items-center gap-2"><span class="text-red-500">2.</span> Add payment method or credits if needed</p>
+                        <p class="flex items-center gap-2"><span class="text-red-500">3.</span> Wait a few minutes and try again</p>
+                    </div>
+                    <button onclick="document.getElementById('fundsErrorModal').remove()" class="w-full bg-red-600 text-white py-3 rounded-xl font-semibold hover:bg-red-700 transition-colors">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
+
         async function deleteWatchlist(watchlistId, watchlistName, btn) {
-            if (!confirm(`Supprimer la watchlist "${watchlistName}" ?\n\nCette action est irreversible.`)) {
+            if (!confirm(`Delete watchlist "${watchlistName}"?\n\nThis action cannot be undone.`)) {
                 return;
             }
 
@@ -993,10 +1039,10 @@
 
             try {
                 await apiCall('watchlist/delete', 'DELETE', { watchlist_id: watchlistId });
-                showToast('Watchlist supprimee', 'success');
+                showToast('Watchlist deleted', 'success');
                 loadDashboard();
             } catch (error) {
-                showToast('Erreur lors de la suppression', 'error');
+                showToast('Error deleting watchlist', 'error');
             } finally {
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
@@ -1009,25 +1055,25 @@
                 const watchlists = data.watchlists || [];
 
                 if (watchlists.length === 0) {
-                    showToast('Aucune watchlist a scanner', 'warning');
+                    showToast('No watchlists to scan', 'warning');
                     return;
                 }
 
-                showToast(`Lancement de ${watchlists.length} scan(s)...`, 'info');
+                showToast(`Launching ${watchlists.length} scan(s)...`, 'info');
 
                 for (const w of watchlists) {
                     await apiCall('watchlist/run', 'POST', { watchlist_id: w.watchlist_id });
                 }
 
-                showToast('Tous les scans ont ete lances', 'success');
+                showToast('All scans have been launched', 'success');
                 setTimeout(() => loadDashboard(), 3000);
             } catch (error) {
-                showToast('Erreur lors du lancement', 'error');
+                showToast('Error launching scans', 'error');
             }
         }
 
         function exportXlsx(watchlistId) {
-            showToast('Preparation de l\'export...', 'info');
+            showToast('Preparing export...', 'info');
 
             fetch(`${API_BASE}/export/xlsx?watchlist_id=${encodeURIComponent(watchlistId)}`, {
                 headers: { 'workspace-api-key': API_KEY }
@@ -1046,9 +1092,9 @@
                 a.download = filename;
                 a.click();
                 URL.revokeObjectURL(url);
-                showToast('Export telecharge', 'success');
+                showToast('Export downloaded', 'success');
             })
-            .catch(() => showToast('Erreur lors de l\'export', 'error'));
+            .catch(() => showToast('Error exporting data', 'error'));
         }
 
         // Keyboard shortcuts

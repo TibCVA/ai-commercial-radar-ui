@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Commercial Radar - Resultats</title>
+    <title>AI Commercial Radar - Results</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -81,7 +81,7 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold tracking-tight">AI Commercial Radar</h1>
-                        <p class="text-blue-100 text-sm">Intelligence M&A pour fonds d'infrastructure</p>
+                        <p class="text-blue-100 text-sm">M&A Intelligence for Infrastructure Funds</p>
                     </div>
                 </div>
                 <nav class="flex gap-2">
@@ -105,44 +105,44 @@
                         <span id="ownerBadge" class="hidden ml-2 px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full"></span>
                     </label>
                     <select id="watchlistSelect" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-shadow">
-                        <option value="">Toutes les watchlists</option>
+                        <option value="">All watchlists</option>
                     </select>
                 </div>
                 <div class="w-full lg:w-40">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Confiance</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Confidence</label>
                     <select id="confidenceFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                        <option value="">Toutes</option>
-                        <option value="high">Elevee</option>
-                        <option value="medium">Moyenne</option>
-                        <option value="low">Faible</option>
+                        <option value="">All</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
                     </select>
                 </div>
                 <div class="w-full lg:w-40">
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
                     <select id="typeFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                        <option value="">Tous</option>
-                        <option value="ma_rumor">M&A Rumeur</option>
+                        <option value="">All</option>
+                        <option value="ma_rumor">M&A Rumor</option>
                         <option value="ma_discussions">M&A Discussions</option>
-                        <option value="ma_announced">M&A Annonce</option>
+                        <option value="ma_announced">M&A Announced</option>
                         <option value="asset_deal">Asset Deal</option>
-                        <option value="financing">Financement</option>
-                        <option value="growth_signal">Signal croissance</option>
+                        <option value="financing">Financing</option>
+                        <option value="growth_signal">Growth signal</option>
                     </select>
                 </div>
                 <div class="w-full lg:w-40">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Fraicheur</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Freshness</label>
                     <select id="freshnessFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                        <option value="">Toutes</option>
-                        <option value="24h">Dernieres 24h</option>
-                        <option value="7d">7 derniers jours</option>
-                        <option value="30d">30 derniers jours</option>
+                        <option value="">All</option>
+                        <option value="24h">Last 24h</option>
+                        <option value="7d">Last 7 days</option>
+                        <option value="30d">Last 30 days</option>
                     </select>
                 </div>
                 <button onclick="loadResults()" class="px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-colors shadow-sm flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                     </svg>
-                    Filtrer
+                    Filter
                 </button>
             </div>
         </div>
@@ -154,21 +154,21 @@
                 <div id="totalDeals" class="text-2xl font-bold text-gray-900">0</div>
             </div>
             <div class="glass-card rounded-xl p-4 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1">Total Acteurs</div>
+                <div class="text-sm text-gray-500 mb-1">Total Actors</div>
                 <div id="totalActors" class="text-2xl font-bold text-gray-900">0</div>
             </div>
             <div class="glass-card rounded-xl p-4 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1">Haute confiance</div>
+                <div class="text-sm text-gray-500 mb-1">High confidence</div>
                 <div id="highConfidence" class="text-2xl font-bold text-success">0</div>
             </div>
             <div class="glass-card rounded-xl p-4 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1">Nouveaux (24h)</div>
+                <div class="text-sm text-gray-500 mb-1">New (24h)</div>
                 <div id="newToday" class="text-2xl font-bold text-radar-600">0</div>
             </div>
         </div>
 
         <!-- Tabs -->
-        <div class="flex gap-2 mb-5">
+        <div class="flex flex-wrap gap-2 mb-5">
             <button id="tabDeals" onclick="switchTab('deals')" class="flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
@@ -179,9 +179,16 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
-                Acteurs (<span id="actorsCount">0</span>)
+                Actors (<span id="actorsCount">0</span>)
             </button>
             <div class="flex-1"></div>
+            <!-- Generate Outreach Button (visible when actors selected) -->
+            <button id="btnGenerateOutreach" onclick="openOutreachModal()" class="hidden flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white rounded-xl font-medium hover:bg-violet-700 transition-colors shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <span>Generate outreach (<span id="selectedActorsCount">0</span>)</span>
+            </button>
             <button onclick="exportCurrentResults()" class="flex items-center gap-2 px-4 py-2.5 bg-success text-white rounded-xl font-medium hover:bg-green-600 transition-colors shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -196,7 +203,7 @@
                 <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
-                <p class="text-gray-500">Selectionnez une watchlist ou cliquez "Filtrer" pour voir les resultats</p>
+                <p class="text-gray-500">Select a watchlist or click "Filter" to view results</p>
             </div>
         </div>
     </main>
@@ -216,9 +223,102 @@
         </div>
     </div>
 
+
+    <!-- Outreach Emails Modal -->
+    <div id="outreachModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="glass-card rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="sticky top-0 bg-white/95 backdrop-blur-sm px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-gray-900">Generate Outreach Emails</h2>
+                <button onclick="closeOutreachModal()" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <!-- Pre-generation view -->
+                <div id="outreachPreGen">
+                    <p class="text-gray-600 mb-4">Generate personalized outreach emails for the selected actors.</p>
+
+                    <div class="mb-5">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Selected actors (<span id="outreachActorCount">0</span>)</label>
+                        <div id="outreachActorList" class="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-xl max-h-32 overflow-y-auto">
+                            <!-- Actor chips will be inserted here -->
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-violet-50 border border-violet-200 rounded-xl mb-5">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-violet-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div class="text-sm text-violet-800">
+                                <span class="font-medium">Smart hook:</span> AI searches for recent news about each actor to personalize the first paragraph of the email.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="closeOutreachModal()" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors font-medium">
+                            Cancel
+                        </button>
+                        <button id="btnGenerateOutreachEmails" onclick="generateOutreachEmails()" class="flex-1 px-4 py-2.5 bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors font-medium flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            Generate emails
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Generation progress view -->
+                <div id="outreachProgress" class="hidden">
+                    <div class="text-center py-8">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-violet-500 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="text-gray-600 mb-2">Generation in progress...</p>
+                        <p id="outreachProgressText" class="text-sm text-gray-400">Searching for news to personalize emails</p>
+                    </div>
+                </div>
+
+                <!-- Results view -->
+                <div id="outreachResults" class="hidden">
+                    <div class="mb-4 flex items-center justify-between">
+                        <span class="text-sm text-gray-600"><span id="outreachSuccessCount">0</span> email(s) generated</span>
+                        <button onclick="copyAllEmails()" class="text-sm text-violet-600 hover:text-violet-700 font-medium flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Copy all
+                        </button>
+                    </div>
+                    <div id="outreachEmailsList" class="space-y-4">
+                        <!-- Email cards will be inserted here -->
+                    </div>
+                    <div id="outreachFailedList" class="mt-4 hidden">
+                        <div class="p-3 bg-red-50 border border-red-200 rounded-xl">
+                            <span class="text-sm font-medium text-red-700">Failed (<span id="outreachFailedCount">0</span>)</span>
+                            <ul id="outreachFailedNames" class="mt-2 text-sm text-red-600"></ul>
+                        </div>
+                    </div>
+                    <div class="mt-5 flex gap-3">
+                        <button onclick="resetOutreachModal()" class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors font-medium">
+                            New generation
+                        </button>
+                        <button onclick="closeOutreachModal()" class="flex-1 px-4 py-2.5 bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors font-medium">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="container mx-auto px-4 py-6 text-center text-sm text-gray-400">
-        AI Commercial Radar v1.0 - Veille M&A pour fonds d'infrastructure
+        AI Commercial Radar v2.0 - M&A Intelligence for Infrastructure Funds
     </footer>
 
     <script>
@@ -227,6 +327,9 @@
         let currentTab = 'deals';
         let currentData = { deals: [], actors: [] };
         let _watchlistsData = [];
+
+        // Actor selection for outreach
+        const selectedActors = new Map(); // actor_id -> { id, name }
 
         // === Security & Data Helpers ===
         function escapeHtml(str) {
@@ -322,7 +425,7 @@
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <p class="text-gray-500">Chargement des resultats...</p>
+                    <p class="text-gray-500">Loading results...</p>
                 </div>
             `;
 
@@ -344,8 +447,8 @@
                         <svg class="w-16 h-16 mx-auto mb-4 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
-                        <p class="text-danger font-medium mb-2">Erreur de chargement</p>
-                        <p class="text-gray-500 text-sm">Verifiez votre connexion et reessayez</p>
+                        <p class="text-danger font-medium mb-2">Loading error</p>
+                        <p class="text-gray-500 text-sm">Check your connection and try again</p>
                     </div>
                 `;
             }
@@ -409,10 +512,10 @@
             const diffHours = Math.floor(diffMs / 3600000);
             const diffDays = Math.floor(diffMs / 86400000);
 
-            if (diffMins < 60) return `il y a ${diffMins}min`;
-            if (diffHours < 24) return `il y a ${diffHours}h`;
-            if (diffDays < 7) return `il y a ${diffDays}j`;
-            return date.toLocaleDateString('fr-FR');
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
         function renderResults() {
@@ -425,7 +528,7 @@
                         <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        <p class="text-gray-500">Aucun ${currentTab === 'deals' ? 'deal' : 'acteur'} trouve avec ces criteres</p>
+                        <p class="text-gray-500">No ${currentTab === 'deals' ? 'deal' : 'actor'} found with these criteria</p>
                     </div>
                 `;
                 return;
@@ -440,20 +543,20 @@
 
         function renderDealCard(deal) {
             const confidenceConfig = {
-                high: { class: 'confidence-high', text: 'Confiance elevee', icon: '✓✓' },
-                medium: { class: 'confidence-medium', text: 'Confiance moyenne', icon: '✓' },
-                low: { class: 'confidence-low', text: 'Confiance faible', icon: '?' }
+                high: { class: 'confidence-high', text: 'High confidence', icon: '✓✓' },
+                medium: { class: 'confidence-medium', text: 'Medium confidence', icon: '✓' },
+                low: { class: 'confidence-low', text: 'Low confidence', icon: '?' }
             };
             const conf = confidenceConfig[normalizeConfidence(deal.confiance)] || confidenceConfig.medium;
 
             const stageLabels = {
-                rumeur: { label: 'Rumeur', color: 'bg-purple-100 text-purple-700' },
+                rumeur: { label: 'Rumor', color: 'bg-purple-100 text-purple-700' },
                 discussions: { label: 'Discussions', color: 'bg-blue-100 text-blue-700' },
-                annoncé: { label: 'Annonce', color: 'bg-green-100 text-green-700' },
-                review_reg: { label: 'Review reg.', color: 'bg-orange-100 text-orange-700' },
-                signé: { label: 'Signe', color: 'bg-teal-100 text-teal-700' },
-                clos: { label: 'Clos', color: 'bg-gray-100 text-gray-700' },
-                annulé: { label: 'Annule', color: 'bg-red-100 text-red-700' }
+                annoncé: { label: 'Announced', color: 'bg-green-100 text-green-700' },
+                review_reg: { label: 'Reg. review', color: 'bg-orange-100 text-orange-700' },
+                signé: { label: 'Signed', color: 'bg-teal-100 text-teal-700' },
+                clos: { label: 'Closed', color: 'bg-gray-100 text-gray-700' },
+                annulé: { label: 'Cancelled', color: 'bg-red-100 text-red-700' }
             };
             const stage = stageLabels[deal.stade] || { label: deal.stade || 'N/A', color: 'bg-gray-100 text-gray-600' };
 
@@ -479,7 +582,7 @@
                         <!-- Main Content -->
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-start gap-2 mb-3">
-                                <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(deal.titre) || 'Deal sans titre'}</h3>
+                                <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(deal.titre) || 'Untitled deal'}</h3>
                                 <span class="px-2.5 py-1 ${stage.color} text-xs font-medium rounded-full">${escapeHtml(stage.label)}</span>
                             </div>
 
@@ -489,15 +592,15 @@
                                     <span class="text-gray-700 font-medium">${escapeHtml(deal.type_operation) || 'N/A'}</span>
                                 </div>
                                 <div>
-                                    <span class="text-gray-400 text-xs block">Geographie</span>
+                                    <span class="text-gray-400 text-xs block">Geography</span>
                                     <span class="text-gray-700 font-medium">${escapeHtml(deal.geographie_pays) || 'N/A'}</span>
                                 </div>
                                 <div>
-                                    <span class="text-gray-400 text-xs block">Valeur est.</span>
+                                    <span class="text-gray-400 text-xs block">Est. value</span>
                                     <span class="text-gray-700 font-medium">${deal.valeur_montant ? `${escapeHtml(deal.valeur_montant)} ${escapeHtml(deal.valeur_devise || '')}` : 'N/A'}</span>
                                 </div>
                                 <div>
-                                    <span class="text-gray-400 text-xs block">Detecte</span>
+                                    <span class="text-gray-400 text-xs block">Detected</span>
                                     <span class="text-gray-700 font-medium">${relativeTime || 'N/A'}</span>
                                     ${dealHasUpdate ? `<span class="block text-xs text-radar-500 mt-0.5">MAJ ${getRelativeTime(deal.last_seen_at)}</span>` : ''}
                                 </div>
@@ -541,11 +644,11 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                                 </svg>
                                 <span>${sourceCount} source${sourceCount > 1 ? 's' : ''}</span>
-                                ${primarySources > 0 ? `<span class="source-badge source-primary">${primarySources} prim.</span>` : ''}
+                                ${primarySources > 0 ? `<span class="source-badge source-primary">${primarySources} primary</span>` : ''}
                             </div>
 
                             <button class="text-radar-600 text-sm font-medium hover:text-radar-700 text-left flex items-center gap-1">
-                                Voir details
+                                View details
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                 </svg>
@@ -558,10 +661,10 @@
 
         function renderActorCard(actor) {
             const typeLabels = {
-                developer: { label: 'Developpeur', color: 'bg-blue-100 text-blue-700', icon: '🏗' },
-                fonds: { label: 'Fonds', color: 'bg-green-100 text-green-700', icon: '💰' },
+                developer: { label: 'Developer', color: 'bg-blue-100 text-blue-700', icon: '🏗' },
+                fonds: { label: 'Fund', color: 'bg-green-100 text-green-700', icon: '💰' },
                 corporate: { label: 'Corporate', color: 'bg-purple-100 text-purple-700', icon: '🏢' },
-                operateur: { label: 'Operateur', color: 'bg-orange-100 text-orange-700', icon: '⚙' }
+                operateur: { label: 'Operator', color: 'bg-orange-100 text-orange-700', icon: '⚙' }
             };
             const actorType = typeLabels[actor.type_acteur] || { label: escapeHtml(actor.type_acteur) || 'N/A', color: 'bg-gray-100 text-gray-600', icon: '👤' };
 
@@ -572,17 +675,26 @@
             const actorSources = ensureArray(actor.sources);
             const actorSourceCount = actorSources.length;
             const hasUpdate = actor.last_seen_at && actor.first_seen_at && actor.last_seen_at !== actor.first_seen_at;
+            const isSelected = selectedActors.has(actor.actor_id);
 
             return `
-                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass}" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
+                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover ${freshnessClass} ${isSelected ? 'ring-2 ring-violet-500' : ''}" data-actor-id="${escapeHtml(actor.actor_id)}">
                     <div class="flex flex-col lg:flex-row gap-4">
                         <div class="flex-1">
                             <div class="flex items-start gap-3 mb-4">
-                                <div class="w-12 h-12 rounded-xl ${actorType.color} flex items-center justify-center text-2xl">
+                                <!-- Selection checkbox -->
+                                <label class="flex items-center cursor-pointer flex-shrink-0" onclick="event.stopPropagation()">
+                                    <input type="checkbox" class="actor-checkbox w-5 h-5 rounded text-violet-600 focus:ring-violet-500 cursor-pointer"
+                                        data-actor-id="${escapeHtml(actor.actor_id)}"
+                                        data-actor-name="${escapeHtml(actor.nom || '')}"
+                                        ${isSelected ? 'checked' : ''}
+                                        onchange="toggleActorSelection('${escapeHtml(actor.actor_id)}', '${escapeHtml(actor.nom || '').replace(/'/g, "\\'")}', this.checked)">
+                                </label>
+                                <div class="w-12 h-12 rounded-xl ${actorType.color} flex items-center justify-center text-2xl cursor-pointer" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
                                     ${actorType.icon}
                                 </div>
-                                <div>
-                                    <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(actor.nom) || 'Acteur sans nom'}</h3>
+                                <div class="cursor-pointer" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
+                                    <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(actor.nom) || 'Unnamed actor'}</h3>
                                     <div class="flex items-center gap-2 mt-1">
                                         <span class="px-2.5 py-0.5 ${actorType.color} text-xs font-medium rounded-full">${actorType.label}</span>
                                         <span class="text-sm text-gray-500">${escapeHtml(actor.geographie) || 'Geo N/A'}</span>
@@ -592,7 +704,7 @@
 
                             ${signaux.length ? `
                                 <div class="mb-3">
-                                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Signaux recents</span>
+                                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Recent signals</span>
                                     <ul class="mt-2 space-y-1">
                                         ${signaux.slice(0, 3).map(s => `
                                             <li class="flex items-start gap-2 text-sm text-gray-700">
@@ -609,7 +721,7 @@
 
                         <div class="lg:w-48 flex flex-col gap-3">
                             <div class="text-sm text-gray-500">
-                                <span class="block text-xs text-gray-400">Detecte</span>
+                                <span class="block text-xs text-gray-400">Detected</span>
                                 <span class="font-medium text-gray-700">${relativeTime || 'N/A'}</span>
                                 ${hasUpdate ? `<span class="block text-xs text-radar-500 mt-0.5">MAJ ${getRelativeTime(actor.last_seen_at)}</span>` : ''}
                             </div>
@@ -633,7 +745,7 @@
                             ` : ''}
 
                             <button class="text-radar-600 text-sm font-medium hover:text-radar-700 text-left flex items-center gap-1 mt-auto">
-                                Voir fiche
+                                View profile
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                 </svg>
@@ -659,16 +771,16 @@
             const rationnel = ensureArray(deal.rationnel);
             const sources = ensureArray(deal.sources);
 
-            document.getElementById('modalTitle').textContent = deal.titre || 'Detail du Deal';
+            document.getElementById('modalTitle').textContent = deal.titre || 'Deal Details';
             document.getElementById('modalContent').innerHTML = `
                 <div class="space-y-6">
                     <!-- Status Bar -->
                     <div class="flex flex-wrap gap-2">
                         <span class="px-3 py-1.5 ${cc[3]} text-sm font-medium rounded-full">
-                            Confiance: ${escapeHtml(deal.confiance) || 'N/A'}
+                            Confidence: ${escapeHtml(deal.confiance) || 'N/A'}
                         </span>
                         <span class="px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
-                            Stade: ${escapeHtml(deal.stade) || 'N/A'}
+                            Stage: ${escapeHtml(deal.stade) || 'N/A'}
                         </span>
                         <span class="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-full">
                             ${escapeHtml(deal.type_operation) || 'Type N/A'}
@@ -687,16 +799,16 @@
                     <!-- Main Info Grid -->
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                         <div class="p-4 bg-gray-50 rounded-xl">
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Geographie</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Geography</span>
                             <p class="text-gray-800 mt-1">${escapeHtml(deal.geographie_pays) || 'N/A'} ${deal.geographie_ville ? '(' + escapeHtml(deal.geographie_ville) + ')' : ''}</p>
                         </div>
                         <div class="p-4 bg-gray-50 rounded-xl">
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Valeur estimee</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Estimated value</span>
                             <p class="text-gray-800 mt-1">${deal.valeur_montant ? `${escapeHtml(deal.valeur_montant)} ${escapeHtml(deal.valeur_devise || '')} (${escapeHtml(deal.valeur_type || 'est.')})` : 'N/A'}</p>
                         </div>
                         ${deal.valeur_estimee_rumeur ? `
                             <div class="p-4 bg-purple-50 rounded-xl">
-                                <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Valeur rumeur</span>
+                                <span class="text-xs font-medium text-purple-600 uppercase tracking-wide">Rumored value</span>
                                 <p class="text-purple-800 mt-1 font-medium">${escapeHtml(deal.valeur_estimee_rumeur)}</p>
                             </div>
                         ` : ''}
@@ -704,18 +816,18 @@
 
                     <!-- Parties -->
                     <div class="p-4 bg-radar-50 rounded-xl">
-                        <span class="text-xs font-medium text-radar-700 uppercase tracking-wide">Parties impliquees</span>
+                        <span class="text-xs font-medium text-radar-700 uppercase tracking-wide">Parties involved</span>
                         <div class="mt-3 space-y-2">
-                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Acquereurs:</span> ${acquereurs.map(escapeHtml).join(', ') || 'Non identifie'}</p>
-                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Cibles:</span> ${cibles.map(escapeHtml).join(', ') || 'Non identifie'}</p>
-                            ${vendeurs.length ? `<p class="text-gray-800"><span class="font-semibold text-gray-600">Vendeurs:</span> ${vendeurs.map(escapeHtml).join(', ')}</p>` : ''}
+                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Acquirers:</span> ${acquereurs.map(escapeHtml).join(', ') || 'Not identified'}</p>
+                            <p class="text-gray-800"><span class="font-semibold text-gray-600">Targets:</span> ${cibles.map(escapeHtml).join(', ') || 'Not identified'}</p>
+                            ${vendeurs.length ? `<p class="text-gray-800"><span class="font-semibold text-gray-600">Sellers:</span> ${vendeurs.map(escapeHtml).join(', ')}</p>` : ''}
                         </div>
                     </div>
 
                     <!-- Advisors -->
                     ${advisors.length ? `
                         <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
-                            <span class="text-xs font-medium text-amber-700 uppercase tracking-wide">Conseils / Advisors</span>
+                            <span class="text-xs font-medium text-amber-700 uppercase tracking-wide">Advisors</span>
                             <div class="mt-2 flex flex-wrap gap-2">
                                 ${advisors.map(a => `
                                     <span class="px-3 py-1.5 bg-amber-100 text-amber-800 text-sm font-medium rounded-full">${escapeHtml(a)}</span>
@@ -727,7 +839,7 @@
                     <!-- Assets -->
                     ${deal.actifs ? `
                         <div>
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Actifs concernes</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Assets involved</span>
                             <p class="text-gray-800 mt-1">${escapeHtml(deal.actifs)}</p>
                         </div>
                     ` : ''}
@@ -735,7 +847,7 @@
                     <!-- Rationnel -->
                     ${rationnel.length ? `
                         <div>
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Rationnel / Signaux detectes</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Rationale / Detected signals</span>
                             <ul class="mt-2 space-y-2">
                                 ${rationnel.map(r => `
                                     <li class="flex items-start gap-2 text-gray-700">
@@ -753,13 +865,13 @@
                     <div class="grid grid-cols-3 gap-4">
                         ${deal.timeline_rumeur ? `
                             <div class="text-center p-3 bg-purple-50 rounded-xl">
-                                <span class="text-xs text-purple-600 font-medium">Rumeur</span>
+                                <span class="text-xs text-purple-600 font-medium">Rumor</span>
                                 <p class="text-purple-800 font-semibold mt-1">${escapeHtml(deal.timeline_rumeur)}</p>
                             </div>
                         ` : ''}
                         ${deal.timeline_annonce ? `
                             <div class="text-center p-3 bg-blue-50 rounded-xl">
-                                <span class="text-xs text-blue-600 font-medium">Annonce</span>
+                                <span class="text-xs text-blue-600 font-medium">Announced</span>
                                 <p class="text-blue-800 font-semibold mt-1">${escapeHtml(deal.timeline_annonce)}</p>
                             </div>
                         ` : ''}
@@ -779,7 +891,7 @@
                         return `
                         <div class="p-4 ${cc[0]} border rounded-xl">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-medium uppercase tracking-wide ${cc[1]}">Force d'evidence</span>
+                                <span class="text-xs font-medium uppercase tracking-wide ${cc[1]}">Evidence strength</span>
                                 ${csValid ? `<span class="text-sm font-bold ${cc[2]}">${cs}/100</span>` : ''}
                             </div>
                             ${csValid ? `
@@ -802,7 +914,7 @@
                                             <div class="flex-1">
                                                 <div class="flex items-center gap-2 mb-1">
                                                     <span class="source-badge ${s.quality === 'primary' ? 'source-primary' : 'source-secondary'}">
-                                                        ${s.quality === 'primary' ? 'Source primaire' : 'Source secondaire'}
+                                                        ${s.quality === 'primary' ? 'Primary source' : 'Secondary source'}
                                                     </span>
                                                     <span class="text-xs text-gray-400">${escapeHtml(s.date_pub || '')}</span>
                                                 </div>
@@ -825,7 +937,7 @@
 
                     <!-- Metadata -->
                     <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
-                        <p>ID: ${escapeHtml(deal.deal_id)} | Detecte: ${deal.first_seen_at ? new Date(deal.first_seen_at).toLocaleString('fr-FR') : 'N/A'} | Maj: ${deal.last_seen_at ? new Date(deal.last_seen_at).toLocaleString('fr-FR') : 'N/A'}</p>
+                        <p>ID: ${escapeHtml(deal.deal_id)} | Detected: ${deal.first_seen_at ? new Date(deal.first_seen_at).toLocaleString('en-US') : 'N/A'} | Updated: ${deal.last_seen_at ? new Date(deal.last_seen_at).toLocaleString('en-US') : 'N/A'}</p>
                     </div>
                 </div>
             `;
@@ -841,7 +953,7 @@
             const dirigeants = ensureArray(actor.dirigeants_cles);
             const sources = ensureArray(actor.sources);
 
-            document.getElementById('modalTitle').textContent = actor.nom || 'Detail Acteur';
+            document.getElementById('modalTitle').textContent = actor.nom || 'Actor Details';
             document.getElementById('modalContent').innerHTML = `
                 <div class="space-y-6">
                     <!-- Header -->
@@ -860,13 +972,13 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             ${actor.capacite_installee ? `
                                 <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                                    <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">Capacite / AUM / Portfolio</span>
+                                    <span class="text-xs font-medium text-blue-600 uppercase tracking-wide">Capacity / AUM / Portfolio</span>
                                     <p class="text-blue-800 mt-1 font-medium">${escapeHtml(actor.capacite_installee)}</p>
                                 </div>
                             ` : ''}
                             ${actor.derniere_levee ? `
                                 <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                                    <span class="text-xs font-medium text-emerald-600 uppercase tracking-wide">Derniere levee / Capital raise</span>
+                                    <span class="text-xs font-medium text-emerald-600 uppercase tracking-wide">Latest fundraise / Capital raise</span>
                                     <p class="text-emerald-800 mt-1 font-medium">${escapeHtml(actor.derniere_levee)}</p>
                                 </div>
                             ` : ''}
@@ -876,7 +988,7 @@
                     <!-- Pipeline Projets -->
                     ${actor.pipeline_projets ? `
                         <div class="p-4 bg-gray-50 rounded-xl">
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pipeline de projets</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Project pipeline</span>
                             <p class="text-gray-700 mt-2">${escapeHtml(actor.pipeline_projets)}</p>
                         </div>
                     ` : ''}
@@ -884,7 +996,7 @@
                     <!-- Dirigeants Cles -->
                     ${dirigeants.length ? `
                         <div>
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Dirigeants cles (${dirigeants.length})</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Key executives (${dirigeants.length})</span>
                             <div class="mt-3 space-y-2">
                                 ${dirigeants.map(d => `
                                     <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
@@ -903,7 +1015,7 @@
                     <!-- Signaux -->
                     ${signaux.length ? `
                         <div>
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Signaux detectes</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Detected signals</span>
                             <ul class="mt-3 space-y-2">
                                 ${signaux.map(s => `
                                     <li class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
@@ -920,7 +1032,7 @@
                     <!-- Contacts -->
                     ${contacts.length ? `
                         <div>
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Points de contact (${contacts.length})</span>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Contact points (${contacts.length})</span>
                             <div class="mt-3 space-y-3">
                                 ${contacts.filter(c => c).map(c => `
                                     <div class="p-4 bg-green-50 rounded-xl border border-green-100">
@@ -941,7 +1053,7 @@
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                                 </svg>
-                                                Voir source
+                                                View source
                                             </a>
                                         ` : ''}
                                     </div>
@@ -969,7 +1081,7 @@
 
                     <!-- Metadata -->
                     <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
-                        <p>ID: ${escapeHtml(actor.actor_id)} | Detecte: ${actor.first_seen_at ? new Date(actor.first_seen_at).toLocaleString('fr-FR') : 'N/A'} | Maj: ${actor.last_seen_at ? new Date(actor.last_seen_at).toLocaleString('fr-FR') : 'N/A'}</p>
+                        <p>ID: ${escapeHtml(actor.actor_id)} | Detected: ${actor.first_seen_at ? new Date(actor.first_seen_at).toLocaleString('en-US') : 'N/A'} | Updated: ${actor.last_seen_at ? new Date(actor.last_seen_at).toLocaleString('en-US') : 'N/A'}</p>
                     </div>
                 </div>
             `;
@@ -983,7 +1095,7 @@
         function exportCurrentResults() {
             const watchlistId = document.getElementById('watchlistSelect').value;
             if (!watchlistId) {
-                alert('Selectionnez une watchlist pour exporter');
+                alert('Select a watchlist to export');
                 return;
             }
 
@@ -1006,17 +1118,238 @@
                 })
                 .catch(err => {
                     console.error('Export error:', err);
-                    alert('Erreur lors de l\'export');
+                    alert('Export error');
                 });
         }
 
         // Close modal on escape or click outside
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
+            if (e.key === 'Escape') {
+                closeModal();
+                closeOutreachModal();
+            }
         });
         document.getElementById('dealModal').addEventListener('click', (e) => {
             if (e.target.id === 'dealModal') closeModal();
         });
+        document.getElementById('outreachModal').addEventListener('click', (e) => {
+            if (e.target.id === 'outreachModal') closeOutreachModal();
+        });
+
+        // ==========================================
+        // Actor Selection for Outreach
+        // ==========================================
+
+        function toggleActorSelection(actorId, actorName, isChecked) {
+            if (isChecked) {
+                selectedActors.set(actorId, { id: actorId, name: actorName });
+            } else {
+                selectedActors.delete(actorId);
+            }
+            updateOutreachButton();
+            // Update visual selection state
+            const card = document.querySelector(`[data-actor-id="${actorId}"]`);
+            if (card) {
+                if (isChecked) {
+                    card.classList.add('ring-2', 'ring-violet-500');
+                } else {
+                    card.classList.remove('ring-2', 'ring-violet-500');
+                }
+            }
+        }
+
+        function updateOutreachButton() {
+            const btn = document.getElementById('btnGenerateOutreach');
+            const count = document.getElementById('selectedActorsCount');
+            if (selectedActors.size > 0) {
+                btn.classList.remove('hidden');
+                btn.classList.add('flex');
+                count.textContent = selectedActors.size;
+            } else {
+                btn.classList.add('hidden');
+                btn.classList.remove('flex');
+            }
+        }
+
+        function clearActorSelection() {
+            selectedActors.clear();
+            document.querySelectorAll('.actor-checkbox').forEach(cb => {
+                cb.checked = false;
+            });
+            document.querySelectorAll('[data-actor-id]').forEach(card => {
+                card.classList.remove('ring-2', 'ring-violet-500');
+            });
+            updateOutreachButton();
+        }
+
+        // ==========================================
+        // Outreach Emails Modal
+        // ==========================================
+
+        function openOutreachModal() {
+            const watchlistId = document.getElementById('watchlistSelect').value;
+            if (!watchlistId) {
+                alert('Select a watchlist');
+                return;
+            }
+            if (selectedActors.size === 0) {
+                alert('Select at least one actor');
+                return;
+            }
+
+            // Populate actor list
+            const listEl = document.getElementById('outreachActorList');
+            const countEl = document.getElementById('outreachActorCount');
+            countEl.textContent = selectedActors.size;
+            listEl.innerHTML = Array.from(selectedActors.values()).map(a => `
+                <span class="px-3 py-1.5 bg-violet-100 text-violet-700 text-sm font-medium rounded-full">${escapeHtml(a.name)}</span>
+            `).join('');
+
+            // Reset modal state
+            document.getElementById('outreachPreGen').classList.remove('hidden');
+            document.getElementById('outreachProgress').classList.add('hidden');
+            document.getElementById('outreachResults').classList.add('hidden');
+
+            document.getElementById('outreachModal').classList.remove('hidden');
+        }
+
+        function closeOutreachModal() {
+            document.getElementById('outreachModal').classList.add('hidden');
+        }
+
+        function resetOutreachModal() {
+            document.getElementById('outreachPreGen').classList.remove('hidden');
+            document.getElementById('outreachProgress').classList.add('hidden');
+            document.getElementById('outreachResults').classList.add('hidden');
+        }
+
+        async function generateOutreachEmails() {
+            const watchlistId = document.getElementById('watchlistSelect').value;
+            const actorRefs = Array.from(selectedActors.keys());
+
+            // Show progress
+            document.getElementById('outreachPreGen').classList.add('hidden');
+            document.getElementById('outreachProgress').classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${API_BASE}/watchlist/${watchlistId}/outreach-emails`, {
+                    method: 'POST',
+                    headers: {
+                        'workspace-api-key': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ actor_refs: actorRefs })
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.error || `HTTP ${response.status}`);
+                }
+
+                const result = await response.json();
+                displayOutreachResults(result);
+            } catch (error) {
+                console.error('Outreach generation error:', error);
+                document.getElementById('outreachProgress').classList.add('hidden');
+                document.getElementById('outreachPreGen').classList.remove('hidden');
+                alert('Generation error:' + error.message);
+            }
+        }
+
+        function displayOutreachResults(result) {
+            const emails = result.emails || [];
+            const failed = result.failed || [];
+
+            document.getElementById('outreachProgress').classList.add('hidden');
+            document.getElementById('outreachResults').classList.remove('hidden');
+
+            document.getElementById('outreachSuccessCount').textContent = emails.length;
+
+            // Render email cards
+            const listEl = document.getElementById('outreachEmailsList');
+            listEl.innerHTML = emails.map((email, idx) => `
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${escapeHtml(email.actor_name)}</h4>
+                            <p class="text-sm text-gray-500">${escapeHtml(email.subject)}</p>
+                        </div>
+                        <button onclick="copyEmail(${idx})" class="px-3 py-1.5 text-sm text-violet-600 hover:bg-violet-50 rounded-lg transition-colors flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    ${email.hook ? `
+                        <div class="mb-3 p-3 bg-violet-50 border border-violet-200 rounded-lg">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-4 h-4 text-violet-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div class="text-sm">
+                                    <span class="font-medium text-violet-700">Hook:</span>
+                                    <span class="text-violet-600">${escapeHtml(email.hook.source_title || '')} (${escapeHtml(email.hook.source_date || '')})</span>
+                                    ${email.hook.source_url ? `<a href="${safeUrl(email.hook.source_url)}" target="_blank" rel="noopener" class="ml-1 text-violet-500 hover:underline">Source</a>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div class="text-sm text-gray-700 whitespace-pre-wrap bg-white p-3 rounded-lg border border-gray-100" id="emailBody${idx}">${escapeHtml(email.email_body)}</div>
+                </div>
+            `).join('');
+
+            // Store emails for copy
+            window._outreachEmails = emails;
+
+            // Show failed list if any
+            if (failed.length > 0) {
+                document.getElementById('outreachFailedList').classList.remove('hidden');
+                document.getElementById('outreachFailedCount').textContent = failed.length;
+                document.getElementById('outreachFailedNames').innerHTML = failed.map(f => `<li>${escapeHtml(f.actor_name || f.actor_ref)}: ${escapeHtml(f.reason || 'Unknown error')}</li>`).join('');
+            } else {
+                document.getElementById('outreachFailedList').classList.add('hidden');
+            }
+        }
+
+        function copyEmail(idx) {
+            const email = window._outreachEmails?.[idx];
+            if (!email) return;
+
+            const text = `Subject: ${email.subject}\n\n${email.email_body}`;
+            navigator.clipboard.writeText(text).then(() => {
+                // Visual feedback
+                const btn = event.target.closest('button');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Copied!
+                `;
+                btn.classList.add('text-green-600');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('text-green-600');
+                }, 1500);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('Copy error');
+            });
+        }
+
+        function copyAllEmails() {
+            const emails = window._outreachEmails || [];
+            if (emails.length === 0) return;
+
+            const text = emails.map(e => `=== ${e.actor_name} ===\nSubject: ${e.subject}\n\n${e.email_body}`).join('\n\n---\n\n');
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`${emails.length} email(s) copied to clipboard`);
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('Copy error');
+            });
+        }
     </script>
 </body>
 </html>
