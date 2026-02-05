@@ -657,15 +657,20 @@
             document.getElementById('selectAllCheckbox').checked = allSelected;
         }
 
+        // Helper to check boolean/string TRUE values from Google Sheets
+        function isTrue(val) {
+            return val === true || val === 'TRUE' || val === 'true';
+        }
+
         function applyViewFilter(items) {
             const viewFilter = document.getElementById('viewFilter')?.value || 'active';
             switch (viewFilter) {
                 case 'priority':
-                    return items.filter(i => i.priority === 'TRUE');
+                    return items.filter(i => isTrue(i.priority));
                 case 'hidden':
-                    return items.filter(i => i.hidden === 'TRUE');
+                    return items.filter(i => isTrue(i.hidden));
                 case 'active':
-                    return items.filter(i => i.hidden !== 'TRUE');
+                    return items.filter(i => !isTrue(i.hidden));
                 case 'all':
                 default:
                     return items;
@@ -1062,8 +1067,8 @@
             const cibles = ensureArray(deal.parties_cibles);
             const rationnel = ensureArray(deal.rationnel);
 
-            const isPriority = deal.priority === 'TRUE';
-            const isHidden = deal.hidden === 'TRUE';
+            const isPriority = isTrue(deal.priority);
+            const isHidden = isTrue(deal.hidden);
 
             return `
                 <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass} ${isPriority ? 'priority-card' : ''} ${isHidden ? 'hidden-card' : ''}" onclick="showDealDetail('${escapeHtml(deal.deal_id)}')">
@@ -1183,8 +1188,8 @@
             const actorSourceCount = actorSources.length;
             const hasUpdate = actor.last_seen_at && actor.first_seen_at && actor.last_seen_at !== actor.first_seen_at;
             const isSelected = selectedActors.has(actor.actor_id);
-            const isPriority = actor.priority === 'TRUE';
-            const isHidden = actor.hidden === 'TRUE';
+            const isPriority = isTrue(actor.priority);
+            const isHidden = isTrue(actor.hidden);
 
             return `
                 <div class="glass-card rounded-2xl p-5 shadow-sm card-hover ${freshnessClass} ${isSelected ? 'ring-2 ring-violet-500' : ''} ${isPriority ? 'priority-card' : ''} ${isHidden ? 'hidden-card' : ''}" data-actor-id="${escapeHtml(actor.actor_id)}">
@@ -1270,9 +1275,9 @@
                                 </div>
                             ` : ''}
 
-                            <button onclick="toggleContactedStatus('${escapeHtml(actor.actor_id)}', ${actor.contacted !== 'TRUE'}); event.stopPropagation();"
-                                class="px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${actor.contacted === 'TRUE' ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}">
-                                ${actor.contacted === 'TRUE' ? '✓ Contacted' : '○ Not contacted'}
+                            <button onclick="toggleContactedStatus('${escapeHtml(actor.actor_id)}', ${!isTrue(actor.contacted)}); event.stopPropagation();"
+                                class="px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${isTrue(actor.contacted) ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}">
+                                ${isTrue(actor.contacted) ? '✓ Contacted' : '○ Not contacted'}
                             </button>
 
                             <button onclick="showActorDetail('${escapeHtml(actor.actor_id)}')" class="text-radar-600 text-sm font-medium hover:text-radar-700 text-left flex items-center gap-1 mt-auto">
