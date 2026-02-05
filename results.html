@@ -17,13 +17,13 @@
                     },
                     colors: {
                         'radar': {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            800: '#1e40af',
-                            900: '#1e3a8a'
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81'
                         },
                         'success': '#059669',
                         'warning': '#d97706',
@@ -40,7 +40,7 @@
             backdrop-filter: blur(10px);
         }
         .gradient-header {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #1e40af 100%);
+            background: linear-gradient(135deg, #3730a3 0%, #6366f1 50%, #3730a3 100%);
         }
         .card-hover {
             transition: all 0.3s ease;
@@ -64,7 +64,7 @@
             font-size: 10px;
             font-weight: 500;
         }
-        .source-primary { background: #dbeafe; color: #1e40af; }
+        .source-primary { background: #e0e7ff; color: #3730a3; }
         .source-secondary { background: #f3f4f6; color: #374151; }
         /* Toast notifications */
         .toast-container {
@@ -87,7 +87,7 @@
         }
         .toast-success { background: #059669; }
         .toast-error { background: #dc2626; }
-        .toast-info { background: #2563eb; }
+        .toast-info { background: #4f46e5; }
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -99,9 +99,20 @@
         .priority-star { color: #f59e0b; }
         /* Hidden indicator */
         .hidden-card { opacity: 0.5; }
+        /* Skeleton loading */
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        /* Back to top */
+        .back-to-top { position: fixed; bottom: 80px; right: 20px; z-index: 50; opacity: 0; transform: translateY(10px); transition: all 0.3s ease; pointer-events: none; }
+        .back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        /* Confirmation modal */
+        .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9998; display: flex; align-items: center; justify-content: center; }
+        .confirm-box { background: white; border-radius: 16px; padding: 24px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+        /* Keyboard hints */
+        .kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 4px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 4px; font-size: 11px; font-family: monospace; color: #6b7280; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+<body class="bg-gradient-to-br from-slate-50 to-indigo-50 min-h-screen">
     <!-- Header -->
     <header class="gradient-header text-white shadow-xl">
         <div class="container mx-auto px-4 py-5">
@@ -114,7 +125,7 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold tracking-tight">AI Commercial Radar</h1>
-                        <p class="text-blue-100 text-sm">M&A Intelligence for Infrastructure Funds</p>
+                        <p class="text-indigo-200 text-sm">M&A Intelligence for Infrastructure Funds</p>
                     </div>
                 </div>
                 <nav class="flex gap-2">
@@ -196,6 +207,16 @@
                         <option value="all">All items</option>
                     </select>
                 </div>
+                <div class="w-full lg:w-40">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Sort by</label>
+                    <select id="sortBy" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent" onchange="renderResults()">
+                        <option value="date_desc">Newest first</option>
+                        <option value="date_asc">Oldest first</option>
+                        <option value="confidence_desc">Confidence (high)</option>
+                        <option value="confidence_asc">Confidence (low)</option>
+                        <option value="name_asc">Name (A-Z)</option>
+                    </select>
+                </div>
                 <button onclick="loadResults()" class="px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-colors shadow-sm flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -206,7 +227,7 @@
         </div>
 
         <!-- Summary Stats -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <div class="glass-card rounded-xl p-4 shadow-sm">
                 <div class="text-sm text-gray-500 mb-1">Total Deals</div>
                 <div id="totalDeals" class="text-2xl font-bold text-gray-900">0</div>
@@ -222,6 +243,10 @@
             <div class="glass-card rounded-xl p-4 shadow-sm">
                 <div class="text-sm text-gray-500 mb-1">New (24h)</div>
                 <div id="newToday" class="text-2xl font-bold text-radar-600">0</div>
+            </div>
+            <div class="glass-card rounded-xl p-4 shadow-sm">
+                <div class="text-sm text-gray-500 mb-1">Contacted</div>
+                <div id="contactedCount" class="text-2xl font-bold text-emerald-600">0</div>
             </div>
         </div>
 
@@ -301,6 +326,21 @@
         </div>
     </div>
 
+
+    <!-- Actor Detail Modal -->
+    <div id="actorModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="glass-card rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="sticky top-0 bg-white/95 backdrop-blur-sm px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h2 id="actorModalTitle" class="text-xl font-bold text-gray-900"></h2>
+                <button onclick="closeActorModal()" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="actorModalContent" class="p-6"></div>
+        </div>
+    </div>
 
     <!-- Outreach Emails Modal -->
     <div id="outreachModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
@@ -531,9 +571,20 @@
         </div>
     </div>
 
+    <!-- Back to top button -->
+    <button id="backToTop" class="back-to-top w-10 h-10 bg-radar-600 text-white rounded-full shadow-lg hover:bg-radar-700 transition-colors flex items-center justify-center" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top (T)">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+    </button>
+
     <!-- Footer -->
     <footer class="container mx-auto px-4 py-6 text-center text-sm text-gray-400">
-        AI Commercial Radar v2.0 - M&A Intelligence for Infrastructure Funds
+        <div>AI Commercial Radar v2.2 - M&A Intelligence for Infrastructure Funds</div>
+        <div class="mt-1 flex items-center justify-center gap-3 text-xs text-gray-300">
+            <span><span class="kbd">D</span> Deals</span>
+            <span><span class="kbd">A</span> Actors</span>
+            <span><span class="kbd">/</span> Search</span>
+            <span><span class="kbd">Esc</span> Close</span>
+        </div>
     </footer>
 
     <script>
@@ -549,6 +600,10 @@
         // Search state
         let searchQuery = '';
         let searchDebounceTimer = null;
+
+        // Pagination state
+        let currentPage = 1;
+        const PAGE_SIZE = 20;
 
         // === Toast Notifications ===
         function showToast(message, type = 'info') {
@@ -569,6 +624,7 @@
             clearTimeout(searchDebounceTimer);
             searchDebounceTimer = setTimeout(() => {
                 searchQuery = value.toLowerCase().trim();
+                currentPage = 1;
                 document.getElementById('clearSearch').classList.toggle('hidden', !searchQuery);
                 renderResults();
             }, 300);
@@ -600,10 +656,31 @@
             updateBulkActions();
         }
 
+        function showConfirm(message, onConfirm) {
+            const overlay = document.createElement('div');
+            overlay.className = 'confirm-overlay';
+            overlay.innerHTML = `
+                <div class="confirm-box">
+                    <p class="text-gray-800 font-medium mb-4">${message}</p>
+                    <div class="flex gap-3">
+                        <button class="confirm-cancel flex-1 px-4 py-2 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors font-medium">Cancel</button>
+                        <button class="confirm-ok flex-1 px-4 py-2 bg-radar-600 text-white rounded-xl hover:bg-radar-700 transition-colors font-medium">Confirm</button>
+                    </div>
+                </div>`;
+            overlay.querySelector('.confirm-cancel').onclick = () => overlay.remove();
+            overlay.querySelector('.confirm-ok').onclick = () => { overlay.remove(); onConfirm(); };
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+            document.body.appendChild(overlay);
+        }
+
         async function markAllContacted() {
             const actorIds = Array.from(selectedActors.keys());
             if (actorIds.length === 0) return;
 
+            showConfirm(`Mark ${actorIds.length} actor(s) as contacted?`, async () => { await doMarkAllContacted(actorIds); });
+        }
+
+        async function doMarkAllContacted(actorIds) {
             showToast(`Marking ${actorIds.length} actors as contacted...`, 'info');
             let successCount = 0;
 
@@ -651,10 +728,14 @@
                 btn.classList.add('hidden');
                 btn.classList.remove('flex');
             }
-            // Update select all checkbox state
+            // Update select all checkbox state with indeterminate support
             const actors = getFilteredActors();
-            const allSelected = actors.length > 0 && actors.every(a => selectedActors.has(a.actor_id));
-            document.getElementById('selectAllCheckbox').checked = allSelected;
+            const cb = document.getElementById('selectAllCheckbox');
+            const selectedCount = actors.filter(a => selectedActors.has(a.actor_id)).length;
+            const allSelected = actors.length > 0 && selectedCount === actors.length;
+            const someSelected = selectedCount > 0 && selectedCount < actors.length;
+            cb.checked = allSelected;
+            cb.indeterminate = someSelected;
         }
 
         // Helper to check boolean/string TRUE values from Google Sheets
@@ -677,11 +758,37 @@
             }
         }
 
+        function applySorting(items) {
+            const sortBy = document.getElementById('sortBy')?.value || 'date_desc';
+            return [...items].sort((a, b) => {
+                switch (sortBy) {
+                    case 'date_desc':
+                        return new Date(b.first_seen_at || 0) - new Date(a.first_seen_at || 0);
+                    case 'date_asc':
+                        return new Date(a.first_seen_at || 0) - new Date(b.first_seen_at || 0);
+                    case 'confidence_desc': {
+                        const sa = typeof a.confiance_score === 'number' ? a.confiance_score : 50;
+                        const sb = typeof b.confiance_score === 'number' ? b.confiance_score : 50;
+                        return sb - sa;
+                    }
+                    case 'confidence_asc': {
+                        const sa = typeof a.confiance_score === 'number' ? a.confiance_score : 50;
+                        const sb = typeof b.confiance_score === 'number' ? b.confiance_score : 50;
+                        return sa - sb;
+                    }
+                    case 'name_asc': {
+                        const na = (a.titre || a.nom || '').toLowerCase();
+                        const nb = (b.titre || b.nom || '').toLowerCase();
+                        return na.localeCompare(nb);
+                    }
+                    default: return 0;
+                }
+            });
+        }
+
         function getFilteredActors() {
             let actors = currentData.actors || [];
-            // Apply view filter (hidden/priority/active/all)
             actors = applyViewFilter(actors);
-            // Apply search filter
             if (searchQuery) {
                 actors = actors.filter(actor => {
                     const searchFields = [
@@ -693,14 +800,12 @@
                     return searchFields.some(f => f.includes(searchQuery));
                 });
             }
-            return actors;
+            return applySorting(actors);
         }
 
         function getFilteredDeals() {
             let deals = currentData.deals || [];
-            // Apply view filter (hidden/priority/active/all)
             deals = applyViewFilter(deals);
-            // Apply search filter
             if (searchQuery) {
                 deals = deals.filter(deal => {
                     const searchFields = [
@@ -713,7 +818,7 @@
                     return searchFields.some(f => f.includes(searchQuery));
                 });
             }
-            return deals;
+            return applySorting(deals);
         }
 
         // === Update Deal/Actor Functions ===
@@ -770,8 +875,15 @@
         }
 
         function toggleDealHidden(dealId, newValue) {
-            updateDeal(dealId, { hidden: newValue });
-            showToast(newValue ? 'Deal hidden' : 'Deal restored', 'info');
+            if (newValue) {
+                showConfirm('Hide this deal? It will only appear in the "Hidden" view.', () => {
+                    updateDeal(dealId, { hidden: true });
+                    showToast('Deal hidden', 'info');
+                });
+            } else {
+                updateDeal(dealId, { hidden: false });
+                showToast('Deal restored', 'info');
+            }
         }
 
         function toggleActorPriority(actorId, newValue) {
@@ -780,8 +892,15 @@
         }
 
         function toggleActorHidden(actorId, newValue) {
-            updateActor(actorId, { hidden: newValue });
-            showToast(newValue ? 'Actor hidden' : 'Actor restored', 'info');
+            if (newValue) {
+                showConfirm('Hide this actor? It will only appear in the "Hidden" view.', () => {
+                    updateActor(actorId, { hidden: true });
+                    showToast('Actor hidden', 'info');
+                });
+            } else {
+                updateActor(actorId, { hidden: false });
+                showToast('Actor restored', 'info');
+            }
         }
 
         // Sync actor selection after filter (keep valid selections)
@@ -821,6 +940,43 @@
             return (s.startsWith('http://') || s.startsWith('https://')) ? escapeHtml(s) : '#';
         }
 
+        // === URL Sync ===
+        function syncFiltersToURL() {
+            const params = new URLSearchParams();
+            const wl = document.getElementById('watchlistSelect').value;
+            const conf = document.getElementById('confidenceFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const fresh = document.getElementById('freshnessFilter').value;
+            const view = document.getElementById('viewFilter').value;
+            const sort = document.getElementById('sortBy').value;
+            if (wl) params.set('watchlist_id', wl);
+            if (conf) params.set('confidence', conf);
+            if (type) params.set('type', type);
+            if (fresh) params.set('freshness', fresh);
+            if (view && view !== 'active') params.set('view', view);
+            if (sort && sort !== 'date_desc') params.set('sort', sort);
+            if (currentTab !== 'deals') params.set('tab', currentTab);
+            if (searchQuery) params.set('q', searchQuery);
+            const qs = params.toString();
+            history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+        }
+
+        function restoreFiltersFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('watchlist_id')) document.getElementById('watchlistSelect').value = params.get('watchlist_id');
+            if (params.get('confidence')) document.getElementById('confidenceFilter').value = params.get('confidence');
+            if (params.get('type')) document.getElementById('typeFilter').value = params.get('type');
+            if (params.get('freshness')) document.getElementById('freshnessFilter').value = params.get('freshness');
+            if (params.get('view')) document.getElementById('viewFilter').value = params.get('view');
+            if (params.get('sort')) document.getElementById('sortBy').value = params.get('sort');
+            if (params.get('tab')) { currentTab = params.get('tab'); switchTab(currentTab); }
+            if (params.get('q')) {
+                searchQuery = params.get('q');
+                document.getElementById('searchInput').value = searchQuery;
+                document.getElementById('clearSearch').classList.remove('hidden');
+            }
+        }
+
         // Init
         document.addEventListener('DOMContentLoaded', async () => {
             if (!API_KEY || !API_BASE) {
@@ -828,14 +984,15 @@
                 return;
             }
             await loadWatchlists();
-
-            const params = new URLSearchParams(window.location.search);
-            const watchlistId = params.get('watchlist_id');
-            if (watchlistId) {
-                document.getElementById('watchlistSelect').value = watchlistId;
-                updateOwnerBadge();
-            }
+            restoreFiltersFromURL();
+            updateOwnerBadge();
             loadResults();
+
+            // Back to top scroll listener
+            window.addEventListener('scroll', () => {
+                const btn = document.getElementById('backToTop');
+                btn.classList.toggle('visible', window.scrollY > 300);
+            });
         });
 
         async function loadWatchlists() {
@@ -886,15 +1043,27 @@
             if (type) url += `type=${type}&`;
             if (freshness) url += `freshness=${freshness}&`;
 
-            document.getElementById('resultsContainer').innerHTML = `
-                <div class="glass-card rounded-2xl p-12 text-center">
-                    <svg class="w-12 h-12 mx-auto mb-4 text-radar-500 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="text-gray-500">Loading results...</p>
+            document.getElementById('resultsContainer').innerHTML = Array.from({length: 4}, () => `
+                <div class="glass-card rounded-2xl p-5 shadow-sm">
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <div class="skeleton h-6 w-3/4 mb-3"></div>
+                            <div class="skeleton h-4 w-1/2 mb-2"></div>
+                            <div class="grid grid-cols-4 gap-3 mb-3">
+                                <div class="skeleton h-10 rounded-xl"></div>
+                                <div class="skeleton h-10 rounded-xl"></div>
+                                <div class="skeleton h-10 rounded-xl"></div>
+                                <div class="skeleton h-10 rounded-xl"></div>
+                            </div>
+                            <div class="skeleton h-4 w-2/3"></div>
+                        </div>
+                        <div class="w-48">
+                            <div class="skeleton h-20 rounded-xl mb-3"></div>
+                            <div class="skeleton h-4 w-24"></div>
+                        </div>
+                    </div>
                 </div>
-            `;
+            `).join('');
 
             try {
                 const response = await fetch(url, {
@@ -950,10 +1119,14 @@
             const yesterday = new Date(now - 24 * 60 * 60 * 1000);
             const newToday = deals.filter(d => new Date(d.first_seen_at) > yesterday).length;
             document.getElementById('newToday').textContent = newToday;
+
+            const contacted = actors.filter(a => isTrue(a.contacted)).length;
+            document.getElementById('contactedCount').textContent = `${contacted}/${actors.length}`;
         }
 
         function switchTab(tab) {
             currentTab = tab;
+            currentPage = 1;
             document.getElementById('tabDeals').className = tab === 'deals'
                 ? 'flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all'
                 : 'flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200';
@@ -1000,36 +1173,88 @@
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
+        function highlightText(text, query) {
+            if (!query || !text) return escapeHtml(text);
+            const escaped = escapeHtml(text);
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return escaped.replace(regex, '<mark class="search-highlight">$1</mark>');
+        }
+
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+            if (totalPages <= 1) return '';
+            const start = (currentPage - 1) * PAGE_SIZE + 1;
+            const end = Math.min(currentPage * PAGE_SIZE, totalItems);
+            let pages = '';
+            const maxButtons = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+            if (endPage - startPage < maxButtons - 1) startPage = Math.max(1, endPage - maxButtons + 1);
+
+            for (let i = startPage; i <= endPage; i++) {
+                pages += `<button onclick="goToPage(${i})" class="px-3 py-1 rounded-lg text-sm font-medium transition-colors ${i === currentPage ? 'bg-radar-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}">${i}</button>`;
+            }
+            return `
+                <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                    <span class="text-sm text-gray-500">Showing ${start}-${end} of ${totalItems}</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1 rounded-lg text-sm font-medium bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">&laquo;</button>
+                        ${pages}
+                        <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1 rounded-lg text-sm font-medium bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed">&raquo;</button>
+                    </div>
+                </div>`;
+        }
+
+        function goToPage(page) {
+            const items = currentTab === 'deals' ? getFilteredDeals() : getFilteredActors();
+            const totalPages = Math.ceil(items.length / PAGE_SIZE);
+            currentPage = Math.max(1, Math.min(page, totalPages));
+            renderResults();
+            window.scrollTo({ top: document.getElementById('resultsContainer').offsetTop - 20, behavior: 'smooth' });
+        }
+
         function renderResults() {
             const container = document.getElementById('resultsContainer');
-            // Use filtered results based on search query
-            const items = currentTab === 'deals' ? getFilteredDeals() : getFilteredActors();
-            const totalItems = currentTab === 'deals' ? (currentData.deals || []).length : (currentData.actors || []).length;
+            const allItems = currentTab === 'deals' ? getFilteredDeals() : getFilteredActors();
+            const totalUnfiltered = currentTab === 'deals' ? (currentData.deals || []).length : (currentData.actors || []).length;
 
-            if (!items || items.length === 0) {
+            // Sync URL state
+            syncFiltersToURL();
+
+            if (!allItems || allItems.length === 0) {
                 const hasSearch = searchQuery.length > 0;
+                const hasData = totalUnfiltered > 0;
                 container.innerHTML = `
                     <div class="glass-card rounded-2xl p-12 text-center">
-                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="${hasSearch ? 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' : 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'}"/>
+                        <svg class="w-20 h-20 mx-auto mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="${hasSearch ? 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' : hasData ? 'M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z' : 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'}"/>
                         </svg>
-                        <p class="text-gray-500">${hasSearch ? `No results for "${escapeHtml(searchQuery)}"` : `No ${currentTab === 'deals' ? 'deal' : 'actor'} found with these criteria`}</p>
-                        ${hasSearch ? '<button onclick="clearSearch()" class="mt-3 text-radar-600 hover:underline text-sm">Clear search</button>' : ''}
+                        <p class="text-gray-500 text-lg font-medium mb-1">${hasSearch ? 'No results found' : hasData ? 'No items match these filters' : 'No data yet'}</p>
+                        <p class="text-gray-400 text-sm">${hasSearch ? `No match for "${escapeHtml(searchQuery)}"` : hasData ? 'Try adjusting your filters or view settings' : 'Select a watchlist and click Filter to load results'}</p>
+                        ${hasSearch ? '<button onclick="clearSearch()" class="mt-4 px-4 py-2 text-radar-600 bg-radar-50 hover:bg-radar-100 rounded-xl text-sm font-medium transition-colors">Clear search</button>' : ''}
                     </div>
                 `;
+                currentPage = 1;
                 return;
             }
 
-            // Show search result count if searching
-            const searchInfo = searchQuery ? `<div class="mb-3 text-sm text-gray-500">Showing ${items.length} of ${totalItems} ${currentTab}</div>` : '';
+            // Clamp page
+            const totalPages = Math.ceil(allItems.length / PAGE_SIZE);
+            if (currentPage > totalPages) currentPage = totalPages;
+            const pageItems = allItems.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+            // Info bar
+            const searchInfo = searchQuery ? `<div class="mb-3 text-sm text-gray-500">Showing ${allItems.length} of ${totalUnfiltered} ${currentTab}</div>` : '';
 
             if (currentTab === 'deals') {
-                container.innerHTML = searchInfo + items.map(deal => renderDealCard(deal)).join('');
+                container.innerHTML = searchInfo + pageItems.map(deal => renderDealCard(deal)).join('') + renderPagination(allItems.length);
             } else {
-                container.innerHTML = searchInfo + items.map(actor => renderActorCard(actor)).join('');
-                // Re-apply checkbox states after render
+                container.innerHTML = searchInfo + pageItems.map(actor => renderActorCard(actor)).join('') + renderPagination(allItems.length);
                 updateCheckboxes();
             }
+
+            // Update contacted stats after render
+            updateSummaryStats();
         }
 
         function renderDealCard(deal) {
@@ -1093,7 +1318,7 @@
                                         </svg>
                                     </button>
                                 </div>
-                                <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(deal.titre) || 'Untitled deal'}</h3>
+                                <h3 class="font-bold text-gray-900 text-lg">${searchQuery ? highlightText(deal.titre, searchQuery) : escapeHtml(deal.titre) || 'Untitled deal'}</h3>
                                 <span class="px-2.5 py-1 ${stage.color} text-xs font-medium rounded-full">${escapeHtml(stage.label)}</span>
                                 ${isPriority ? '<span class="text-amber-500 text-lg">★</span>' : ''}
                             </div>
@@ -1225,7 +1450,7 @@
                                     ${actorType.icon}
                                 </div>
                                 <div class="cursor-pointer flex-1" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
-                                    <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(actor.nom) || 'Unnamed actor'}${isPriority ? ' <span class="text-amber-500">★</span>' : ''}</h3>
+                                    <h3 class="font-bold text-gray-900 text-lg">${searchQuery ? highlightText(actor.nom, searchQuery) : escapeHtml(actor.nom) || 'Unnamed actor'}${isPriority ? ' <span class="text-amber-500">★</span>' : ''}</h3>
                                     <div class="flex items-center gap-2 mt-1">
                                         <span class="px-2.5 py-0.5 ${actorType.color} text-xs font-medium rounded-full">${actorType.label}</span>
                                         <span class="text-sm text-gray-500">${escapeHtml(actor.geographie) || 'Geo N/A'}</span>
@@ -1489,8 +1714,8 @@
             const dirigeants = ensureArray(actor.dirigeants_cles);
             const sources = ensureArray(actor.sources);
 
-            document.getElementById('modalTitle').textContent = actor.nom || 'Actor Details';
-            document.getElementById('modalContent').innerHTML = `
+            document.getElementById('actorModalTitle').textContent = actor.nom || 'Actor Details';
+            document.getElementById('actorModalContent').innerHTML = `
                 <div class="space-y-6">
                     <!-- Header -->
                     <div class="flex items-center gap-4">
@@ -1621,7 +1846,11 @@
                     </div>
                 </div>
             `;
-            document.getElementById('dealModal').classList.remove('hidden');
+            document.getElementById('actorModal').classList.remove('hidden');
+        }
+
+        function closeActorModal() {
+            document.getElementById('actorModal').classList.add('hidden');
         }
 
         function closeModal() {
@@ -1660,16 +1889,35 @@
                 });
         }
 
-        // Close modals on escape or click outside
+        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
+            // Ignore when typing in inputs
+            const tag = e.target.tagName;
+            const isEditable = e.target.isContentEditable;
+            const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || isEditable;
+
             if (e.key === 'Escape') {
                 closeModal();
+                closeActorModal();
                 closeOutreachModal();
                 closeSummaryModal();
+                // Remove any confirm dialogs
+                document.querySelector('.confirm-overlay')?.remove();
+                return;
             }
+
+            if (isInput) return;
+
+            if (e.key === 'd' || e.key === 'D') { switchTab('deals'); e.preventDefault(); }
+            if (e.key === 'a' || e.key === 'A') { switchTab('actors'); e.preventDefault(); }
+            if (e.key === '/') { document.getElementById('searchInput').focus(); e.preventDefault(); }
+            if (e.key === 't' || e.key === 'T') { window.scrollTo({top: 0, behavior: 'smooth'}); e.preventDefault(); }
         });
         document.getElementById('dealModal').addEventListener('click', (e) => {
             if (e.target.id === 'dealModal') closeModal();
+        });
+        document.getElementById('actorModal').addEventListener('click', (e) => {
+            if (e.target.id === 'actorModal') closeActorModal();
         });
         document.getElementById('outreachModal').addEventListener('click', (e) => {
             if (e.target.id === 'outreachModal') closeOutreachModal();
