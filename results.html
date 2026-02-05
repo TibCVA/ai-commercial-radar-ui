@@ -835,7 +835,7 @@
                                         data-actor-id="${escapeHtml(actor.actor_id)}"
                                         data-actor-name="${escapeHtml(actor.nom || '')}"
                                         ${isSelected ? 'checked' : ''}
-                                        onchange="toggleActorSelection('${escapeHtml(actor.actor_id)}', '${escapeHtml(actor.nom || '').replace(/'/g, "\\'")}', this.checked)">
+                                        onchange="toggleActorSelection('${escapeHtml(actor.actor_id)}', '${escapeHtml(actor.nom || '').replace(/'/g, "\\'")}', '${escapeHtml(actor.watchlist_id || '')}', this.checked)">
                                 </label>
                                 <div class="w-12 h-12 rounded-xl ${actorType.color} flex items-center justify-center text-2xl cursor-pointer" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
                                     ${actorType.icon}
@@ -890,6 +890,11 @@
                                     <span>${contacts.length} contact(s)</span>
                                 </div>
                             ` : ''}
+
+                            <button onclick="toggleContactedStatus('${escapeHtml(actor.actor_id)}', ${actor.contacted !== 'TRUE'}); event.stopPropagation();"
+                                class="px-2.5 py-1 text-xs font-medium rounded-full transition-colors ${actor.contacted === 'TRUE' ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}">
+                                ${actor.contacted === 'TRUE' ? '✓ Contacted' : '○ Not contacted'}
+                            </button>
 
                             <button onclick="showActorDetail('${escapeHtml(actor.actor_id)}')" class="text-radar-600 text-sm font-medium hover:text-radar-700 text-left flex items-center gap-1 mt-auto">
                                 View profile
@@ -1288,9 +1293,9 @@
         // Actor Selection for Outreach
         // ==========================================
 
-        function toggleActorSelection(actorId, actorName, isChecked) {
+        function toggleActorSelection(actorId, actorName, watchlistId, isChecked) {
             if (isChecked) {
-                selectedActors.set(actorId, { id: actorId, name: actorName });
+                selectedActors.set(actorId, { id: actorId, name: actorName, watchlist_id: watchlistId });
             } else {
                 selectedActors.delete(actorId);
             }
@@ -1331,17 +1336,51 @@
         }
 
         // ==========================================
+        // Contacted Status Toggle
+        // ==========================================
+
+        async function toggleContactedStatus(actorId, newStatus) {
+            try {
+                const response = await fetch(`${API_BASE}/actor/contacted`, {
+                    method: 'POST',
+                    headers: {
+                        'workspace-api-key': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ actor_id: actorId, contacted: newStatus })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.error || `HTTP ${response.status}`);
+                }
+
+                // Update local data and re-render
+                const actor = (currentData.actors || []).find(a => a.actor_id === actorId);
+                if (actor) {
+                    actor.contacted = newStatus ? 'TRUE' : 'FALSE';
+                }
+                renderResults();
+            } catch (error) {
+                console.error('Failed to update contacted status:', error);
+                alert('Failed to update contacted status: ' + error.message);
+            }
+        }
+
+        // ==========================================
         // Outreach Emails Modal
         // ==========================================
 
         function openOutreachModal() {
-            const watchlistId = document.getElementById('watchlistSelect').value;
-            if (!watchlistId) {
-                alert('Select a watchlist');
-                return;
-            }
             if (selectedActors.size === 0) {
                 alert('Select at least one actor');
+                return;
+            }
+
+            // Check all selected actors have the same watchlist_id
+            const watchlistIds = new Set(Array.from(selectedActors.values()).map(a => a.watchlist_id));
+            if (watchlistIds.size > 1) {
+                alert('Please select actors from the same watchlist only');
                 return;
             }
 
@@ -1372,8 +1411,15 @@
         }
 
         async function generateOutreachEmails() {
-            const watchlistId = document.getElementById('watchlistSelect').value;
+            // Get watchlist_id from selected actors (all should be the same, validated in openOutreachModal)
+            const selectedArray = Array.from(selectedActors.values());
+            const watchlistId = selectedArray[0]?.watchlist_id || '';
             const actorRefs = Array.from(selectedActors.keys());
+
+            if (!watchlistId) {
+                alert('Error: Actor watchlist_id not found');
+                return;
+            }
 
             // Show progress
             document.getElementById('outreachPreGen').classList.add('hidden');
