@@ -215,8 +215,20 @@
                         <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">9</span>
                         Workflow actions
                     </a>
+                    <a href="#smart-tools" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold flex-shrink-0">10</span>
+                        Smart tools
+                    </a>
+                    <a href="#notes-export" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold flex-shrink-0">11</span>
+                        Notes & Contact export
+                    </a>
+                    <a href="#shortcuts" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-violet-100 text-violet-600 flex items-center justify-center text-xs font-bold flex-shrink-0">12</span>
+                        Keyboard shortcuts
+                    </a>
                     <a href="#faq" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
-                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">10</span>
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">13</span>
                         FAQ
                     </a>
                 </div>
@@ -464,7 +476,7 @@
                             </div>
                             <div>
                                 <p class="font-medium text-gray-900">Search</p>
-                                <p class="text-gray-500">Type to filter by name, parties, signals...</p>
+                                <p class="text-gray-500">Type to filter by name, parties, signals... Matching text is <strong>highlighted in yellow</strong> in the results.</p>
                             </div>
                         </div>
                         <div class="flex gap-3 items-start text-sm">
@@ -482,7 +494,7 @@
                             </div>
                             <div>
                                 <p class="font-medium text-gray-900">By operation type</p>
-                                <p class="text-gray-500">M&A rumor, asset deal, financing, growth signal, etc.</p>
+                                <p class="text-gray-500">M&A, asset deal, financing, JV, growth signal, etc.</p>
                             </div>
                         </div>
                         <div class="flex gap-3 items-start text-sm">
@@ -491,7 +503,7 @@
                             </div>
                             <div>
                                 <p class="font-medium text-gray-900">By freshness</p>
-                                <p class="text-gray-500">Last 24h, 7 days or 30 days.</p>
+                                <p class="text-gray-500">Last 24h, 7 days, 30 days, or <strong>90 days</strong>. Freshness is now enforced server-side.</p>
                             </div>
                         </div>
                         <div class="flex gap-3 items-start text-sm">
@@ -503,9 +515,49 @@
                                 <p class="text-gray-500">Active, priority, hidden or all items.</p>
                             </div>
                         </div>
+                        <div class="flex gap-3 items-start text-sm">
+                            <div class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Sort by</p>
+                                <p class="text-gray-500">Date (newest first), confidence score (highest first), or name (A-Z).</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <p class="text-sm text-gray-500 mt-6">Click on a deal or actor to view its <strong>detailed card</strong> with all sources, confidence justification, and complete information.</p>
+                    <h3 class="font-semibold text-gray-900 mt-8 mb-3">Pagination & navigation</h3>
+                    <p class="text-gray-600 text-sm mb-3">
+                        Results are <strong>paginated</strong> (20 items per page) for faster loading. Use the pagination buttons at the bottom to navigate between pages. A <strong>back-to-top button</strong> appears when you scroll down.
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 mt-6 mb-3">Summary statistics</h3>
+                    <p class="text-gray-600 text-sm mb-3">
+                        The top bar displays 5 stat cards: <strong>Total Deals</strong>, <strong>Total Actors</strong>, <strong>High Confidence</strong>, <strong>Sources</strong>, and <strong>Contacted</strong> (number of actors marked as contacted).
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 mt-6 mb-3">Detail modals</h3>
+                    <p class="text-sm text-gray-600 mb-3">Click on a deal or actor to view its <strong>detailed card</strong>:</p>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-100 text-sm">
+                            <p class="font-medium text-gray-900 mb-2">Deal detail</p>
+                            <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                                <li>Full deal information and parties</li>
+                                <li><strong>Enhanced evidence bar</strong>: primary vs secondary sources, freshness badge, momentum indicator</li>
+                                <li>Sources with direct links</li>
+                                <li>Notes (editable, see section 11)</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 text-sm">
+                            <p class="font-medium text-gray-900 mb-2">Actor detail</p>
+                            <ul class="text-gray-600 space-y-1 list-disc list-inside">
+                                <li>Actor profile and geography</li>
+                                <li><strong>Activity timeline</strong>: vertical timeline with colored dots for each detected signal</li>
+                                <li>Contact points and executives</li>
+                                <li>Notes (editable, see section 11)</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -565,6 +617,7 @@
                         Export identified deals and actors in <strong>CSV</strong> format (Excel compatible) for offline analysis or team sharing.
                     </p>
 
+                    <h3 class="font-semibold text-gray-900 mb-4">Full data export (XLSX)</h3>
                     <div class="space-y-4">
                         <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
                             <svg class="w-6 h-6 text-teal-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -582,8 +635,17 @@
                         </div>
                     </div>
 
-                    <div class="mt-6 p-4 bg-teal-50 rounded-xl border border-teal-100 text-sm text-teal-800">
-                        <strong>Format:</strong> CSV with semicolon separator (<code>;</code>), UTF-8 encoding with BOM for optimal Excel compatibility. Contains two sections: deals and actors.
+                    <h3 class="font-semibold text-gray-900 mt-8 mb-4">Contact export (CSV)</h3>
+                    <div class="flex gap-4 items-start p-4 bg-teal-50 rounded-xl border border-teal-100 mb-4">
+                        <svg class="w-6 h-6 text-teal-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <div>
+                            <p class="font-medium text-gray-900">Export selected contacts</p>
+                            <p class="text-sm text-gray-600 mt-1">On the Actors tab, select actors with checkboxes. A teal <strong>"Export contacts"</strong> button appears next to the outreach button. Click it to download a CSV with columns: Actor Name, Type, Geography, Contact Name, Role, Email, Source URL, Contacted.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-teal-50 rounded-xl border border-teal-100 text-sm text-teal-800">
+                        <strong>Format:</strong> Both exports use UTF-8 encoding with BOM for optimal Excel compatibility. Full export uses semicolons (<code>;</code>), contact export uses commas (<code>,</code>).
                     </div>
                 </div>
             </div>
@@ -878,12 +940,191 @@
             </div>
         </section>
 
-        <!-- 10. FAQ -->
+        <!-- 10. Smart Tools -->
+        <section id="smart-tools" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-emerald-600 to-green-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">10</span>
+                        Smart tools
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <p class="text-gray-600 mb-6">
+                        Advanced productivity tools to help you focus on the most actionable results and save time on repetitive tasks.
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 mb-4">Ready to Prospect</h3>
+                    <div class="flex gap-4 items-start p-4 bg-emerald-50 rounded-xl border border-emerald-100 mb-6">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900 mb-1">One-click smart filter for actionable actors</p>
+                            <p class="text-sm text-gray-600">The green <strong>"Ready to Prospect"</strong> button on the Results page instantly filters actors to show only those that meet all three criteria:</p>
+                            <ul class="text-sm text-gray-600 mt-2 space-y-1 list-disc list-inside">
+                                <li><strong>Has contacts</strong>: at least one contact point with email</li>
+                                <li><strong>Fresh</strong>: first detected less than 14 days ago</li>
+                                <li><strong>Not yet contacted</strong>: not hidden and not marked as contacted</li>
+                            </ul>
+                            <p class="text-sm text-gray-500 mt-2">Click the button again to deactivate the filter and return to the normal view.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="font-semibold text-gray-900 mb-4">Saved filter presets</h3>
+                    <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900 mb-1">Save and restore filter combinations</p>
+                            <p class="text-sm text-gray-600">Below the filter bar, a <strong>Presets</strong> row lets you:</p>
+                            <ul class="text-sm text-gray-600 mt-2 space-y-1 list-disc list-inside">
+                                <li><strong>Save</strong>: Click "Save" to store the current filter state (watchlist, confidence, type, freshness, view, sort) under a custom name</li>
+                                <li><strong>Load</strong>: Select a preset from the dropdown to instantly restore all filters and reload results</li>
+                                <li><strong>Delete</strong>: Select a preset then click "Delete" to remove it</li>
+                            </ul>
+                            <p class="text-sm text-gray-500 mt-2">Presets are stored in your browser's local storage and persist across sessions.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="font-semibold text-gray-900 mb-4">URL sharing</h3>
+                    <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 text-sm text-blue-800">
+                        <strong>Share your view:</strong> All filter selections are automatically synced to the URL query parameters. Copy the URL from your browser's address bar to share your exact filter combination with a colleague. When they open the link, all filters are restored automatically.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. Notes & Contact Export -->
+        <section id="notes-export" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">11</span>
+                        Notes & Contact export
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <h3 class="font-semibold text-gray-900 mb-4">Notes on deals and actors</h3>
+                    <p class="text-gray-600 mb-4">
+                        Add personal notes to any deal or actor to keep track of context, next steps, or team decisions. Notes persist across sessions.
+                    </p>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex gap-4 items-start p-4 bg-amber-50 rounded-xl border border-amber-100">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Open the detail modal</p>
+                                <p class="text-sm text-gray-600 mt-1">Click on any deal or actor card to open its detail view.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-4 bg-amber-50 rounded-xl border border-amber-100">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Write your note</p>
+                                <p class="text-sm text-gray-600 mt-1">In the yellow <strong>"Notes"</strong> section, type your note (max 500 characters). A character counter shows remaining space.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-4 bg-amber-50 rounded-xl border border-amber-100">
+                            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Save</p>
+                                <p class="text-sm text-gray-600 mt-1">Click <strong>"Save note"</strong>. The note is saved to the database and will appear next time you open the detail card. Items with notes show a pencil icon on their card.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="font-semibold text-gray-900 mb-4">Contact export (CSV)</h3>
+                    <p class="text-gray-600 mb-4">
+                        Quickly export contact information from selected actors into a spreadsheet-ready CSV file.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Select actors</p>
+                                <p class="text-sm text-gray-600 mt-1">On the Actors tab, use checkboxes to select the actors whose contacts you want to export.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Click "Export contacts"</p>
+                                <p class="text-sm text-gray-600 mt-1">The teal button appears next to "Generate outreach". It shows the count of selected actors.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</div>
+                            <div>
+                                <p class="font-medium text-gray-900">Open in Excel</p>
+                                <p class="text-sm text-gray-600 mt-1">A CSV file downloads with columns: Actor Name, Type, Geography, Contact Name, Role, Email, Source URL, Contacted. Open directly in Excel or Google Sheets.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 12. Keyboard Shortcuts -->
+        <section id="shortcuts" class="mb-12 scroll-mt-24">
+            <div class="step-card rounded-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-violet-600 to-purple-500 px-8 py-5">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">12</span>
+                        Keyboard shortcuts
+                    </h2>
+                </div>
+                <div class="p-8">
+                    <p class="text-gray-600 mb-6">
+                        Navigate the Results page faster with keyboard shortcuts. These work when no input field or modal is focused.
+                    </p>
+
+                    <div class="rounded-xl border border-gray-100 overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="text-left px-5 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider w-32">Key</th>
+                                    <th class="text-left px-5 py-3 font-semibold text-gray-500 uppercase text-xs tracking-wider">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <tr>
+                                    <td class="px-5 py-3"><kbd class="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-bold text-gray-700">D</kbd></td>
+                                    <td class="px-5 py-3 text-gray-600">Switch to Deals tab</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3"><kbd class="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-bold text-gray-700">A</kbd></td>
+                                    <td class="px-5 py-3 text-gray-600">Switch to Actors tab</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3"><kbd class="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-bold text-gray-700">/</kbd></td>
+                                    <td class="px-5 py-3 text-gray-600">Focus the search field</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3"><kbd class="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-bold text-gray-700">T</kbd></td>
+                                    <td class="px-5 py-3 text-gray-600">Scroll back to top</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-5 py-3"><kbd class="px-2 py-1 bg-gray-100 rounded text-xs font-mono font-bold text-gray-700">Esc</kbd></td>
+                                    <td class="px-5 py-3 text-gray-600">Close any open modal</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-violet-50 rounded-xl border border-violet-100 text-sm text-violet-800">
+                        <strong>Tip:</strong> Shortcuts are disabled when you're typing in a search field, note textarea, or any other input. Press <kbd class="px-1.5 py-0.5 bg-white rounded text-xs font-mono">Esc</kbd> to leave the search field first, then use shortcuts.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 13. FAQ -->
         <section id="faq" class="mb-12 scroll-mt-24">
             <div class="step-card rounded-2xl overflow-hidden">
                 <div class="bg-gradient-to-r from-cyan-600 to-blue-500 px-8 py-5">
                     <h2 class="text-xl font-bold text-white flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">10</span>
+                        <span class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center text-sm font-extrabold">13</span>
                         Frequently asked questions
                     </h2>
                 </div>
@@ -902,7 +1143,7 @@
                     </div>
                     <div class="border-t border-gray-100 pt-6">
                         <h3 class="font-semibold text-gray-900 mb-2">What sources are used?</h3>
-                        <p class="text-gray-600 text-sm">The AI uses a combination of specialized RSS feeds (Infrastructure Investor, DataCenter Dynamics, etc.) and web search via gpt-5-nano with web_search. The v6 "Bounded Scan" pipeline generates targeted queries by geography, collects up to 120 sources, clusters them thematically, then extracts signals with gpt-5.2 and advanced reasoning.</p>
+                        <p class="text-gray-600 text-sm">The AI uses 12 specialized RSS feeds (Infrastructure Investor, DataCenter Dynamics, Recharge News, PV Magazine, PE Hub, Capacity Media, etc.) and web search via gpt-5-nano. The v7 pipeline generates targeted queries by geography, collects up to 200 sources, clusters them thematically, then extracts signals with gpt-5.2 and advanced reasoning. The LLM follows strict dedup rules to avoid returning the same transaction multiple times.</p>
                     </div>
                     <div class="border-t border-gray-100 pt-6">
                         <h3 class="font-semibold text-gray-900 mb-2">How do I configure the tool for the first time?</h3>
@@ -910,7 +1151,7 @@
                     </div>
                     <div class="border-t border-gray-100 pt-6">
                         <h3 class="font-semibold text-gray-900 mb-2">How does deduplication work?</h3>
-                        <p class="text-gray-600 text-sm">Each deal and actor is identified by a unique SHA-256 hash, calculated from title, parties, operation type and geography. Company names are normalized (removing legal suffixes like GmbH, Inc, SA). If a deal is detected again in a later scan, it is <strong>enriched</strong> (merged sources, advanced stage, filled empty fields) instead of duplicated.</p>
+                        <p class="text-gray-600 text-sm">Each deal and actor is identified by a unique SHA-256 hash, calculated from title, parties, operation type and geography. Company names are normalized by removing 40+ legal and business suffixes (GmbH, Inc, SA, Partners, Capital, Holdings, Fund, Management, Infrastructure, etc.). This means "InfraFund Partners GmbH" and "Infra Fund" are treated as the same entity. If a deal is detected again in a later scan, it is <strong>enriched</strong> (merged sources, advanced stage, recalculated confidence) instead of duplicated. The AI also follows explicit dedup rules: a rumor that becomes an announcement is merged into one deal at the latest stage.</p>
                     </div>
                     <div class="border-t border-gray-100 pt-6">
                         <h3 class="font-semibold text-gray-900 mb-2">What does "Updated X ago" mean on a deal or actor?</h3>
@@ -923,6 +1164,26 @@
                     <div class="border-t border-gray-100 pt-6">
                         <h3 class="font-semibold text-gray-900 mb-2">What happens if a scan fails due to insufficient OpenAI funds?</h3>
                         <p class="text-gray-600 text-sm">A visual error modal will appear explaining that the scan could not complete due to insufficient funds in the OpenAI account. Contact your administrator to add credits or check the billing page.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">How does the freshness filter work?</h3>
+                        <p class="text-gray-600 text-sm">The freshness filter (24h, 7d, 30d, 90d) is enforced <strong>server-side</strong>. When you select "Last 30 days", the API filters results by <code>first_seen_at</code> date, so only deals and actors detected within the last 30 days are returned. This prevents stale results from appearing regardless of how many past scans have been performed.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Are my filter presets shared with the team?</h3>
+                        <p class="text-gray-600 text-sm">No. Presets are stored locally in your browser (localStorage). Each team member has their own presets. However, you can share your current filter view by copying the URL, which contains all filter parameters.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">What does "Ready to Prospect" filter?</h3>
+                        <p class="text-gray-600 text-sm">It shows only actors that meet three criteria: (1) have at least one contact point, (2) were first detected less than 14 days ago, and (3) have not been hidden or marked as contacted. It switches to the Actors tab automatically.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">What is the activity timeline in actor details?</h3>
+                        <p class="text-gray-600 text-sm">The timeline replaces the flat signal list with a visual vertical timeline. It shows the first detection date, each signal as a colored dot with its description, and the last update date. Colors cycle through 5 different hues for visual distinction.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">What are the "primary" and "secondary" sources in the evidence bar?</h3>
+                        <p class="text-gray-600 text-sm">The enhanced evidence bar on deal detail cards breaks down sources into <strong>primary</strong> (sources with quality marked as "primary" or from credible financial press) and <strong>secondary</strong> (all other sources). It also shows a freshness badge (average age of sources) and a momentum indicator ("Gaining traction" when recent sources outnumber older ones).</p>
                     </div>
                 </div>
             </div>
@@ -939,7 +1200,7 @@
 
     <!-- Footer -->
     <footer class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-        <p class="text-sm text-gray-400">AI Commercial Radar v2.1 - M&A Intelligence for Infrastructure Funds - Last update: Feb 5, 2026 (workflow actions: priority, hide, contacted)</p>
+        <p class="text-sm text-gray-400">AI Commercial Radar v3.0 - M&A Intelligence for Infrastructure Funds - Last update: Feb 5, 2026 (smart tools, notes, presets, timeline, enhanced evidence, keyboard shortcuts, freshness fix, dedup v7)</p>
     </footer>
 </body>
 </html>
