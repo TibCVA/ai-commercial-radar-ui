@@ -196,6 +196,7 @@
                         <option value="24h">Last 24h</option>
                         <option value="7d">Last 7 days</option>
                         <option value="30d">Last 30 days</option>
+                        <option value="90d">Last 90 days</option>
                     </select>
                 </div>
                 <div class="w-full lg:w-40">
@@ -222,6 +223,39 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                     </svg>
                     Filter
+                </button>
+                <button id="btnReadyToProspect" onclick="applyReadyToProspect()"
+                    class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2"
+                    title="Contacts available + fresh (<14d) + not contacted">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Ready to Prospect
+                </button>
+            </div>
+            <!-- Filter Presets -->
+            <div class="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100">
+                <div class="flex items-center gap-2 flex-1">
+                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                    </svg>
+                    <select id="presetSelect" onchange="loadPreset()"
+                        class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                        <option value="">Saved presets...</option>
+                    </select>
+                </div>
+                <button onclick="saveCurrentPreset()"
+                    class="px-3 py-2 text-sm bg-radar-100 text-radar-700 rounded-lg hover:bg-radar-200 transition-colors font-medium flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Save
+                </button>
+                <button onclick="deleteCurrentPreset()" id="btnDeletePreset"
+                    class="hidden px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -291,6 +325,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 <span>Generate outreach (<span id="selectedActorsCount">0</span>)</span>
+            </button>
+            <button id="btnExportContacts" onclick="exportContactsCsv()"
+                class="hidden flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-colors shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span>Export contacts (<span id="exportContactsCount">0</span>)</span>
             </button>
             <button onclick="exportCurrentResults()" class="flex items-center gap-2 px-4 py-2.5 bg-success text-white rounded-xl font-medium hover:bg-green-600 transition-colors shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -800,6 +841,7 @@
                     return searchFields.some(f => f.includes(searchQuery));
                 });
             }
+            actors = applyProspectFilter(actors);
             return applySorting(actors);
         }
 
@@ -986,6 +1028,7 @@
             await loadWatchlists();
             restoreFiltersFromURL();
             updateOwnerBadge();
+            populatePresetDropdown();
             loadResults();
 
             // Back to top scroll listener
@@ -1644,22 +1687,42 @@
                         ` : ''}
                     </div>
 
-                    <!-- Confidence Justification + Evidence Bar -->
+                    <!-- Enhanced Evidence Bar -->
                     ${(() => {
                         const cs = typeof deal.confiance_score === 'number' ? deal.confiance_score : (deal.confiance_score ? parseInt(deal.confiance_score, 10) : null);
                         const csValid = cs !== null && !isNaN(cs);
                         const csColor = csValid ? (cs >= 60 ? '#059669' : cs >= 30 ? '#d97706' : '#dc2626') : '#9ca3af';
+                        const srcs = sources.filter(s => s);
+                        const primaryCount = srcs.filter(s => s.quality === 'primary').length;
+                        const secondaryCount = srcs.length - primaryCount;
+                        const now = new Date();
+                        const pubDates = srcs.map(s => s.date_pub ? new Date(s.date_pub) : null).filter(d => d && !isNaN(d.getTime()));
+                        const avgDays = pubDates.length > 0 ? Math.round(pubDates.reduce((sum, d) => sum + (now - d) / 86400000, 0) / pubDates.length) : null;
+                        const freshnessLabel = avgDays !== null ? (avgDays <= 7 ? 'Very fresh' : avgDays <= 30 ? 'Recent' : 'Aging') : null;
+                        const freshnessColor = avgDays !== null ? (avgDays <= 7 ? 'text-green-600 bg-green-50' : avgDays <= 30 ? 'text-amber-600 bg-amber-50' : 'text-red-600 bg-red-50') : '';
+                        const sortedDates = [...pubDates].sort((a, b) => a - b);
+                        let momentumLabel = '', momentumColor = '';
+                        if (sortedDates.length >= 3) {
+                            const mid = Math.floor(sortedDates.length / 2);
+                            const recentCount = sortedDates.filter(d => d > sortedDates[mid]).length;
+                            const olderCount = sortedDates.filter(d => d <= sortedDates[mid]).length;
+                            if (recentCount > olderCount) { momentumLabel = 'Gaining traction'; momentumColor = 'text-green-700 bg-green-100'; }
+                            else { momentumLabel = 'Steady coverage'; momentumColor = 'text-blue-700 bg-blue-100'; }
+                        }
                         return `
                         <div class="p-4 ${cc[0]} border rounded-xl">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-xs font-medium uppercase tracking-wide ${cc[1]}">Evidence strength</span>
                                 ${csValid ? `<span class="text-sm font-bold ${cc[2]}">${cs}/100</span>` : ''}
                             </div>
-                            ${csValid ? `
-                                <div class="w-full bg-white/60 rounded-full h-3 mb-3">
-                                    <div class="h-3 rounded-full transition-all" style="width: ${cs}%; background-color: ${csColor};"></div>
-                                </div>
-                            ` : ''}
+                            ${csValid ? `<div class="w-full bg-white/60 rounded-full h-3 mb-3"><div class="h-3 rounded-full transition-all" style="width: ${cs}%; background-color: ${csColor};"></div></div>` : ''}
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">${primaryCount} primary</span>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">${secondaryCount} secondary</span>
+                                ${freshnessLabel ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${freshnessColor}">${freshnessLabel} (avg ${avgDays}d)</span>` : ''}
+                                ${momentumLabel ? `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${momentumColor}">${momentumLabel}</span>` : ''}
+                            </div>
+                            ${srcs.length > 0 ? `<div class="flex h-2 rounded-full overflow-hidden mb-3"><div class="bg-blue-500" style="width: ${primaryCount / srcs.length * 100}%"></div><div class="bg-gray-300" style="width: ${secondaryCount / srcs.length * 100}%"></div></div>` : ''}
                             ${deal.confiance_justification ? `<p class="mt-1 ${cc[2]} text-sm">${escapeHtml(deal.confiance_justification)}</p>` : ''}
                         </div>`;
                     })()}
@@ -1695,6 +1758,17 @@
                             </div>
                         </div>
                     ` : ''}
+
+                    <!-- Notes -->
+                    <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium text-amber-700 uppercase tracking-wide">Notes</span>
+                            <button id="btnSaveNoteDeal" onclick="saveNote('deal', '${escapeHtml(deal.deal_id)}')"
+                                class="hidden px-3 py-1 text-xs bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">Save</button>
+                        </div>
+                        <textarea id="noteInputDeal" class="w-full border border-amber-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none bg-white" rows="2" maxlength="500" placeholder="Add a note about this deal...">${escapeHtml(deal.notes || '')}</textarea>
+                        <div class="text-xs text-amber-400 mt-1 text-right"><span id="noteCharsDeal">${(deal.notes || '').length}</span>/500</div>
+                    </div>
 
                     <!-- Metadata -->
                     <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
@@ -1773,20 +1847,40 @@
                         </div>
                     ` : ''}
 
-                    <!-- Signaux -->
-                    ${signaux.length ? `
+                    <!-- Activity Timeline -->
+                    ${signaux.length || actor.first_seen_at ? `
                         <div>
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Detected signals</span>
-                            <ul class="mt-3 space-y-2">
-                                ${signaux.map(s => `
-                                    <li class="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                                        <svg class="w-5 h-5 text-radar-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                        </svg>
-                                        <span class="text-gray-700">${escapeHtml(s)}</span>
-                                    </li>
-                                `).join('')}
-                            </ul>
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Activity Timeline</span>
+                            <div class="mt-3 relative">
+                                <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                                ${actor.first_seen_at ? `
+                                    <div class="flex items-start gap-4 mb-4 relative">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 border-2 border-green-500 flex items-center justify-center z-10 flex-shrink-0">
+                                            <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                        </div>
+                                        <div class="pt-1">
+                                            <span class="text-xs text-green-600 font-medium">${new Date(actor.first_seen_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                            <p class="text-sm text-gray-700 font-medium">First detected</p>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                ${signaux.map((s, i) => {
+                                    const colors = [{bg:'bg-blue-100',border:'border-blue-400',dot:'bg-blue-400'},{bg:'bg-purple-100',border:'border-purple-400',dot:'bg-purple-400'},{bg:'bg-amber-100',border:'border-amber-400',dot:'bg-amber-400'},{bg:'bg-teal-100',border:'border-teal-400',dot:'bg-teal-400'},{bg:'bg-pink-100',border:'border-pink-400',dot:'bg-pink-400'}];
+                                    const c = colors[i % colors.length];
+                                    return '<div class="flex items-start gap-4 mb-4 relative"><div class="w-8 h-8 rounded-full '+c.bg+' border-2 '+c.border+' flex items-center justify-center z-10 flex-shrink-0"><div class="w-2.5 h-2.5 rounded-full '+c.dot+'"></div></div><div class="pt-1 flex-1"><p class="text-sm text-gray-700">'+escapeHtml(s)+'</p></div></div>';
+                                }).join('')}
+                                ${actor.last_seen_at && actor.first_seen_at && actor.last_seen_at !== actor.first_seen_at ? `
+                                    <div class="flex items-start gap-4 relative">
+                                        <div class="w-8 h-8 rounded-full bg-radar-100 border-2 border-radar-500 flex items-center justify-center z-10 flex-shrink-0">
+                                            <svg class="w-4 h-4 text-radar-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                        </div>
+                                        <div class="pt-1">
+                                            <span class="text-xs text-radar-600 font-medium">${new Date(actor.last_seen_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                            <p class="text-sm text-gray-700 font-medium">Last updated</p>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
                     ` : ''}
 
@@ -1839,6 +1933,17 @@
                             </div>
                         </div>
                     ` : ''}
+
+                    <!-- Notes -->
+                    <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium text-amber-700 uppercase tracking-wide">Notes</span>
+                            <button id="btnSaveNoteActor" onclick="saveNote('actor', '${escapeHtml(actor.actor_id)}')"
+                                class="hidden px-3 py-1 text-xs bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors">Save</button>
+                        </div>
+                        <textarea id="noteInputActor" class="w-full border border-amber-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none bg-white" rows="2" maxlength="500" placeholder="Add a note about this actor...">${escapeHtml(actor.notes || '')}</textarea>
+                        <div class="text-xs text-amber-400 mt-1 text-right"><span id="noteCharsActor">${(actor.notes || '').length}</span>/500</div>
+                    </div>
 
                     <!-- Metadata -->
                     <div class="pt-4 border-t border-gray-100 text-xs text-gray-400">
@@ -1947,14 +2052,18 @@
 
         function updateOutreachButton() {
             const btn = document.getElementById('btnGenerateOutreach');
+            const btnExport = document.getElementById('btnExportContacts');
             const count = document.getElementById('selectedActorsCount');
+            const exportCount = document.getElementById('exportContactsCount');
             if (selectedActors.size > 0) {
                 btn.classList.remove('hidden');
                 btn.classList.add('flex');
                 count.textContent = selectedActors.size;
+                if (btnExport) { btnExport.classList.remove('hidden'); btnExport.classList.add('flex'); exportCount.textContent = selectedActors.size; }
             } else {
                 btn.classList.add('hidden');
                 btn.classList.remove('flex');
+                if (btnExport) { btnExport.classList.add('hidden'); btnExport.classList.remove('flex'); }
             }
         }
 
@@ -2433,6 +2542,221 @@
         // Close summary modal on click outside
         document.getElementById('summaryModal')?.addEventListener('click', (e) => {
             if (e.target.id === 'summaryModal') closeSummaryModal();
+        });
+
+        // ==========================================
+        // Feature D: Saved Filter Presets
+        // ==========================================
+        const PRESETS_STORAGE_KEY = 'radar_filter_presets';
+
+        function getPresets() {
+            try { return JSON.parse(localStorage.getItem(PRESETS_STORAGE_KEY)) || []; } catch { return []; }
+        }
+
+        function savePresetsToStorage(presets) {
+            localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(presets));
+        }
+
+        function populatePresetDropdown() {
+            const select = document.getElementById('presetSelect');
+            if (!select) return;
+            select.innerHTML = '<option value="">Saved presets...</option>';
+            getPresets().forEach((p, i) => {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = p.name;
+                select.appendChild(option);
+            });
+        }
+
+        function getCurrentFilterState() {
+            return {
+                watchlist_id: document.getElementById('watchlistSelect').value,
+                confidence: document.getElementById('confidenceFilter').value,
+                type: document.getElementById('typeFilter').value,
+                freshness: document.getElementById('freshnessFilter').value,
+                view: document.getElementById('viewFilter')?.value || 'active',
+                sort: document.getElementById('sortBy')?.value || 'date_desc'
+            };
+        }
+
+        function saveCurrentPreset() {
+            const name = prompt('Preset name:');
+            if (!name || !name.trim()) return;
+            const presets = getPresets();
+            const existingIdx = presets.findIndex(p => p.name === name.trim());
+            const entry = { name: name.trim(), filters: getCurrentFilterState(), created_at: new Date().toISOString() };
+            if (existingIdx >= 0) {
+                presets[existingIdx] = entry;
+            } else {
+                presets.push(entry);
+            }
+            savePresetsToStorage(presets);
+            populatePresetDropdown();
+            showToast(`Preset "${name.trim()}" saved`, 'success');
+        }
+
+        function loadPreset() {
+            const select = document.getElementById('presetSelect');
+            const idx = parseInt(select.value);
+            const presets = getPresets();
+            if (isNaN(idx) || !presets[idx]) {
+                document.getElementById('btnDeletePreset').classList.add('hidden');
+                return;
+            }
+            const f = presets[idx].filters;
+            if (f.watchlist_id) document.getElementById('watchlistSelect').value = f.watchlist_id;
+            if (f.confidence !== undefined) document.getElementById('confidenceFilter').value = f.confidence;
+            if (f.type !== undefined) document.getElementById('typeFilter').value = f.type;
+            if (f.freshness !== undefined) document.getElementById('freshnessFilter').value = f.freshness;
+            if (f.view) { const vf = document.getElementById('viewFilter'); if (vf) vf.value = f.view; }
+            if (f.sort) { const sb = document.getElementById('sortBy'); if (sb) sb.value = f.sort; }
+            updateOwnerBadge();
+            document.getElementById('btnDeletePreset').classList.remove('hidden');
+            loadResults();
+        }
+
+        function deleteCurrentPreset() {
+            const select = document.getElementById('presetSelect');
+            const idx = parseInt(select.value);
+            const presets = getPresets();
+            if (isNaN(idx) || !presets[idx]) return;
+            showConfirm(`Delete preset "${presets[idx].name}"?`, () => {
+                presets.splice(idx, 1);
+                savePresetsToStorage(presets);
+                populatePresetDropdown();
+                document.getElementById('btnDeletePreset').classList.add('hidden');
+                showToast('Preset deleted', 'info');
+            });
+        }
+
+        // ==========================================
+        // Feature A: Ready to Prospect Smart Filter
+        // ==========================================
+        let readyToProspectActive = false;
+
+        function applyReadyToProspect() {
+            readyToProspectActive = !readyToProspectActive;
+            const btn = document.getElementById('btnReadyToProspect');
+            if (readyToProspectActive) {
+                switchTab('actors');
+                btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
+                btn.classList.add('bg-emerald-800', 'ring-2', 'ring-emerald-400');
+                btn.querySelector('svg path').setAttribute('d', 'M6 18L18 6M6 6l12 12');
+                btn.lastElementChild ? btn.childNodes[btn.childNodes.length - 1].textContent = ' Clear Prospect' : null;
+            } else {
+                btn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+                btn.classList.remove('bg-emerald-800', 'ring-2', 'ring-emerald-400');
+                btn.querySelector('svg path').setAttribute('d', 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z');
+                btn.childNodes[btn.childNodes.length - 1].textContent = ' Ready to Prospect';
+            }
+            currentPage = 1;
+            renderResults();
+        }
+
+        function applyProspectFilter(actors) {
+            if (!readyToProspectActive) return actors;
+            const now = new Date();
+            const fourteenDaysAgo = new Date(now - 14 * 86400000);
+            return actors.filter(actor => {
+                const contacts = ensureArray(actor.contact_points);
+                if (contacts.length === 0) return false;
+                const firstSeen = new Date(actor.first_seen_at);
+                if (isNaN(firstSeen.getTime()) || firstSeen < fourteenDaysAgo) return false;
+                if (isTrue(actor.hidden)) return false;
+                if (isTrue(actor.contacted)) return false;
+                return true;
+            });
+        }
+
+        // ==========================================
+        // Feature B: Batch Contact Export CSV
+        // ==========================================
+        function csvEscape(val) {
+            const str = String(val || '');
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                return '"' + str.replace(/"/g, '""') + '"';
+            }
+            return str;
+        }
+
+        function exportContactsCsv() {
+            if (selectedActors.size === 0) {
+                showToast('Select at least one actor to export', 'error');
+                return;
+            }
+            const actors = currentData.actors || [];
+            const selectedIds = new Set(selectedActors.keys());
+            const selectedActorData = actors.filter(a => selectedIds.has(a.actor_id));
+            const headers = ['Actor Name', 'Type', 'Geography', 'Contact Name', 'Role', 'Email', 'Source URL', 'Contacted'];
+            const rows = [headers.join(',')];
+            selectedActorData.forEach(actor => {
+                const contacts = ensureArray(actor.contact_points);
+                if (contacts.length === 0) {
+                    rows.push([csvEscape(actor.nom), csvEscape(actor.type_acteur), csvEscape(actor.geographie), '', '', '', '', isTrue(actor.contacted) ? 'Yes' : 'No'].join(','));
+                } else {
+                    contacts.forEach(c => {
+                        if (!c) return;
+                        rows.push([csvEscape(actor.nom), csvEscape(actor.type_acteur), csvEscape(actor.geographie), csvEscape(c.nom_contact), csvEscape(c.role), csvEscape(c.email), csvEscape(c.preuve_url), isTrue(actor.contacted) ? 'Yes' : 'No'].join(','));
+                    });
+                }
+            });
+            const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'radar_contacts_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.click();
+            URL.revokeObjectURL(url);
+            showToast(selectedActorData.length + ' actor(s) exported', 'success');
+        }
+
+        // ==========================================
+        // Feature C: Notes on Actors and Deals
+        // ==========================================
+        async function saveNote(itemType, itemId) {
+            const inputId = itemType === 'deal' ? 'noteInputDeal' : 'noteInputActor';
+            const btnId = itemType === 'deal' ? 'btnSaveNoteDeal' : 'btnSaveNoteActor';
+            const textarea = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            if (!textarea || !btn) return;
+            const notes = textarea.value.trim().substring(0, 500);
+            btn.textContent = 'Saving...';
+            btn.disabled = true;
+            try {
+                const endpoint = itemType === 'deal' ? '/deal/update' : '/actor/update';
+                const idField = itemType === 'deal' ? 'deal_id' : 'actor_id';
+                const response = await fetch(API_BASE + endpoint, {
+                    method: 'POST',
+                    headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ [idField]: itemId, notes: notes })
+                });
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const collection = itemType === 'deal' ? currentData.deals : currentData.actors;
+                const item = (collection || []).find(i => i[idField] === itemId);
+                if (item) item.notes = notes;
+                renderResults();
+                btn.textContent = 'Saved!';
+                btn.classList.add('bg-green-500');
+                setTimeout(() => { btn.textContent = 'Save'; btn.classList.remove('bg-green-500'); btn.classList.add('hidden'); btn.disabled = false; }, 1500);
+            } catch (error) {
+                console.error('Save note error:', error);
+                btn.textContent = 'Error';
+                btn.disabled = false;
+                setTimeout(() => { btn.textContent = 'Save'; }, 2000);
+                showToast('Failed to save note', 'error');
+            }
+        }
+
+        document.addEventListener('input', (e) => {
+            if (e.target.id === 'noteInputDeal') {
+                document.getElementById('noteCharsDeal').textContent = e.target.value.length;
+                document.getElementById('btnSaveNoteDeal').classList.remove('hidden');
+            }
+            if (e.target.id === 'noteInputActor') {
+                document.getElementById('noteCharsActor').textContent = e.target.value.length;
+                document.getElementById('btnSaveNoteActor').classList.remove('hidden');
+            }
         });
     </script>
 
