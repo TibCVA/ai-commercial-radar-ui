@@ -142,8 +142,9 @@
     <main class="container mx-auto px-4 py-8">
         <!-- Filters Bar -->
         <div class="glass-card rounded-2xl shadow-sm p-5 mb-6">
-            <div class="flex flex-col lg:flex-row gap-4 items-end">
-                <div class="w-full lg:w-56">
+            <!-- Row 1: Watchlist + Search -->
+            <div class="flex flex-col lg:flex-row gap-4 items-end mb-4">
+                <div class="w-full lg:w-64">
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">
                         Watchlist
                         <span id="ownerBadge" class="hidden ml-2 px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full"></span>
@@ -168,18 +169,21 @@
                         </button>
                     </div>
                 </div>
-                <div class="w-full lg:w-40">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Confidence</label>
-                    <select id="confidenceFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+            </div>
+            <!-- Row 2: Filters + Actions -->
+            <div class="flex flex-col lg:flex-row gap-3 items-end">
+                <div class="w-full lg:w-36">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Confidence</label>
+                    <select id="confidenceFilter" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-radar-500 focus:border-transparent">
                         <option value="">All</option>
                         <option value="high">High</option>
                         <option value="medium">Medium</option>
                         <option value="low">Low</option>
                     </select>
                 </div>
-                <div class="w-full lg:w-40">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
-                    <select id="typeFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                <div class="w-full lg:w-36">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
+                    <select id="typeFilter" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-radar-500 focus:border-transparent">
                         <option value="">All</option>
                         <option value="ma_rumor">M&A Rumor</option>
                         <option value="ma_discussions">M&A Discussions</option>
@@ -189,9 +193,9 @@
                         <option value="growth_signal">Growth signal</option>
                     </select>
                 </div>
-                <div class="w-full lg:w-40">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Freshness</label>
-                    <select id="freshnessFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                <div class="w-full lg:w-36">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Freshness</label>
+                    <select id="freshnessFilter" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-radar-500 focus:border-transparent">
                         <option value="">All</option>
                         <option value="24h">Last 24h</option>
                         <option value="7d">Last 7 days</option>
@@ -199,18 +203,18 @@
                         <option value="90d">Last 90 days</option>
                     </select>
                 </div>
-                <div class="w-full lg:w-40">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">View</label>
-                    <select id="viewFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent" onchange="renderResults()">
+                <div class="w-full lg:w-36">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">View</label>
+                    <select id="viewFilter" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-radar-500 focus:border-transparent" onchange="renderResults()">
                         <option value="active">Active only</option>
                         <option value="priority">Priority only</option>
                         <option value="hidden">Hidden only</option>
                         <option value="all">All items</option>
                     </select>
                 </div>
-                <div class="w-full lg:w-40">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Sort by</label>
-                    <select id="sortBy" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent" onchange="renderResults()">
+                <div class="w-full lg:w-36">
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Sort by</label>
+                    <select id="sortBy" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-radar-500 focus:border-transparent" onchange="renderResults()">
                         <option value="date_desc">Newest first</option>
                         <option value="date_asc">Oldest first</option>
                         <option value="confidence_desc">Confidence (high)</option>
@@ -218,44 +222,19 @@
                         <option value="name_asc">Name (A-Z)</option>
                     </select>
                 </div>
-                <button onclick="loadResults()" class="px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-colors shadow-sm flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button onclick="loadResults()" class="px-5 py-2.5 bg-radar-600 text-white rounded-xl text-sm font-medium hover:bg-radar-700 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                     </svg>
                     Filter
                 </button>
                 <button id="btnReadyToProspect" onclick="applyReadyToProspect()"
-                    class="px-5 py-2.5 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2"
+                    class="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2 whitespace-nowrap"
                     title="Contacts available + fresh (<14d) + not contacted">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Ready to Prospect
-                </button>
-            </div>
-            <!-- Filter Presets -->
-            <div class="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100">
-                <div class="flex items-center gap-2 flex-1">
-                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-                    </svg>
-                    <select id="presetSelect" onchange="loadPreset()"
-                        class="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                        <option value="">Saved presets...</option>
-                    </select>
-                </div>
-                <button onclick="saveCurrentPreset()"
-                    class="px-3 py-2 text-sm bg-radar-100 text-radar-700 rounded-lg hover:bg-radar-200 transition-colors font-medium flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Save
-                </button>
-                <button onclick="deleteCurrentPreset()" id="btnDeletePreset"
-                    class="hidden px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
+                    Prospect
                 </button>
             </div>
         </div>
@@ -297,6 +276,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
                 Actors (<span id="actorsCount">0</span>)
+            </button>
+            <button id="tabEmails" onclick="switchTab('emails')" class="flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Emails (<span id="emailsCount">0</span>)
             </button>
             <!-- Bulk Actions (visible in Actors tab) -->
             <div id="bulkActions" class="hidden items-center gap-2 ml-4 pl-4 border-l border-gray-200">
@@ -612,6 +597,44 @@
         </div>
     </div>
 
+    <!-- Email Edit Modal -->
+    <div id="emailEditModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4" onclick="if(event.target===this) closeEmailEditModal()">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col" onclick="event.stopPropagation()">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-900">Edit Email</h3>
+                <button onclick="closeEmailEditModal()" class="text-gray-400 hover:text-gray-600 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Recipient email</label>
+                    <input id="editEmailRecipient" type="email" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent" placeholder="john.smith@company.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                    <input id="editEmailSubject" type="text" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Body</label>
+                    <textarea id="editEmailBody" rows="12" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent text-sm font-mono"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select id="editEmailStatus" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                        <option value="draft">Draft</option>
+                        <option value="sent">Sent</option>
+                        <option value="archived">Archived</option>
+                    </select>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
+                <button onclick="closeEmailEditModal()" class="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+                <button onclick="saveEmailEditFromModal()" class="px-6 py-2 text-sm bg-radar-600 text-white rounded-xl hover:bg-radar-700 transition-colors font-medium">Save changes</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Back to top button -->
     <button id="backToTop" class="back-to-top w-10 h-10 bg-radar-600 text-white rounded-full shadow-lg hover:bg-radar-700 transition-colors flex items-center justify-center" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top (T)">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
@@ -619,10 +642,11 @@
 
     <!-- Footer -->
     <footer class="container mx-auto px-4 py-6 text-center text-sm text-gray-400">
-        <div>AI Commercial Radar v2.2 - M&A Intelligence for Infrastructure Funds</div>
+        <div>AI Commercial Radar v3.1 - M&A Intelligence for Infrastructure Funds</div>
         <div class="mt-1 flex items-center justify-center gap-3 text-xs text-gray-300">
             <span><span class="kbd">D</span> Deals</span>
             <span><span class="kbd">A</span> Actors</span>
+            <span><span class="kbd">E</span> Emails</span>
             <span><span class="kbd">/</span> Search</span>
             <span><span class="kbd">Esc</span> Close</span>
         </div>
@@ -982,43 +1006,6 @@
             return (s.startsWith('http://') || s.startsWith('https://')) ? escapeHtml(s) : '#';
         }
 
-        // === URL Sync ===
-        function syncFiltersToURL() {
-            const params = new URLSearchParams();
-            const wl = document.getElementById('watchlistSelect').value;
-            const conf = document.getElementById('confidenceFilter').value;
-            const type = document.getElementById('typeFilter').value;
-            const fresh = document.getElementById('freshnessFilter').value;
-            const view = document.getElementById('viewFilter').value;
-            const sort = document.getElementById('sortBy').value;
-            if (wl) params.set('watchlist_id', wl);
-            if (conf) params.set('confidence', conf);
-            if (type) params.set('type', type);
-            if (fresh) params.set('freshness', fresh);
-            if (view && view !== 'active') params.set('view', view);
-            if (sort && sort !== 'date_desc') params.set('sort', sort);
-            if (currentTab !== 'deals') params.set('tab', currentTab);
-            if (searchQuery) params.set('q', searchQuery);
-            const qs = params.toString();
-            history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
-        }
-
-        function restoreFiltersFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('watchlist_id')) document.getElementById('watchlistSelect').value = params.get('watchlist_id');
-            if (params.get('confidence')) document.getElementById('confidenceFilter').value = params.get('confidence');
-            if (params.get('type')) document.getElementById('typeFilter').value = params.get('type');
-            if (params.get('freshness')) document.getElementById('freshnessFilter').value = params.get('freshness');
-            if (params.get('view')) document.getElementById('viewFilter').value = params.get('view');
-            if (params.get('sort')) document.getElementById('sortBy').value = params.get('sort');
-            if (params.get('tab')) { currentTab = params.get('tab'); switchTab(currentTab); }
-            if (params.get('q')) {
-                searchQuery = params.get('q');
-                document.getElementById('searchInput').value = searchQuery;
-                document.getElementById('clearSearch').classList.remove('hidden');
-            }
-        }
-
         // Init
         document.addEventListener('DOMContentLoaded', async () => {
             if (!API_KEY || !API_BASE) {
@@ -1026,9 +1013,7 @@
                 return;
             }
             await loadWatchlists();
-            restoreFiltersFromURL();
             updateOwnerBadge();
-            populatePresetDropdown();
             loadResults();
 
             // Back to top scroll listener
@@ -1170,12 +1155,11 @@
         function switchTab(tab) {
             currentTab = tab;
             currentPage = 1;
-            document.getElementById('tabDeals').className = tab === 'deals'
-                ? 'flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all'
-                : 'flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200';
-            document.getElementById('tabActors').className = tab === 'actors'
-                ? 'flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all'
-                : 'flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200';
+            const active = 'flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all';
+            const inactive = 'flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200';
+            document.getElementById('tabDeals').className = tab === 'deals' ? active : inactive;
+            document.getElementById('tabActors').className = tab === 'actors' ? active : inactive;
+            document.getElementById('tabEmails').className = tab === 'emails' ? active : inactive;
 
             // Show/hide bulk actions based on tab
             const bulkActions = document.getElementById('bulkActions');
@@ -1188,7 +1172,11 @@
                 bulkActions.classList.remove('flex');
             }
 
-            renderResults();
+            if (tab === 'emails') {
+                loadEmails();
+            } else {
+                renderResults();
+            }
         }
 
         function getFreshnessClass(dateStr) {
@@ -1257,12 +1245,10 @@
         }
 
         function renderResults() {
+            if (currentTab === 'emails') { renderEmails(); return; }
             const container = document.getElementById('resultsContainer');
             const allItems = currentTab === 'deals' ? getFilteredDeals() : getFilteredActors();
             const totalUnfiltered = currentTab === 'deals' ? (currentData.deals || []).length : (currentData.actors || []).length;
-
-            // Sync URL state
-            syncFiltersToURL();
 
             if (!allItems || allItems.length === 0) {
                 const hasSearch = searchQuery.length > 0;
@@ -2015,6 +2001,7 @@
 
             if (e.key === 'd' || e.key === 'D') { switchTab('deals'); e.preventDefault(); }
             if (e.key === 'a' || e.key === 'A') { switchTab('actors'); e.preventDefault(); }
+            if (e.key === 'e' || e.key === 'E') { switchTab('emails'); e.preventDefault(); }
             if (e.key === '/') { document.getElementById('searchInput').focus(); e.preventDefault(); }
             if (e.key === 't' || e.key === 'T') { window.scrollTo({top: 0, behavior: 'smooth'}); e.preventDefault(); }
         });
@@ -2307,6 +2294,12 @@
             // Store emails for copy
             window._outreachEmails = emails;
 
+            // Auto-save generated emails to Emails tab
+            if (emails.length > 0) {
+                const wlId = document.getElementById('watchlistSelect').value;
+                saveGeneratedEmails(emails, wlId);
+            }
+
             // Show failed list if any
             if (failed.length > 0) {
                 document.getElementById('outreachFailedList').classList.remove('hidden');
@@ -2544,90 +2537,196 @@
             if (e.target.id === 'summaryModal') closeSummaryModal();
         });
 
+
         // ==========================================
-        // Feature D: Saved Filter Presets
+        // Emails Tab: Load, Render, Edit, Delete
         // ==========================================
-        const PRESETS_STORAGE_KEY = 'radar_filter_presets';
+        let emailsData = [];
 
-        function getPresets() {
-            try { return JSON.parse(localStorage.getItem(PRESETS_STORAGE_KEY)) || []; } catch { return []; }
-        }
+        async function loadEmails() {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `<div class="glass-card rounded-2xl p-12 text-center">
+                <div class="animate-pulse space-y-4">
+                    <div class="h-4 bg-gray-200 rounded w-1/3 mx-auto"></div>
+                    <div class="h-3 bg-gray-200 rounded w-1/2 mx-auto"></div>
+                </div>
+            </div>`;
 
-        function savePresetsToStorage(presets) {
-            localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(presets));
-        }
-
-        function populatePresetDropdown() {
-            const select = document.getElementById('presetSelect');
-            if (!select) return;
-            select.innerHTML = '<option value="">Saved presets...</option>';
-            getPresets().forEach((p, i) => {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = p.name;
-                select.appendChild(option);
-            });
-        }
-
-        function getCurrentFilterState() {
-            return {
-                watchlist_id: document.getElementById('watchlistSelect').value,
-                confidence: document.getElementById('confidenceFilter').value,
-                type: document.getElementById('typeFilter').value,
-                freshness: document.getElementById('freshnessFilter').value,
-                view: document.getElementById('viewFilter')?.value || 'active',
-                sort: document.getElementById('sortBy')?.value || 'date_desc'
-            };
-        }
-
-        function saveCurrentPreset() {
-            const name = prompt('Preset name:');
-            if (!name || !name.trim()) return;
-            const presets = getPresets();
-            const existingIdx = presets.findIndex(p => p.name === name.trim());
-            const entry = { name: name.trim(), filters: getCurrentFilterState(), created_at: new Date().toISOString() };
-            if (existingIdx >= 0) {
-                presets[existingIdx] = entry;
-            } else {
-                presets.push(entry);
+            try {
+                const watchlistId = document.getElementById('watchlistSelect').value;
+                let url = `${API_BASE}/emails/list`;
+                if (watchlistId) url += `?watchlist_id=${watchlistId}`;
+                const resp = await fetch(url, { headers: { 'workspace-api-key': API_KEY } });
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+                emailsData = data.emails || [];
+                document.getElementById('emailsCount').textContent = emailsData.length;
+                renderEmails();
+            } catch (err) {
+                console.error('Load emails error:', err);
+                container.innerHTML = `<div class="glass-card rounded-2xl p-12 text-center">
+                    <p class="text-gray-500 text-lg font-medium mb-1">Could not load emails</p>
+                    <p class="text-gray-400 text-sm">${escapeHtml(err.message)}</p>
+                </div>`;
             }
-            savePresetsToStorage(presets);
-            populatePresetDropdown();
-            showToast(`Preset "${name.trim()}" saved`, 'success');
         }
 
-        function loadPreset() {
-            const select = document.getElementById('presetSelect');
-            const idx = parseInt(select.value);
-            const presets = getPresets();
-            if (isNaN(idx) || !presets[idx]) {
-                document.getElementById('btnDeletePreset').classList.add('hidden');
+        function renderEmails() {
+            const container = document.getElementById('resultsContainer');
+            if (!emailsData || emailsData.length === 0) {
+                container.innerHTML = `<div class="glass-card rounded-2xl p-12 text-center">
+                    <svg class="w-20 h-20 mx-auto mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <p class="text-gray-500 text-lg font-medium mb-1">No saved emails yet</p>
+                    <p class="text-gray-400 text-sm">Generate outreach emails from the Actors tab to see them here</p>
+                </div>`;
                 return;
             }
-            const f = presets[idx].filters;
-            if (f.watchlist_id) document.getElementById('watchlistSelect').value = f.watchlist_id;
-            if (f.confidence !== undefined) document.getElementById('confidenceFilter').value = f.confidence;
-            if (f.type !== undefined) document.getElementById('typeFilter').value = f.type;
-            if (f.freshness !== undefined) document.getElementById('freshnessFilter').value = f.freshness;
-            if (f.view) { const vf = document.getElementById('viewFilter'); if (vf) vf.value = f.view; }
-            if (f.sort) { const sb = document.getElementById('sortBy'); if (sb) sb.value = f.sort; }
-            updateOwnerBadge();
-            document.getElementById('btnDeletePreset').classList.remove('hidden');
-            loadResults();
+
+            const totalPages = Math.ceil(emailsData.length / PAGE_SIZE);
+            if (currentPage > totalPages) currentPage = totalPages;
+            const pageItems = emailsData.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+            container.innerHTML = pageItems.map(email => renderEmailCard(email)).join('') + renderPagination(emailsData.length);
         }
 
-        function deleteCurrentPreset() {
-            const select = document.getElementById('presetSelect');
-            const idx = parseInt(select.value);
-            const presets = getPresets();
-            if (isNaN(idx) || !presets[idx]) return;
-            showConfirm(`Delete preset "${presets[idx].name}"?`, () => {
-                presets.splice(idx, 1);
-                savePresetsToStorage(presets);
-                populatePresetDropdown();
-                document.getElementById('btnDeletePreset').classList.add('hidden');
-                showToast('Preset deleted', 'info');
+        function renderEmailCard(email) {
+            const statusColors = { draft: 'bg-gray-100 text-gray-600', sent: 'bg-green-100 text-green-700', archived: 'bg-orange-100 text-orange-700', deleted: 'bg-red-100 text-red-700' };
+            const statusClass = statusColors[email.status] || statusColors.draft;
+            const dateStr = email.created_at ? new Date(email.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+            const bodyPreview = (email.body || '').substring(0, 150).replace(/\n/g, ' ') + ((email.body || '').length > 150 ? '...' : '');
+
+            return `<div class="glass-card rounded-xl p-5 mb-3 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-semibold text-gray-900 truncate">${escapeHtml(email.actor_name || 'Unknown')}</h3>
+                            <span class="px-2 py-0.5 text-xs font-medium rounded-full ${statusClass}">${escapeHtml(email.status || 'draft')}</span>
+                        </div>
+                        <p class="text-sm font-medium text-gray-700 mb-1">${escapeHtml(email.subject || '(no subject)')}</p>
+                        ${email.recipient_email ? `<p class="text-xs text-gray-400 mb-1">To: ${escapeHtml(email.recipient_email)}</p>` : ''}
+                    </div>
+                    <div class="flex items-center gap-1 ml-3 flex-shrink-0">
+                        <button onclick="openEmailEditModal('${escapeHtml(email.email_id)}')" class="p-2 text-gray-400 hover:text-radar-600 hover:bg-radar-50 rounded-lg transition-colors" title="Edit">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                        <button onclick="copyEmailFromList('${escapeHtml(email.email_id)}')" class="p-2 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors" title="Copy">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                        </button>
+                        <button onclick="deleteEmailFromList('${escapeHtml(email.email_id)}')" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 line-clamp-2">${escapeHtml(bodyPreview)}</p>
+                <div class="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                    ${dateStr ? `<span>${dateStr}</span>` : ''}
+                    ${email.hook_source_url ? `<a href="${safeUrl(email.hook_source_url)}" target="_blank" rel="noopener" class="text-violet-500 hover:underline">Hook source</a>` : ''}
+                </div>
+            </div>`;
+        }
+
+        function copyEmailFromList(emailId) {
+            const email = emailsData.find(e => e.email_id === emailId);
+            if (!email) return;
+            const text = `Subject: ${email.subject}\n\n${email.body}`;
+            navigator.clipboard.writeText(text).then(() => showToast('Email copied', 'success')).catch(() => showToast('Copy failed', 'error'));
+        }
+
+        function deleteEmailFromList(emailId) {
+            showConfirm('Delete this email?', async () => {
+                try {
+                    await fetch(`${API_BASE}/emails/delete`, {
+                        method: 'POST',
+                        headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email_id: emailId })
+                    });
+                    emailsData = emailsData.filter(e => e.email_id !== emailId);
+                    document.getElementById('emailsCount').textContent = emailsData.length;
+                    renderEmails();
+                    showToast('Email deleted', 'info');
+                } catch (err) {
+                    showToast('Delete failed: ' + err.message, 'error');
+                }
             });
+        }
+
+        let editingEmailId = null;
+
+        function openEmailEditModal(emailId) {
+            const email = emailsData.find(e => e.email_id === emailId);
+            if (!email) return;
+            editingEmailId = emailId;
+            document.getElementById('editEmailSubject').value = email.subject || '';
+            document.getElementById('editEmailRecipient').value = email.recipient_email || '';
+            document.getElementById('editEmailBody').value = email.body || '';
+            document.getElementById('editEmailStatus').value = email.status || 'draft';
+            document.getElementById('emailEditModal').classList.remove('hidden');
+        }
+
+        function closeEmailEditModal() {
+            document.getElementById('emailEditModal').classList.add('hidden');
+            editingEmailId = null;
+        }
+
+        async function saveEmailEditFromModal() {
+            if (!editingEmailId) return;
+            const payload = {
+                email_id: editingEmailId,
+                subject: document.getElementById('editEmailSubject').value,
+                recipient_email: document.getElementById('editEmailRecipient').value,
+                body: document.getElementById('editEmailBody').value,
+                status: document.getElementById('editEmailStatus').value
+            };
+            try {
+                await fetch(`${API_BASE}/emails/update`, {
+                    method: 'POST',
+                    headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                // Update local data
+                const idx = emailsData.findIndex(e => e.email_id === editingEmailId);
+                if (idx >= 0) Object.assign(emailsData[idx], payload, { updated_at: new Date().toISOString() });
+                closeEmailEditModal();
+                renderEmails();
+                showToast('Email updated', 'success');
+            } catch (err) {
+                showToast('Update failed: ' + err.message, 'error');
+            }
+        }
+
+        // Auto-save outreach emails to Emails tab
+        async function saveGeneratedEmails(emails, watchlistId) {
+            try {
+                const payload = emails.map((e, i) => ({
+                    email_id: 'email_' + Date.now() + '_' + i,
+                    actor_id: e.actor_id || e.actor_ref || '',
+                    actor_name: e.actor_name || '',
+                    watchlist_id: watchlistId,
+                    recipient_email: e.guessed_email?.email || '',
+                    subject: e.subject || '',
+                    body: e.email_body || '',
+                    hook_source_url: e.hook?.source_url || '',
+                    status: 'draft',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                }));
+                await fetch(`${API_BASE}/emails/save`, {
+                    method: 'POST',
+                    headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ emails: payload })
+                });
+                showToast(`${payload.length} email(s) saved to Emails tab`, 'success');
+            } catch (err) {
+                console.error('Auto-save emails error:', err);
+            }
         }
 
         // ==========================================

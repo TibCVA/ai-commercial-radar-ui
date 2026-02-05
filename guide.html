@@ -971,26 +971,27 @@
                         </div>
                     </div>
 
-                    <h3 class="font-semibold text-gray-900 mb-4">Saved filter presets</h3>
-                    <div class="flex gap-4 items-start p-4 bg-gray-50 rounded-xl mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                    <h3 class="font-semibold text-gray-900 mb-4">Emails tab</h3>
+                    <div class="flex gap-4 items-start p-4 bg-violet-50 rounded-xl border border-violet-100 mb-4">
+                        <div class="w-10 h-10 rounded-lg bg-violet-100 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </div>
                         <div>
-                            <p class="font-medium text-gray-900 mb-1">Save and restore filter combinations</p>
-                            <p class="text-sm text-gray-600">Below the filter bar, a <strong>Presets</strong> row lets you:</p>
+                            <p class="font-medium text-gray-900 mb-1">Automatic email storage and management</p>
+                            <p class="text-sm text-gray-600">Every outreach email you generate is <strong>automatically saved as a draft</strong> in the Emails tab. From there you can:</p>
                             <ul class="text-sm text-gray-600 mt-2 space-y-1 list-disc list-inside">
-                                <li><strong>Save</strong>: Click "Save" to store the current filter state (watchlist, confidence, type, freshness, view, sort) under a custom name</li>
-                                <li><strong>Load</strong>: Select a preset from the dropdown to instantly restore all filters and reload results</li>
-                                <li><strong>Delete</strong>: Select a preset then click "Delete" to remove it</li>
+                                <li><strong>Edit</strong>: Click the pencil icon to modify the subject, body, recipient email, or status</li>
+                                <li><strong>Copy</strong>: Click the copy icon to copy the full email to your clipboard</li>
+                                <li><strong>Delete</strong>: Click the trash icon (with confirmation) to remove an email</li>
+                                <li><strong>Track status</strong>: Change status from <em>draft</em> to <em>sent</em> or <em>archived</em></li>
                             </ul>
-                            <p class="text-sm text-gray-500 mt-2">Presets are stored in your browser's local storage and persist across sessions.</p>
+                            <p class="text-sm text-gray-500 mt-2">Use keyboard shortcut <strong>E</strong> to quickly switch to the Emails tab.</p>
                         </div>
                     </div>
 
-                    <h3 class="font-semibold text-gray-900 mb-4">URL sharing</h3>
+                    <h3 class="font-semibold text-gray-900 mb-4">Estimated contact emails</h3>
                     <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 text-sm text-blue-800">
-                        <strong>Share your view:</strong> All filter selections are automatically synced to the URL query parameters. Copy the URL from your browser's address bar to share your exact filter combination with a colleague. When they open the link, all filters are restored automatically.
+                        <strong>How it works:</strong> The AI identifies key decision-makers mentioned in news sources (CEO, CFO, Head of M&A, IR Manager, etc.) and constructs probable email addresses using the corporate pattern <code>firstname.lastname@domain.com</code>. These are marked with <strong>[estimated]</strong> in the contact points. Always verify estimated emails before sending. The AI also includes generic addresses (info@, ir@, contact@) when the company domain is identifiable.
                     </div>
                 </div>
             </div>
@@ -1170,10 +1171,6 @@
                         <p class="text-gray-600 text-sm">The freshness filter (24h, 7d, 30d, 90d) is enforced <strong>server-side</strong>. When you select "Last 30 days", the API filters results by <code>first_seen_at</code> date, so only deals and actors detected within the last 30 days are returned. This prevents stale results from appearing regardless of how many past scans have been performed.</p>
                     </div>
                     <div class="border-t border-gray-100 pt-6">
-                        <h3 class="font-semibold text-gray-900 mb-2">Are my filter presets shared with the team?</h3>
-                        <p class="text-gray-600 text-sm">No. Presets are stored locally in your browser (localStorage). Each team member has their own presets. However, you can share your current filter view by copying the URL, which contains all filter parameters.</p>
-                    </div>
-                    <div class="border-t border-gray-100 pt-6">
                         <h3 class="font-semibold text-gray-900 mb-2">What does "Ready to Prospect" filter?</h3>
                         <p class="text-gray-600 text-sm">It shows only actors that meet three criteria: (1) have at least one contact point, (2) were first detected less than 14 days ago, and (3) have not been hidden or marked as contacted. It switches to the Actors tab automatically.</p>
                     </div>
@@ -1184,6 +1181,14 @@
                     <div class="border-t border-gray-100 pt-6">
                         <h3 class="font-semibold text-gray-900 mb-2">What are the "primary" and "secondary" sources in the evidence bar?</h3>
                         <p class="text-gray-600 text-sm">The enhanced evidence bar on deal detail cards breaks down sources into <strong>primary</strong> (sources with quality marked as "primary" or from credible financial press) and <strong>secondary</strong> (all other sources). It also shows a freshness badge (average age of sources) and a momentum indicator ("Gaining traction" when recent sources outnumber older ones).</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">Where are my generated outreach emails saved?</h3>
+                        <p class="text-gray-600 text-sm">All generated emails are automatically saved as drafts in the <strong>Emails tab</strong> on the Results page. You can edit the subject and body, change the status to "sent" after sending, or delete emails you no longer need. Emails are stored server-side and persist across sessions.</p>
+                    </div>
+                    <div class="border-t border-gray-100 pt-6">
+                        <h3 class="font-semibold text-gray-900 mb-2">How does the AI find contact emails for actors?</h3>
+                        <p class="text-gray-600 text-sm">The AI identifies key decision-makers mentioned in news sources and constructs probable email addresses based on corporate patterns (<code>firstname.lastname@domain.com</code>). These are marked as <strong>[estimated]</strong> in the contact points. Always verify before sending. The AI also includes generic contact emails (info@, ir@, press@) when the company domain is identifiable from source URLs.</p>
                     </div>
                 </div>
             </div>
@@ -1200,7 +1205,7 @@
 
     <!-- Footer -->
     <footer class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-        <p class="text-sm text-gray-400">AI Commercial Radar v3.0 - M&A Intelligence for Infrastructure Funds - Last update: Feb 5, 2026 (smart tools, notes, presets, timeline, enhanced evidence, keyboard shortcuts, freshness fix, dedup v7)</p>
+        <p class="text-sm text-gray-400">AI Commercial Radar v3.1 - M&A Intelligence for Infrastructure Funds - Last update: Feb 5, 2026 (emails tab, estimated contacts, scan quality v8, 2-row filter layout, smart tools, notes, timeline, enhanced evidence, keyboard shortcuts)</p>
     </footer>
 </body>
 </html>
