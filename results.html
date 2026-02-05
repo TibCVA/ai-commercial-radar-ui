@@ -552,6 +552,9 @@
         }
 
         async function loadResults() {
+            // Clear actor selection when loading new results to avoid ID mismatch
+            clearActorSelection();
+
             const watchlistId = document.getElementById('watchlistSelect').value;
             const confidence = document.getElementById('confidenceFilter').value;
             const type = document.getElementById('typeFilter').value;
@@ -1375,9 +1378,11 @@
             // Show progress
             document.getElementById('outreachPreGen').classList.add('hidden');
             document.getElementById('outreachProgress').classList.remove('hidden');
+            document.getElementById('outreachProgressText').textContent = 'Starting email generation...';
 
             try {
-                const response = await fetch(`${API_BASE}/watchlist/outreach`, {
+                // Step 1: Create job (returns immediately)
+                const createResponse = await fetch(`${API_BASE}/watchlist/outreach`, {
                     method: 'POST',
                     headers: {
                         'workspace-api-key': API_KEY,
@@ -1386,18 +1391,70 @@
                     body: JSON.stringify({ watchlist_id: watchlistId, actor_refs: actorRefs })
                 });
 
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => ({}));
-                    throw new Error(errData.error || `HTTP ${response.status}`);
+                if (!createResponse.ok) {
+                    const errData = await createResponse.json().catch(() => ({}));
+                    throw new Error(errData.error || `HTTP ${createResponse.status}`);
                 }
 
-                const result = await response.json();
-                displayOutreachResults(result);
+                const jobData = await createResponse.json();
+                const jobId = jobData.job_id;
+
+                if (!jobId) {
+                    throw new Error('No job_id returned from server');
+                }
+
+                document.getElementById('outreachProgressText').textContent = 'Searching for news and generating emails...';
+
+                // Step 2: Poll for completion
+                const maxAttempts = 60; // 5 minutes max (60 * 5s)
+                let attempts = 0;
+
+                while (attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5s
+                    attempts++;
+
+                    const statusResponse = await fetch(`${API_BASE}/watchlist/outreach/job?job_id=${jobId}`, {
+                        headers: { 'workspace-api-key': API_KEY }
+                    });
+
+                    if (!statusResponse.ok) {
+                        console.warn('Status check failed, retrying...', statusResponse.status);
+                        continue;
+                    }
+
+                    const statusData = await statusResponse.json();
+                    console.log(`[Outreach] Poll ${attempts}: status=${statusData.status}, hasResults=${!!statusData.results}`);
+
+                    if (statusData.status === 'completed' || statusData.status === 'error') {
+                        console.log('[Outreach] Job finished:', JSON.stringify(statusData.results || {}).substring(0, 500));
+                        if (statusData.results) {
+                            displayOutreachResults(statusData.results);
+                        } else if (statusData.error_message) {
+                            throw new Error(statusData.error_message);
+                        } else {
+                            displayOutreachResults({ emails: [], failed: [{ reason: 'Unknown error' }] });
+                        }
+                        return;
+                    }
+
+                    // Update progress text
+                    const progressMsgs = [
+                        'Searching for recent news...',
+                        'Analyzing company signals...',
+                        'Crafting personalized hooks...',
+                        'Generating email content...',
+                        'Validating sources...'
+                    ];
+                    document.getElementById('outreachProgressText').textContent = progressMsgs[attempts % progressMsgs.length];
+                }
+
+                throw new Error('Timeout: Email generation took too long. Please try again.');
+
             } catch (error) {
                 console.error('Outreach generation error:', error);
                 document.getElementById('outreachProgress').classList.add('hidden');
                 document.getElementById('outreachPreGen').classList.remove('hidden');
-                alert('Generation error:' + error.message);
+                alert('Generation error: ' + error.message);
             }
         }
 
