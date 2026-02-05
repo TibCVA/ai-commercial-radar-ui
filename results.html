@@ -66,6 +66,34 @@
         }
         .source-primary { background: #dbeafe; color: #1e40af; }
         .source-secondary { background: #f3f4f6; color: #374151; }
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+        }
+        .toast-success { background: #059669; }
+        .toast-error { background: #dc2626; }
+        .toast-info { background: #2563eb; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        /* Search highlight */
+        .search-highlight { background: #fef08a; padding: 0 2px; border-radius: 2px; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -99,7 +127,7 @@
         <!-- Filters Bar -->
         <div class="glass-card rounded-2xl shadow-sm p-5 mb-6">
             <div class="flex flex-col lg:flex-row gap-4 items-end">
-                <div class="flex-1 min-w-0">
+                <div class="w-full lg:w-56">
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">
                         Watchlist
                         <span id="ownerBadge" class="hidden ml-2 px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full"></span>
@@ -107,6 +135,22 @@
                     <select id="watchlistSelect" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-shadow">
                         <option value="">All watchlists</option>
                     </select>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Search</label>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="Search deals, actors, parties..."
+                            class="w-full border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-shadow"
+                            oninput="handleSearch(this.value)">
+                        <button id="clearSearch" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="w-full lg:w-40">
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Confidence</label>
@@ -181,6 +225,19 @@
                 </svg>
                 Actors (<span id="actorsCount">0</span>)
             </button>
+            <!-- Bulk Actions (visible in Actors tab) -->
+            <div id="bulkActions" class="hidden items-center gap-2 ml-4 pl-4 border-l border-gray-200">
+                <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-600 hover:text-gray-900">
+                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)" class="w-4 h-4 rounded text-violet-600 focus:ring-violet-500">
+                    <span>Select all</span>
+                </label>
+                <button id="btnMarkAllContacted" onclick="markAllContacted()" class="hidden items-center gap-1.5 px-3 py-1.5 text-sm text-green-700 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Mark all contacted
+                </button>
+            </div>
             <div class="flex-1"></div>
             <!-- AI Summary Button -->
             <button id="btnAISummary" onclick="openSummaryModal()" class="flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl font-medium hover:bg-amber-600 transition-colors shadow-sm">
@@ -473,7 +530,165 @@
         let _watchlistsData = [];
 
         // Actor selection for outreach
-        const selectedActors = new Map(); // actor_id -> { id, name }
+        const selectedActors = new Map(); // actor_id -> { id, name, watchlist_id }
+
+        // Search state
+        let searchQuery = '';
+        let searchDebounceTimer = null;
+
+        // === Toast Notifications ===
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // === Search Functions ===
+        function handleSearch(value) {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                searchQuery = value.toLowerCase().trim();
+                document.getElementById('clearSearch').classList.toggle('hidden', !searchQuery);
+                renderResults();
+            }, 300);
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            document.getElementById('clearSearch').classList.add('hidden');
+            renderResults();
+        }
+
+        // === Bulk Selection Functions ===
+        function toggleSelectAll(checked) {
+            const actors = getFilteredActors();
+            if (checked) {
+                actors.forEach(actor => {
+                    selectedActors.set(actor.actor_id, {
+                        id: actor.actor_id,
+                        name: actor.nom,
+                        watchlist_id: actor.watchlist_id
+                    });
+                });
+            } else {
+                actors.forEach(actor => selectedActors.delete(actor.actor_id));
+            }
+            updateCheckboxes();
+            updateOutreachButton();
+            updateBulkActions();
+        }
+
+        async function markAllContacted() {
+            const actorIds = Array.from(selectedActors.keys());
+            if (actorIds.length === 0) return;
+
+            showToast(`Marking ${actorIds.length} actors as contacted...`, 'info');
+            let successCount = 0;
+
+            for (const actorId of actorIds) {
+                try {
+                    const response = await fetch(`${API_BASE}/actor/contacted`, {
+                        method: 'POST',
+                        headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ actor_id: actorId, contacted: true })
+                    });
+                    if (response.ok) {
+                        const actor = (currentData.actors || []).find(a => a.actor_id === actorId);
+                        if (actor) actor.contacted = 'TRUE';
+                        successCount++;
+                    }
+                } catch (e) { console.error('Failed to mark actor:', actorId, e); }
+            }
+
+            renderResults();
+            showToast(`${successCount}/${actorIds.length} actors marked as contacted`, 'success');
+        }
+
+        function updateCheckboxes() {
+            document.querySelectorAll('.actor-checkbox').forEach(cb => {
+                cb.checked = selectedActors.has(cb.dataset.actorId);
+            });
+            document.querySelectorAll('[data-actor-id]').forEach(card => {
+                if (card.classList.contains('glass-card')) {
+                    const actorId = card.dataset.actorId;
+                    if (selectedActors.has(actorId)) {
+                        card.classList.add('ring-2', 'ring-violet-500');
+                    } else {
+                        card.classList.remove('ring-2', 'ring-violet-500');
+                    }
+                }
+            });
+        }
+
+        function updateBulkActions() {
+            const btn = document.getElementById('btnMarkAllContacted');
+            if (selectedActors.size > 0) {
+                btn.classList.remove('hidden');
+                btn.classList.add('flex');
+            } else {
+                btn.classList.add('hidden');
+                btn.classList.remove('flex');
+            }
+            // Update select all checkbox state
+            const actors = getFilteredActors();
+            const allSelected = actors.length > 0 && actors.every(a => selectedActors.has(a.actor_id));
+            document.getElementById('selectAllCheckbox').checked = allSelected;
+        }
+
+        function getFilteredActors() {
+            let actors = currentData.actors || [];
+            if (searchQuery) {
+                actors = actors.filter(actor => {
+                    const searchFields = [
+                        actor.nom,
+                        ...(ensureArray(actor.signaux_recents)),
+                        actor.type_acteur,
+                        actor.geographie
+                    ].filter(Boolean).map(s => s.toLowerCase());
+                    return searchFields.some(f => f.includes(searchQuery));
+                });
+            }
+            return actors;
+        }
+
+        function getFilteredDeals() {
+            let deals = currentData.deals || [];
+            if (searchQuery) {
+                deals = deals.filter(deal => {
+                    const searchFields = [
+                        deal.titre,
+                        ...(ensureArray(deal.parties_acquereurs)),
+                        ...(ensureArray(deal.parties_cibles)),
+                        deal.deal_type,
+                        deal.rationale
+                    ].filter(Boolean).map(s => s.toLowerCase());
+                    return searchFields.some(f => f.includes(searchQuery));
+                });
+            }
+            return deals;
+        }
+
+        // Sync actor selection after filter (keep valid selections)
+        function syncActorSelection() {
+            const currentActorIds = new Set((currentData.actors || []).map(a => a.actor_id));
+            // Remove actors that no longer exist in results
+            for (const [id] of selectedActors) {
+                if (!currentActorIds.has(id)) {
+                    selectedActors.delete(id);
+                }
+            }
+            updateCheckboxes();
+            updateOutreachButton();
+            updateBulkActions();
+        }
 
         // === Security & Data Helpers ===
         function escapeHtml(str) {
@@ -552,9 +767,6 @@
         }
 
         async function loadResults() {
-            // Clear actor selection when loading new results to avoid ID mismatch
-            clearActorSelection();
-
             const watchlistId = document.getElementById('watchlistSelect').value;
             const confidence = document.getElementById('confidenceFilter').value;
             const type = document.getElementById('typeFilter').value;
@@ -587,6 +799,8 @@
 
                 updateSummaryStats();
                 renderResults();
+                // Sync actor selection (keep valid selections, remove invalid ones)
+                syncActorSelection();
             } catch (error) {
                 console.error('Error loading results:', error);
                 document.getElementById('resultsContainer').innerHTML = `
@@ -598,6 +812,7 @@
                         <p class="text-gray-500 text-sm">Check your connection and try again</p>
                     </div>
                 `;
+                showToast('Failed to load results', 'error');
             }
         }
 
@@ -637,6 +852,18 @@
             document.getElementById('tabActors').className = tab === 'actors'
                 ? 'flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all'
                 : 'flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200';
+
+            // Show/hide bulk actions based on tab
+            const bulkActions = document.getElementById('bulkActions');
+            if (tab === 'actors') {
+                bulkActions.classList.remove('hidden');
+                bulkActions.classList.add('flex');
+                updateBulkActions();
+            } else {
+                bulkActions.classList.add('hidden');
+                bulkActions.classList.remove('flex');
+            }
+
             renderResults();
         }
 
@@ -667,24 +894,33 @@
 
         function renderResults() {
             const container = document.getElementById('resultsContainer');
-            const items = currentTab === 'deals' ? currentData.deals : currentData.actors;
+            // Use filtered results based on search query
+            const items = currentTab === 'deals' ? getFilteredDeals() : getFilteredActors();
+            const totalItems = currentTab === 'deals' ? (currentData.deals || []).length : (currentData.actors || []).length;
 
             if (!items || items.length === 0) {
+                const hasSearch = searchQuery.length > 0;
                 container.innerHTML = `
                     <div class="glass-card rounded-2xl p-12 text-center">
                         <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="${hasSearch ? 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' : 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'}"/>
                         </svg>
-                        <p class="text-gray-500">No ${currentTab === 'deals' ? 'deal' : 'actor'} found with these criteria</p>
+                        <p class="text-gray-500">${hasSearch ? `No results for "${escapeHtml(searchQuery)}"` : `No ${currentTab === 'deals' ? 'deal' : 'actor'} found with these criteria`}</p>
+                        ${hasSearch ? '<button onclick="clearSearch()" class="mt-3 text-radar-600 hover:underline text-sm">Clear search</button>' : ''}
                     </div>
                 `;
                 return;
             }
 
+            // Show search result count if searching
+            const searchInfo = searchQuery ? `<div class="mb-3 text-sm text-gray-500">Showing ${items.length} of ${totalItems} ${currentTab}</div>` : '';
+
             if (currentTab === 'deals') {
-                container.innerHTML = items.map(deal => renderDealCard(deal)).join('');
+                container.innerHTML = searchInfo + items.map(deal => renderDealCard(deal)).join('');
             } else {
-                container.innerHTML = items.map(actor => renderActorCard(actor)).join('');
+                container.innerHTML = searchInfo + items.map(actor => renderActorCard(actor)).join('');
+                // Re-apply checkbox states after render
+                updateCheckboxes();
             }
         }
 
@@ -1247,10 +1483,11 @@
         function exportCurrentResults() {
             const watchlistId = document.getElementById('watchlistSelect').value;
             if (!watchlistId) {
-                alert('Select a watchlist to export');
+                showToast('Select a watchlist to export', 'error');
                 return;
             }
 
+            showToast('Preparing export...', 'info');
             const url = `${API_BASE}/export/xlsx?watchlist_id=${encodeURIComponent(watchlistId)}`;
             fetch(url, { headers: { 'workspace-api-key': API_KEY } })
                 .then(res => {
@@ -1267,10 +1504,11 @@
                     link.download = filename;
                     link.click();
                     URL.revokeObjectURL(blobUrl);
+                    showToast('Export downloaded', 'success');
                 })
                 .catch(err => {
                     console.error('Export error:', err);
-                    alert('Export error');
+                    showToast('Export failed', 'error');
                 });
         }
 
@@ -1361,9 +1599,10 @@
                     actor.contacted = newStatus ? 'TRUE' : 'FALSE';
                 }
                 renderResults();
+                showToast(newStatus ? 'Marked as contacted' : 'Marked as not contacted', 'success');
             } catch (error) {
                 console.error('Failed to update contacted status:', error);
-                alert('Failed to update contacted status: ' + error.message);
+                showToast('Failed to update status', 'error');
             }
         }
 
@@ -1373,14 +1612,14 @@
 
         function openOutreachModal() {
             if (selectedActors.size === 0) {
-                alert('Select at least one actor');
+                showToast('Select at least one actor', 'error');
                 return;
             }
 
             // Check all selected actors have the same watchlist_id
             const watchlistIds = new Set(Array.from(selectedActors.values()).map(a => a.watchlist_id));
             if (watchlistIds.size > 1) {
-                alert('Please select actors from the same watchlist only');
+                showToast('Select actors from the same watchlist only', 'error');
                 return;
             }
 
@@ -1417,7 +1656,7 @@
             const actorRefs = Array.from(selectedActors.keys());
 
             if (!watchlistId) {
-                alert('Error: Actor watchlist_id not found');
+                showToast('Actor watchlist_id not found', 'error');
                 return;
             }
 
@@ -1500,7 +1739,14 @@
                 console.error('Outreach generation error:', error);
                 document.getElementById('outreachProgress').classList.add('hidden');
                 document.getElementById('outreachPreGen').classList.remove('hidden');
-                alert('Generation error: ' + error.message);
+                showToast('Generation error: ' + error.message, 'error');
+            }
+        }
+
+        // Save email edits from contenteditable
+        function saveEmailEdit(idx, newText) {
+            if (window._outreachEmails && window._outreachEmails[idx]) {
+                window._outreachEmails[idx].email_body = newText;
             }
         }
 
@@ -1566,7 +1812,12 @@
                             </div>
                         </div>
                     ` : ''}
-                    <div class="text-sm text-gray-700 whitespace-pre-wrap bg-white p-3 rounded-lg border border-gray-100" id="emailBody${idx}">${escapeHtml(email.email_body)}</div>
+                    <div class="text-sm text-gray-700 whitespace-pre-wrap bg-white p-3 rounded-lg border border-gray-100 focus:ring-2 focus:ring-violet-300 focus:border-violet-300 outline-none cursor-text"
+                        id="emailBody${idx}"
+                        contenteditable="true"
+                        onblur="saveEmailEdit(${idx}, this.innerText)"
+                        title="Click to edit">${escapeHtml(email.email_body)}</div>
+                    <p class="text-xs text-gray-400 mt-1">Click to edit the email before copying</p>
                 </div>
             `).join('');
 
@@ -1605,7 +1856,7 @@
                 }, 1500);
             }).catch(err => {
                 console.error('Copy failed:', err);
-                alert('Copy error');
+                showToast('Copy failed', 'error');
             });
         }
 
@@ -1615,10 +1866,10 @@
 
             const text = emails.map(e => `=== ${e.actor_name} ===\nSubject: ${e.subject}\n\n${e.email_body}`).join('\n\n---\n\n');
             navigator.clipboard.writeText(text).then(() => {
-                alert(`${emails.length} email(s) copied to clipboard`);
+                showToast(`${emails.length} email(s) copied`, 'success');
             }).catch(err => {
                 console.error('Copy failed:', err);
-                alert('Copy error');
+                showToast('Copy failed', 'error');
             });
         }
 
@@ -1629,7 +1880,7 @@
         function openSummaryModal() {
             const watchlistId = document.getElementById('watchlistSelect').value;
             if (!watchlistId) {
-                alert('Select a watchlist first');
+                showToast('Select a watchlist first', 'error');
                 return;
             }
 
@@ -1810,5 +2061,8 @@
             if (e.target.id === 'summaryModal') closeSummaryModal();
         });
     </script>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
 </body>
 </html>
