@@ -94,6 +94,11 @@
         }
         /* Search highlight */
         .search-highlight { background: #fef08a; padding: 0 2px; border-radius: 2px; }
+        /* Priority indicator */
+        .priority-card { border-left: 4px solid #f59e0b !important; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important; }
+        .priority-star { color: #f59e0b; }
+        /* Hidden indicator */
+        .hidden-card { opacity: 0.5; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
@@ -180,6 +185,15 @@
                         <option value="24h">Last 24h</option>
                         <option value="7d">Last 7 days</option>
                         <option value="30d">Last 30 days</option>
+                    </select>
+                </div>
+                <div class="w-full lg:w-40">
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">View</label>
+                    <select id="viewFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent" onchange="renderResults()">
+                        <option value="active">Active only</option>
+                        <option value="priority">Priority only</option>
+                        <option value="hidden">Hidden only</option>
+                        <option value="all">All items</option>
                     </select>
                 </div>
                 <button onclick="loadResults()" class="px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-colors shadow-sm flex items-center gap-2">
@@ -595,7 +609,7 @@
 
             for (const actorId of actorIds) {
                 try {
-                    const response = await fetch(`${API_BASE}/actor/contacted`, {
+                    const response = await fetch(`${API_BASE}/actor/update`, {
                         method: 'POST',
                         headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
                         body: JSON.stringify({ actor_id: actorId, contacted: true })
@@ -643,8 +657,26 @@
             document.getElementById('selectAllCheckbox').checked = allSelected;
         }
 
+        function applyViewFilter(items) {
+            const viewFilter = document.getElementById('viewFilter')?.value || 'active';
+            switch (viewFilter) {
+                case 'priority':
+                    return items.filter(i => i.priority === 'TRUE');
+                case 'hidden':
+                    return items.filter(i => i.hidden === 'TRUE');
+                case 'active':
+                    return items.filter(i => i.hidden !== 'TRUE');
+                case 'all':
+                default:
+                    return items;
+            }
+        }
+
         function getFilteredActors() {
             let actors = currentData.actors || [];
+            // Apply view filter (hidden/priority/active/all)
+            actors = applyViewFilter(actors);
+            // Apply search filter
             if (searchQuery) {
                 actors = actors.filter(actor => {
                     const searchFields = [
@@ -661,6 +693,9 @@
 
         function getFilteredDeals() {
             let deals = currentData.deals || [];
+            // Apply view filter (hidden/priority/active/all)
+            deals = applyViewFilter(deals);
+            // Apply search filter
             if (searchQuery) {
                 deals = deals.filter(deal => {
                     const searchFields = [
@@ -674,6 +709,74 @@
                 });
             }
             return deals;
+        }
+
+        // === Update Deal/Actor Functions ===
+        async function updateDeal(dealId, updates) {
+            try {
+                const response = await fetch(`${API_BASE}/deal/update`, {
+                    method: 'POST',
+                    headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deal_id: dealId, ...updates })
+                });
+                if (!response.ok) throw new Error('Update failed');
+                // Update local data
+                const deal = (currentData.deals || []).find(d => d.deal_id === dealId);
+                if (deal) {
+                    if (typeof updates.hidden === 'boolean') deal.hidden = updates.hidden ? 'TRUE' : 'FALSE';
+                    if (typeof updates.priority === 'boolean') deal.priority = updates.priority ? 'TRUE' : 'FALSE';
+                }
+                renderResults();
+                return true;
+            } catch (error) {
+                console.error('Update deal error:', error);
+                showToast('Failed to update deal', 'error');
+                return false;
+            }
+        }
+
+        async function updateActor(actorId, updates) {
+            try {
+                const response = await fetch(`${API_BASE}/actor/update`, {
+                    method: 'POST',
+                    headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ actor_id: actorId, ...updates })
+                });
+                if (!response.ok) throw new Error('Update failed');
+                // Update local data
+                const actor = (currentData.actors || []).find(a => a.actor_id === actorId);
+                if (actor) {
+                    if (typeof updates.hidden === 'boolean') actor.hidden = updates.hidden ? 'TRUE' : 'FALSE';
+                    if (typeof updates.priority === 'boolean') actor.priority = updates.priority ? 'TRUE' : 'FALSE';
+                    if (typeof updates.contacted === 'boolean') actor.contacted = updates.contacted ? 'TRUE' : 'FALSE';
+                }
+                renderResults();
+                return true;
+            } catch (error) {
+                console.error('Update actor error:', error);
+                showToast('Failed to update actor', 'error');
+                return false;
+            }
+        }
+
+        function toggleDealPriority(dealId, newValue) {
+            updateDeal(dealId, { priority: newValue });
+            showToast(newValue ? 'Marked as priority' : 'Removed from priority', 'success');
+        }
+
+        function toggleDealHidden(dealId, newValue) {
+            updateDeal(dealId, { hidden: newValue });
+            showToast(newValue ? 'Deal hidden' : 'Deal restored', 'info');
+        }
+
+        function toggleActorPriority(actorId, newValue) {
+            updateActor(actorId, { priority: newValue });
+            showToast(newValue ? 'Marked as priority' : 'Removed from priority', 'success');
+        }
+
+        function toggleActorHidden(actorId, newValue) {
+            updateActor(actorId, { hidden: newValue });
+            showToast(newValue ? 'Actor hidden' : 'Actor restored', 'info');
         }
 
         // Sync actor selection after filter (keep valid selections)
@@ -959,14 +1062,35 @@
             const cibles = ensureArray(deal.parties_cibles);
             const rationnel = ensureArray(deal.rationnel);
 
+            const isPriority = deal.priority === 'TRUE';
+            const isHidden = deal.hidden === 'TRUE';
+
             return `
-                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass}" onclick="showDealDetail('${escapeHtml(deal.deal_id)}')">
+                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${freshnessClass} ${isPriority ? 'priority-card' : ''} ${isHidden ? 'hidden-card' : ''}" onclick="showDealDetail('${escapeHtml(deal.deal_id)}')">
                     <div class="flex flex-col lg:flex-row gap-4">
                         <!-- Main Content -->
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-start gap-2 mb-3">
+                                <!-- Priority & Hide buttons -->
+                                <div class="flex gap-1 mr-2" onclick="event.stopPropagation()">
+                                    <button onclick="toggleDealPriority('${escapeHtml(deal.deal_id)}', ${!isPriority})"
+                                        class="p-1.5 rounded-lg transition-colors ${isPriority ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-500'}"
+                                        title="${isPriority ? 'Remove priority' : 'Mark as priority'}">
+                                        <svg class="w-4 h-4" fill="${isPriority ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                        </svg>
+                                    </button>
+                                    <button onclick="toggleDealHidden('${escapeHtml(deal.deal_id)}', ${!isHidden})"
+                                        class="p-1.5 rounded-lg transition-colors ${isHidden ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500'}"
+                                        title="${isHidden ? 'Restore deal' : 'Hide deal'}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isHidden ? 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' : 'M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21'}"/>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(deal.titre) || 'Untitled deal'}</h3>
                                 <span class="px-2.5 py-1 ${stage.color} text-xs font-medium rounded-full">${escapeHtml(stage.label)}</span>
+                                ${isPriority ? '<span class="text-amber-500 text-lg">★</span>' : ''}
                             </div>
 
                             <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm mb-4">
@@ -1059,9 +1183,11 @@
             const actorSourceCount = actorSources.length;
             const hasUpdate = actor.last_seen_at && actor.first_seen_at && actor.last_seen_at !== actor.first_seen_at;
             const isSelected = selectedActors.has(actor.actor_id);
+            const isPriority = actor.priority === 'TRUE';
+            const isHidden = actor.hidden === 'TRUE';
 
             return `
-                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover ${freshnessClass} ${isSelected ? 'ring-2 ring-violet-500' : ''}" data-actor-id="${escapeHtml(actor.actor_id)}">
+                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover ${freshnessClass} ${isSelected ? 'ring-2 ring-violet-500' : ''} ${isPriority ? 'priority-card' : ''} ${isHidden ? 'hidden-card' : ''}" data-actor-id="${escapeHtml(actor.actor_id)}">
                     <div class="flex flex-col lg:flex-row gap-4">
                         <div class="flex-1">
                             <div class="flex items-start gap-3 mb-4">
@@ -1073,11 +1199,28 @@
                                         ${isSelected ? 'checked' : ''}
                                         onchange="toggleActorSelection('${escapeHtml(actor.actor_id)}', '${escapeHtml(actor.nom || '').replace(/'/g, "\\'")}', '${escapeHtml(actor.watchlist_id || '')}', this.checked)">
                                 </label>
+                                <!-- Priority & Hide buttons -->
+                                <div class="flex flex-col gap-1" onclick="event.stopPropagation()">
+                                    <button onclick="toggleActorPriority('${escapeHtml(actor.actor_id)}', ${!isPriority})"
+                                        class="p-1 rounded transition-colors ${isPriority ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400'}"
+                                        title="${isPriority ? 'Remove priority' : 'Mark as priority'}">
+                                        <svg class="w-4 h-4" fill="${isPriority ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                        </svg>
+                                    </button>
+                                    <button onclick="toggleActorHidden('${escapeHtml(actor.actor_id)}', ${!isHidden})"
+                                        class="p-1 rounded transition-colors ${isHidden ? 'text-red-500' : 'text-gray-300 hover:text-red-400'}"
+                                        title="${isHidden ? 'Restore' : 'Hide'}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${isHidden ? 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' : 'M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21'}"/>
+                                        </svg>
+                                    </button>
+                                </div>
                                 <div class="w-12 h-12 rounded-xl ${actorType.color} flex items-center justify-center text-2xl cursor-pointer" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
                                     ${actorType.icon}
                                 </div>
-                                <div class="cursor-pointer" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
-                                    <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(actor.nom) || 'Unnamed actor'}</h3>
+                                <div class="cursor-pointer flex-1" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
+                                    <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(actor.nom) || 'Unnamed actor'}${isPriority ? ' <span class="text-amber-500">★</span>' : ''}</h3>
                                     <div class="flex items-center gap-2 mt-1">
                                         <span class="px-2.5 py-0.5 ${actorType.color} text-xs font-medium rounded-full">${actorType.label}</span>
                                         <span class="text-sm text-gray-500">${escapeHtml(actor.geographie) || 'Geo N/A'}</span>
@@ -1578,31 +1721,9 @@
         // ==========================================
 
         async function toggleContactedStatus(actorId, newStatus) {
-            try {
-                const response = await fetch(`${API_BASE}/actor/contacted`, {
-                    method: 'POST',
-                    headers: {
-                        'workspace-api-key': API_KEY,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ actor_id: actorId, contacted: newStatus })
-                });
-
-                if (!response.ok) {
-                    const err = await response.json().catch(() => ({}));
-                    throw new Error(err.error || `HTTP ${response.status}`);
-                }
-
-                // Update local data and re-render
-                const actor = (currentData.actors || []).find(a => a.actor_id === actorId);
-                if (actor) {
-                    actor.contacted = newStatus ? 'TRUE' : 'FALSE';
-                }
-                renderResults();
+            const success = await updateActor(actorId, { contacted: newStatus });
+            if (success) {
                 showToast(newStatus ? 'Marked as contacted' : 'Marked as not contacted', 'success');
-            } catch (error) {
-                console.error('Failed to update contacted status:', error);
-                showToast('Failed to update status', 'error');
             }
         }
 
