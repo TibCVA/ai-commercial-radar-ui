@@ -2708,9 +2708,9 @@
                 const payload = emails.map((e, i) => ({
                     email_id: 'email_' + Date.now() + '_' + i,
                     actor_id: e.actor_id || e.actor_ref || '',
-                    actor_name: e.actor_name || '',
+                    actor_name: e.actor_name || e.actor_ref || '',
                     watchlist_id: watchlistId,
-                    recipient_email: e.guessed_email?.email || '',
+                    recipient_email: '',
                     subject: e.subject || '',
                     body: e.email_body || '',
                     hook_source_url: e.hook?.source_url || '',
@@ -2718,14 +2718,22 @@
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 }));
-                await fetch(`${API_BASE}/emails/save`, {
+                console.log('[Emails] Saving', payload.length, 'emails:', payload.map(p => p.actor_name));
+                const resp = await fetch(`${API_BASE}/emails/save`, {
                     method: 'POST',
                     headers: { 'workspace-api-key': API_KEY, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ emails: payload })
                 });
+                if (!resp.ok) {
+                    const errText = await resp.text().catch(() => '');
+                    throw new Error(`Save failed: HTTP ${resp.status} ${errText}`);
+                }
+                const data = await resp.json().catch(() => ({}));
+                console.log('[Emails] Save response:', data);
                 showToast(`${payload.length} email(s) saved to Emails tab`, 'success');
             } catch (err) {
                 console.error('Auto-save emails error:', err);
+                showToast('Email save failed: ' + err.message, 'error');
             }
         }
 
