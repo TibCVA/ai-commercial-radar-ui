@@ -183,7 +183,7 @@
                     </a>
                     <div>
                         <h1 class="text-lg font-bold tracking-tight">AI Commercial Radar</h1>
-                        <p class="text-xs text-indigo-200 -mt-0.5">M&A Intelligence Platform</p>
+                        <p class="text-xs text-indigo-200 -mt-0.5">Target Screening & Weak Signals</p>
                     </div>
                 </div>
                 <nav class="hidden md:flex items-center gap-1">
@@ -208,7 +208,7 @@
                 <span id="breadcrumbLabel" class="text-gray-900">New Watchlist</span>
             </div>
             <h2 id="pageTitle" class="text-2xl font-bold text-gray-900">Create a new watchlist</h2>
-            <p id="pageSubtitle" class="text-gray-500 mt-1">Define your M&A monitoring criteria</p>
+            <p id="pageSubtitle" class="text-gray-500 mt-1">Define your screening or weak-signal criteria</p>
         </div>
 
         <form id="watchlistForm" class="space-y-6">
@@ -251,6 +251,21 @@
                             placeholder="Owner name">
                         <p class="text-xs text-gray-400 mt-1.5">Person responsible for this watchlist</p>
                     </div>
+                </div>
+
+                <div class="mt-5 p-4 bg-radar-50 border border-radar-100 rounded-xl">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Engine type</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-lg cursor-pointer">
+                            <input type="radio" name="engine_type" value="screening_targets_v1" class="w-4 h-4 text-radar-600 focus:ring-radar-500" checked onchange="toggleEngineSections()">
+                            <span class="text-sm text-gray-800 font-medium">Target screening (Funding/Grants)</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-lg cursor-pointer">
+                            <input type="radio" name="engine_type" value="weak_signals_mna" class="w-4 h-4 text-radar-600 focus:ring-radar-500" onchange="toggleEngineSections()">
+                            <span class="text-sm text-gray-800 font-medium">M&A weak signals</span>
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Default: <code>screening_targets_v1</code></p>
                 </div>
             </section>
 
@@ -378,7 +393,8 @@
                 <div class="space-y-5">
                     <!-- Types d'operations -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Operation types to monitor</label>
+                        <label id="operationTypesLabel" class="block text-sm font-medium text-gray-700 mb-3">Operation types to monitor</label>
+                        <p id="operationTypesHint" class="text-xs text-gray-500 mb-2">For screening mode, the form enforces funding and growth oriented operation types.</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <label class="checkbox-card flex items-start gap-3 p-3 border border-gray-200 rounded-xl cursor-pointer">
                                 <input type="checkbox" name="operation_types" value="ma_rumor" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500 mt-0.5" checked>
@@ -501,6 +517,223 @@
                                 onkeydown="handleTagInput(event, 'excludeCompanies')">
                         </div>
                         <input type="hidden" id="excludeCompanies" name="exclude_companies">
+                    </div>
+
+                    <div id="screeningCriteriaSection" class="space-y-5 pt-3 border-t border-gray-100">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-semibold text-gray-900">Screening engine settings</label>
+                            <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">screening_targets_v1</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Segment name</label>
+                            <input type="text" id="segmentName" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent" placeholder="Ex: EV charging Nordics - Seed/A">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Subsector</label>
+                                <input type="text" id="subsector" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent" placeholder="Ex: EV charging">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Subsector tags (comma separated)</label>
+                                <input type="text" id="subsectorTags" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent" placeholder="Ex: charging, cpo, fleet">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Source pack</label>
+                                <select id="sourcePack" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                                    <option value="EU_CORE">EU_CORE</option>
+                                    <option value="NORDICS">NORDICS</option>
+                                    <option value="FRANCE">FRANCE</option>
+                                    <option value="GRANTS_EU">GRANTS_EU</option>
+                                    <option value="INVESTOR_EU">INVESTOR_EU</option>
+                                    <option value="DB_PREMIUM">DB_PREMIUM</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Outreach pitch type</label>
+                                <select id="outreachPitchType" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                                    <option value="mixed" selected>mixed</option>
+                                    <option value="growth_strategy">growth_strategy</option>
+                                    <option value="fundraising_support">fundraising_support</option>
+                                    <option value="corporate_dev">corporate_dev</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Sourcing strategy</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="sourcing_strategies" value="funding_media" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">Funding media</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="sourcing_strategies" value="investor_announcements" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">Investor announcements</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="sourcing_strategies" value="grants" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">Grants</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="sourcing_strategies" value="competitor_mining" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                    <span class="text-sm text-gray-700">Competitor mining</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Funding round types</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="funding_round_types" value="Seed" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">Seed</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="funding_round_types" value="Series A" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">Series A</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="funding_round_types" value="Series B" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">Series B</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="funding_round_types" value="Growth" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                    <span class="text-sm text-gray-700">Growth</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Funding min (EUR)</label>
+                                <input type="number" id="fundingAmountMinEur" value="1000000" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Funding max (EUR)</label>
+                                <input type="number" id="fundingAmountMaxEur" value="10000000" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Funding age min (months)</label>
+                                <input type="number" id="fundingAgeMinMonths" value="6" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Funding age max (months)</label>
+                                <input type="number" id="fundingAgeMaxMonths" value="24" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Lookback (months)</label>
+                                <input type="number" id="fundingLookbackMonths" value="24" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Grant lookback (months)</label>
+                                <input type="number" id="grantLookbackMonths" value="24" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Batch size</label>
+                                <select id="stage1BatchSize" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Max new companies/run</label>
+                                <input type="number" id="stage1MaxNewCompaniesPerRun" value="10" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Profile depth (Stage2)</label>
+                                <select id="stage2DefaultProfileDepth" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                                    <option value="lite">lite</option>
+                                    <option value="standard" selected>standard</option>
+                                    <option value="deep">deep</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Ownership policy</label>
+                                <select id="ownershipExclusionPolicy" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                                    <option value="exclude_majority_corporate" selected>exclude_majority_corporate</option>
+                                    <option value="allow_unknown">allow_unknown</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Corporate threshold (%)</label>
+                                <input type="number" id="ownershipCorporateThresholdPct" value="50" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="checkbox-card flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" id="competitorModeEnabled" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500">
+                                <span class="text-sm text-gray-700">Enable competitor mode</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" id="includeGrantsAsEquivalent" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                <span class="text-sm text-gray-700">Include grants as equivalent funding</span>
+                            </label>
+                            <label class="checkbox-card flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer">
+                                <input type="checkbox" id="stage2Enabled" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                <span class="text-sm text-gray-700">Enable Stage2 profiling</span>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Grant sources</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="grant_sources" value="ADEME" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">ADEME</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="grant_sources" value="BPI" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">BPI</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="grant_sources" value="EU_FT_PORTAL" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">EU FT Portal</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="grant_sources" value="CORDIS" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">CORDIS</span>
+                                </label>
+                                <label class="checkbox-card flex items-center gap-2 p-2.5 border border-gray-200 rounded-lg cursor-pointer">
+                                    <input type="checkbox" name="grant_sources" value="STATE_AID" class="w-4 h-4 rounded text-radar-600 focus:ring-radar-500" checked>
+                                    <span class="text-sm text-gray-700">State aid</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Competitor reference companies (comma separated)</label>
+                                <input type="text" id="competitorReferenceCompanies" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent" placeholder="Ex: ChargePoint, Fastned">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Exclude subsidiaries of (comma separated)</label>
+                                <input type="text" id="excludeSubsidiariesOf" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent" placeholder="Ex: Engie, EDF">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Include competitors if no funding in last (months)</label>
+                                <input type="number" id="competitorIncludeIfNoFundingInLastMonths" value="12" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">Competitor similarity threshold</label>
+                                <input type="number" id="competitorSimilarityThreshold" step="0.05" min="0" max="1" value="0.6" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -677,7 +910,7 @@ Best regards,
     <!-- Footer -->
     <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-8 border-t border-gray-200">
         <div class="text-center text-sm text-gray-500">
-            AI Commercial Radar v2.0 - M&A Intelligence for Infrastructure Funds
+            AI Commercial Radar v3.0 - Multi-engine screening and weak signals
         </div>
     </footer>
 
@@ -711,6 +944,62 @@ Best regards,
                 return document.getElementById('ownerCustom').value.trim();
             }
             return sel.value;
+        }
+
+        function getSelectedEngineType() {
+            return document.querySelector('input[name="engine_type"]:checked')?.value || 'screening_targets_v1';
+        }
+
+        function setSelectedEngineType(engineType) {
+            const target = document.querySelector(`input[name="engine_type"][value="${CSS.escape(engineType)}"]`);
+            if (target) target.checked = true;
+        }
+
+        function parseCsvList(text) {
+            if (!text) return [];
+            return String(text).split(',').map((x) => x.trim()).filter(Boolean);
+        }
+
+        function getCheckedValues(name) {
+            return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map((el) => el.value);
+        }
+
+        function setCheckedValues(name, values) {
+            const wanted = new Set(values || []);
+            document.querySelectorAll(`input[name="${name}"]`).forEach((el) => {
+                el.checked = wanted.has(el.value);
+            });
+        }
+
+        function lockOperationTypesForScreening(isScreening) {
+            const label = document.getElementById('operationTypesLabel');
+            const hint = document.getElementById('operationTypesHint');
+            const ops = Array.from(document.querySelectorAll('input[name="operation_types"]'));
+            if (label) {
+                label.textContent = isScreening
+                    ? 'Funding events / Grants / Growth signals'
+                    : 'Operation types to monitor';
+            }
+            if (hint) {
+                hint.classList.toggle('hidden', !isScreening);
+            }
+
+            const forced = new Set(['financing', 'growth_signal']);
+            ops.forEach((el) => {
+                if (isScreening) {
+                    el.checked = forced.has(el.value);
+                    el.disabled = !forced.has(el.value);
+                } else {
+                    el.disabled = false;
+                }
+            });
+        }
+
+        function toggleEngineSections() {
+            const isScreening = getSelectedEngineType() === 'screening_targets_v1';
+            const screening = document.getElementById('screeningCriteriaSection');
+            if (screening) screening.classList.toggle('hidden', !isScreening);
+            lockOperationTypesForScreening(isScreening);
         }
 
         // Tags management
@@ -794,6 +1083,7 @@ Best regards,
         function prefillForm(wl) {
             document.getElementById('name').value = wl.name || '';
             document.getElementById('sector').value = wl.sector || '';
+            setSelectedEngineType(wl.engine_type || 'screening_targets_v1');
 
             // Owner
             if (wl.owner) {
@@ -870,6 +1160,82 @@ Best regards,
             if (wl.deal_size_min) document.getElementById('dealSizeMin').value = wl.deal_size_min;
             if (wl.deal_size_max) document.getElementById('dealSizeMax').value = wl.deal_size_max;
 
+            // Screening fields
+            if (wl.segment_name) document.getElementById('segmentName').value = wl.segment_name;
+            if (wl.subsector) document.getElementById('subsector').value = wl.subsector;
+            const subsectorTags = safeParse(wl.subsector_tags);
+            if (subsectorTags.length) document.getElementById('subsectorTags').value = subsectorTags.join(', ');
+            if (wl.source_pack) {
+                const pack = Array.isArray(wl.source_pack) ? wl.source_pack[0] : safeParse(wl.source_pack)[0] || wl.source_pack;
+                if (pack) document.getElementById('sourcePack').value = pack;
+            }
+            const sourcingStrategies = safeParse(wl.sourcing_strategies);
+            if (sourcingStrategies.length) setCheckedValues('sourcing_strategies', sourcingStrategies);
+
+            if (wl.funding_amount_min_eur !== undefined && wl.funding_amount_min_eur !== null) {
+                document.getElementById('fundingAmountMinEur').value = wl.funding_amount_min_eur;
+            }
+            if (wl.funding_amount_max_eur !== undefined && wl.funding_amount_max_eur !== null) {
+                document.getElementById('fundingAmountMaxEur').value = wl.funding_amount_max_eur;
+            }
+            if (wl.funding_age_min_months !== undefined && wl.funding_age_min_months !== null) {
+                document.getElementById('fundingAgeMinMonths').value = wl.funding_age_min_months;
+            }
+            if (wl.funding_age_max_months !== undefined && wl.funding_age_max_months !== null) {
+                document.getElementById('fundingAgeMaxMonths').value = wl.funding_age_max_months;
+            }
+            if (wl.funding_lookback_months !== undefined && wl.funding_lookback_months !== null) {
+                document.getElementById('fundingLookbackMonths').value = wl.funding_lookback_months;
+            }
+            if (wl.grant_lookback_months !== undefined && wl.grant_lookback_months !== null) {
+                document.getElementById('grantLookbackMonths').value = wl.grant_lookback_months;
+            }
+            if (wl.stage1_batch_size !== undefined && wl.stage1_batch_size !== null) {
+                document.getElementById('stage1BatchSize').value = String(wl.stage1_batch_size);
+            }
+            if (wl.stage1_max_new_companies_per_run !== undefined && wl.stage1_max_new_companies_per_run !== null) {
+                document.getElementById('stage1MaxNewCompaniesPerRun').value = wl.stage1_max_new_companies_per_run;
+            }
+            if (wl.stage2_default_profile_depth) {
+                document.getElementById('stage2DefaultProfileDepth').value = wl.stage2_default_profile_depth;
+            }
+            if (wl.include_grants_as_equivalent !== undefined && wl.include_grants_as_equivalent !== null) {
+                document.getElementById('includeGrantsAsEquivalent').checked = ['true', '1', 'yes', 'oui'].includes(String(wl.include_grants_as_equivalent).toLowerCase()) || wl.include_grants_as_equivalent === true;
+            }
+            if (wl.stage2_enabled !== undefined && wl.stage2_enabled !== null) {
+                document.getElementById('stage2Enabled').checked = ['true', '1', 'yes', 'oui'].includes(String(wl.stage2_enabled).toLowerCase()) || wl.stage2_enabled === true;
+            }
+            if (wl.competitor_mode_enabled !== undefined && wl.competitor_mode_enabled !== null) {
+                document.getElementById('competitorModeEnabled').checked = ['true', '1', 'yes', 'oui'].includes(String(wl.competitor_mode_enabled).toLowerCase()) || wl.competitor_mode_enabled === true;
+            }
+
+            const roundTypes = safeParse(wl.funding_round_types);
+            if (roundTypes.length) setCheckedValues('funding_round_types', roundTypes);
+            const grantSources = safeParse(wl.grant_sources);
+            if (grantSources.length) setCheckedValues('grant_sources', grantSources);
+
+            const compRefs = safeParse(wl.competitor_reference_companies);
+            if (compRefs.length) document.getElementById('competitorReferenceCompanies').value = compRefs.join(', ');
+            if (wl.competitor_include_if_no_funding_in_last_months !== undefined && wl.competitor_include_if_no_funding_in_last_months !== null) {
+                document.getElementById('competitorIncludeIfNoFundingInLastMonths').value = wl.competitor_include_if_no_funding_in_last_months;
+            }
+            if (wl.competitor_similarity_threshold !== undefined && wl.competitor_similarity_threshold !== null) {
+                document.getElementById('competitorSimilarityThreshold').value = wl.competitor_similarity_threshold;
+            }
+
+            if (wl.ownership_exclusion_policy) {
+                document.getElementById('ownershipExclusionPolicy').value = wl.ownership_exclusion_policy;
+            }
+            if (wl.ownership_corporate_threshold_pct !== undefined && wl.ownership_corporate_threshold_pct !== null) {
+                document.getElementById('ownershipCorporateThresholdPct').value = wl.ownership_corporate_threshold_pct;
+            }
+            const excludedParents = safeParse(wl.exclude_subsidiaries_of);
+            if (excludedParents.length) document.getElementById('excludeSubsidiariesOf').value = excludedParents.join(', ');
+
+            if (wl.outreach_pitch_type) {
+                document.getElementById('outreachPitchType').value = wl.outreach_pitch_type;
+            }
+
             // Outreach settings
             if (wl.outreach_template_enabled) {
                 document.getElementById('outreach_template_enabled').checked = true;
@@ -878,6 +1244,8 @@ Best regards,
             if (wl.outreach_template_text) {
                 document.getElementById('outreach_template_text').value = wl.outreach_template_text;
             }
+
+            toggleEngineSections();
         }
 
         // Load watchlist for editing
@@ -920,12 +1288,13 @@ Best regards,
 
             // Setup outreach template toggle
             document.getElementById('outreach_template_enabled').addEventListener('change', toggleOutreachTemplate);
+            toggleEngineSections();
 
             if (isEditMode) {
                 // Update UI for edit mode
                 document.getElementById('breadcrumbLabel').textContent = 'Edit Watchlist';
                 document.getElementById('pageTitle').textContent = 'Edit watchlist';
-                document.getElementById('pageSubtitle').textContent = 'Edit your M&A monitoring criteria';
+                document.getElementById('pageSubtitle').textContent = 'Edit your screening or weak-signal criteria';
                 document.getElementById('submitBtn').innerHTML = `
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -953,6 +1322,7 @@ Best regards,
             const formData = {
                 name: document.getElementById('name').value,
                 owner: getOwnerValue(),
+                engine_type: getSelectedEngineType(),
                 sector: document.getElementById('sector').value,
                 sector_tags: tagsData.sectorTags,
                 geographies: allGeographies,
@@ -970,7 +1340,35 @@ Best regards,
                 deal_size_min: document.getElementById('dealSizeMin').value ? parseInt(document.getElementById('dealSizeMin').value) : null,
                 deal_size_max: document.getElementById('dealSizeMax').value ? parseInt(document.getElementById('dealSizeMax').value) : null,
                 outreach_template_enabled: document.getElementById('outreach_template_enabled').checked,
-                outreach_template_text: document.getElementById('outreach_template_text').value || ''
+                outreach_template_text: document.getElementById('outreach_template_text').value || '',
+
+                segment_name: document.getElementById('segmentName').value || null,
+                subsector: document.getElementById('subsector').value || null,
+                subsector_tags: parseCsvList(document.getElementById('subsectorTags').value),
+                geo_scope: allGeographies,
+                sourcing_strategies: getCheckedValues('sourcing_strategies'),
+                source_pack: document.getElementById('sourcePack').value || 'EU_CORE',
+                funding_amount_min_eur: document.getElementById('fundingAmountMinEur').value ? parseInt(document.getElementById('fundingAmountMinEur').value, 10) : 1000000,
+                funding_amount_max_eur: document.getElementById('fundingAmountMaxEur').value ? parseInt(document.getElementById('fundingAmountMaxEur').value, 10) : 10000000,
+                funding_round_types: getCheckedValues('funding_round_types'),
+                funding_age_min_months: document.getElementById('fundingAgeMinMonths').value ? parseInt(document.getElementById('fundingAgeMinMonths').value, 10) : 6,
+                funding_age_max_months: document.getElementById('fundingAgeMaxMonths').value ? parseInt(document.getElementById('fundingAgeMaxMonths').value, 10) : 24,
+                funding_lookback_months: document.getElementById('fundingLookbackMonths').value ? parseInt(document.getElementById('fundingLookbackMonths').value, 10) : 24,
+                include_grants_as_equivalent: document.getElementById('includeGrantsAsEquivalent').checked,
+                grant_sources: getCheckedValues('grant_sources'),
+                grant_lookback_months: document.getElementById('grantLookbackMonths').value ? parseInt(document.getElementById('grantLookbackMonths').value, 10) : 24,
+                competitor_mode_enabled: document.getElementById('competitorModeEnabled').checked,
+                competitor_reference_companies: parseCsvList(document.getElementById('competitorReferenceCompanies').value),
+                competitor_include_if_no_funding_in_last_months: document.getElementById('competitorIncludeIfNoFundingInLastMonths').value ? parseInt(document.getElementById('competitorIncludeIfNoFundingInLastMonths').value, 10) : 12,
+                competitor_similarity_threshold: document.getElementById('competitorSimilarityThreshold').value ? parseFloat(document.getElementById('competitorSimilarityThreshold').value) : 0.6,
+                stage1_batch_size: document.getElementById('stage1BatchSize').value ? parseInt(document.getElementById('stage1BatchSize').value, 10) : 10,
+                stage1_max_new_companies_per_run: document.getElementById('stage1MaxNewCompaniesPerRun').value ? parseInt(document.getElementById('stage1MaxNewCompaniesPerRun').value, 10) : 10,
+                stage2_enabled: document.getElementById('stage2Enabled').checked,
+                stage2_default_profile_depth: document.getElementById('stage2DefaultProfileDepth').value || 'standard',
+                ownership_exclusion_policy: document.getElementById('ownershipExclusionPolicy').value || 'exclude_majority_corporate',
+                ownership_corporate_threshold_pct: document.getElementById('ownershipCorporateThresholdPct').value ? parseInt(document.getElementById('ownershipCorporateThresholdPct').value, 10) : 50,
+                exclude_subsidiaries_of: parseCsvList(document.getElementById('excludeSubsidiariesOf').value),
+                outreach_pitch_type: document.getElementById('outreachPitchType').value || 'mixed'
             };
 
             // Add watchlist_id for update
@@ -986,6 +1384,20 @@ Best regards,
             if (formData.operation_types.length === 0) {
                 showToast('Select at least one operation type', 'error');
                 return;
+            }
+            if (formData.engine_type === 'screening_targets_v1') {
+                if (formData.funding_round_types.length === 0) {
+                    showToast('Select at least one funding round type', 'error');
+                    return;
+                }
+                if (formData.sourcing_strategies.length === 0) {
+                    showToast('Select at least one sourcing strategy', 'error');
+                    return;
+                }
+                if (formData.stage1_batch_size !== 10 && formData.stage1_batch_size !== 20 && formData.stage1_batch_size !== 30) {
+                    showToast('Batch size must be 10, 20 or 30', 'error');
+                    return;
+                }
             }
 
             const btn = document.getElementById('submitBtn');

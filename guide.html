@@ -132,12 +132,12 @@
                 AI Commercial Radar
             </h1>
             <p class="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
-                AI-powered M&A intelligence platform to detect investment opportunities <strong class="text-gray-700">before they become public</strong>.
+                Dual-engine platform for <strong class="text-gray-700">Target Screening (Funding/Grants)</strong> and <strong class="text-gray-700">M&A weak signals</strong>, with Stage1 longlist, Stage2 profiling and outreach.
             </p>
         </div>
 
         <!-- What it does -->
-        <section class="mb-14">
+        <section id="engines" class="mb-14 scroll-mt-24">
             <div class="step-card rounded-2xl p-8">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
                     <div class="feature-icon bg-radar-100 text-radar-600">
@@ -146,7 +146,7 @@
                     What is it?
                 </h2>
                 <p class="text-gray-600 leading-relaxed mb-6">
-                    AI Commercial Radar is an automated monitoring tool that continuously scans hundreds of sources (trade press, RSS feeds, financial media, press releases) to identify <strong>early signals</strong> in the world of M&A and infrastructure investment.
+                    AI Commercial Radar continuously scans curated sources (media, investor sites, grants datasets) to identify commercial opportunities before they become obvious. The platform now runs two engines: screening for actionable targets and weak-signal monitoring for pre-announcement M&A situations.
                 </p>
                 <div class="grid sm:grid-cols-3 gap-5">
                     <div class="rounded-xl bg-emerald-50 border border-emerald-100 p-5">
@@ -174,11 +174,43 @@
             </div>
         </section>
 
+        <section class="mb-14">
+            <div class="step-card rounded-2xl p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Engine Modes</h2>
+                <div class="grid md:grid-cols-2 gap-5">
+                    <div class="rounded-xl bg-teal-50 border border-teal-100 p-5">
+                        <h3 class="font-semibold text-teal-900 mb-2"><code>screening_targets_v1</code> (default)</h3>
+                        <p class="text-sm text-teal-800 mb-3">Use this mode for target discovery and qualification.</p>
+                        <ul class="text-sm text-teal-800 space-y-1">
+                            <li>Stage1: Longlist batches (10/20/30)</li>
+                            <li>Validation: validate/discard selected targets</li>
+                            <li>Stage2: profiling (<code>lite|standard|deep</code>)</li>
+                            <li>Outreach: hook uses funding/grants + timing + source URLs</li>
+                        </ul>
+                    </div>
+                    <div class="rounded-xl bg-indigo-50 border border-indigo-100 p-5">
+                        <h3 class="font-semibold text-indigo-900 mb-2"><code>weak_signals_mna</code></h3>
+                        <p class="text-sm text-indigo-800 mb-3">Use this mode for pre-announcement M&A/advisory opportunities.</p>
+                        <ul class="text-sm text-indigo-800 space-y-1">
+                            <li>Maturity gate: pre-announcement only</li>
+                            <li>Scores: <code>need_probability</code> + <code>weak_signal_score</code></li>
+                            <li>Automatic exclusion of matured signals</li>
+                            <li>Prioritization by urgency window and confidence</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Table of Contents -->
         <section class="mb-14">
             <div class="step-card rounded-2xl p-6">
                 <h2 class="text-lg font-bold text-gray-900 mb-4">Table of Contents</h2>
                 <div class="grid sm:grid-cols-2 gap-x-8 gap-y-2">
+                    <a href="#engines" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
+                        <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">0</span>
+                        Engine modes
+                    </a>
                     <a href="#create" class="toc-link flex items-center gap-2 text-gray-600 py-1.5">
                         <span class="w-6 h-6 rounded-md bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
                         Create a watchlist
@@ -324,20 +356,20 @@
                                     <td class="px-5 py-3 text-gray-600">Free-text instructions sent directly to the LLM (e.g., "Focus on brownfield assets over 100MW").</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-5 py-3 font-medium text-gray-900">Signal mode</td>
-                                    <td class="px-5 py-3 text-gray-600"><strong>Default: <code>weak_signals</code></strong>. Focuses on pre-announcement weak signals instead of already public deals.</td>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Engine type</td>
+                                    <td class="px-5 py-3 text-gray-600"><strong>Default: <code>screening_targets_v1</code></strong>. You can switch to <code>weak_signals_mna</code> for pre-announcement M&A monitoring.</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-5 py-3 font-medium text-gray-900">Maturity policy</td>
-                                    <td class="px-5 py-3 text-gray-600"><strong>Default: <code>pre_announce_only</code></strong>. Excludes mature stages (<code>annonce</code>, <code>signe</code>, <code>clos</code>, <code>annule</code>).</td>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Screening defaults</td>
+                                    <td class="px-5 py-3 text-gray-600">Funding window defaults: <code>1M-10M EUR</code>, <code>6-24 months</code>, batch size <code>10/20/30</code>, source packs and sourcing strategies.</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-5 py-3 font-medium text-gray-900">Weak-signal thresholds</td>
-                                    <td class="px-5 py-3 text-gray-600">Configurable scoring gates: <code>weak_signal_threshold</code>, <code>need_probability_threshold</code>, <code>domain_independence_min</code>, and <code>urgency_max_days</code>.</td>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Stage1/Stage2 controls</td>
+                                    <td class="px-5 py-3 text-gray-600">Use Stage1 batch controls, validation actions, and Stage2 profiling depth (<code>lite|standard|deep</code>) to qualify targets before outreach.</td>
                                 </tr>
                                 <tr>
-                                    <td class="px-5 py-3 font-medium text-gray-900">Matured deal exclusion</td>
-                                    <td class="px-5 py-3 text-gray-600"><strong>Default: enabled</strong> via <code>exclude_matured_deals=true</code>. If a rumor later becomes announced/signed/closed, it is automatically marked <code>matured_excluded</code>.</td>
+                                    <td class="px-5 py-3 font-medium text-gray-900">Weak-signal policy</td>
+                                    <td class="px-5 py-3 text-gray-600">In <code>weak_signals_mna</code>, maturity gate stays active (<code>pre_announce_only</code>) and matured deals are excluded from active lists.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -384,27 +416,27 @@
                         </div>
                     </div>
 
-                    <h3 class="font-semibold text-gray-900 mt-8 mb-3">5-stage pipeline (v10 Weak-Signal Engine)</h3>
+                    <h3 class="font-semibold text-gray-900 mt-8 mb-3">Pipeline (v11 Multi-engine)</h3>
                     <div class="flex flex-col gap-3">
                         <div class="flex items-center gap-3 text-sm text-gray-600">
                             <div class="w-6 h-6 rounded-full bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
-                            <div><strong>PLAN</strong> - gpt-5-nano generates pre-announcement weak-signal queries (advisor mandates, strategic review, carve-out prep, capital stress).</div>
+                            <div><strong>PLAN</strong> - query plan is generated from watchlist criteria and SourceCatalog templates.</div>
                         </div>
                         <div class="flex items-center gap-3 text-sm text-gray-600">
                             <div class="w-6 h-6 rounded-full bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
-                            <div><strong>WEB SEARCH</strong> - gpt-5-nano + web_search executes queries in parallel and tags source ownership (owned vs non-owned).</div>
+                            <div><strong>SEARCH</strong> - active source packs are executed in parallel with source quality tagging.</div>
                         </div>
                         <div class="flex items-center gap-3 text-sm text-gray-600">
                             <div class="w-6 h-6 rounded-full bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
-                            <div><strong>TRIAGE</strong> - maturity gate + need triggers + pre-announcement clustering to prioritize short-term advisory/financing need.</div>
+                            <div><strong>TRIAGE</strong> - hard filters and maturity rules apply by engine type (screening vs weak signals).</div>
                         </div>
                         <div class="flex items-center gap-3 text-sm text-gray-600">
                             <div class="w-6 h-6 rounded-full bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
-                            <div><strong>EVIDENCE PACK</strong> - Selection of top 30 sources, prioritizing independent and non-owned evidence.</div>
+                            <div><strong>EVIDENCE PACK</strong> - top evidence URLs are stored per event/target for auditability.</div>
                         </div>
                         <div class="flex items-center gap-3 text-sm text-gray-600">
                             <div class="w-6 h-6 rounded-full bg-radar-100 text-radar-600 flex items-center justify-center text-xs font-bold flex-shrink-0">5</div>
-                            <div><strong>VALIDATION</strong> - gpt-5.2 extracts deals/actors plus weak-signal fields (<code>need_probability</code>, <code>weak_signal_score</code>, <code>maturity_status</code>).</div>
+                            <div><strong>VALIDATION</strong> - outputs are written as events/targets (aliases deals/actors kept for compatibility).</div>
                         </div>
                     </div>
                     <div class="mt-4 flex flex-col gap-2 pl-9">
@@ -440,23 +472,23 @@
                         <span class="text-sm text-blue-700"><strong>Access:</strong> <em>Results</em> tab&ensp;or&ensp;click <strong>"View &rarr;"</strong> in the dashboard history table</span>
                     </div>
 
-                    <p class="text-gray-600 mb-3">The Results page displays two tabs:</p>
-                    <p class="text-sm text-blue-700 mb-6"><strong>Default mode:</strong> <code>weak_signals</code>. Active shortlist includes only pre-announcement qualified signals.</p>
+                    <p class="text-gray-600 mb-3">The Results page displays two tabs and adapts automatically to the selected watchlist engine.</p>
+                    <p class="text-sm text-blue-700 mb-6"><strong>Default mode:</strong> <code>screening_targets_v1</code>. Tabs are shown as <strong>Events</strong> and <strong>Targets</strong>.</p>
 
                     <div class="grid sm:grid-cols-2 gap-5 mb-6">
                         <div class="rounded-xl border border-emerald-100 bg-emerald-50/50 p-5">
                             <h3 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                 <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                                Deals Tab
+                                Events Tab
                             </h3>
-                            <p class="text-sm text-gray-600">Each deal shows: title, operation type, stage, parties involved (acquirers, targets, sellers), geography, estimated value, sources, and confidence level with justification.</p>
+                            <p class="text-sm text-gray-600">Funding/grant events with type, round, amount, date, beneficiary and evidence URLs. In weak mode, this tab remains deal-centric.</p>
                         </div>
                         <div class="rounded-xl border border-blue-100 bg-blue-50/50 p-5">
                             <h3 class="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                Actors Tab
+                                Targets Tab
                             </h3>
-                            <p class="text-sm text-gray-600">Each actor shows: name, type (developer, fund, corporate...), geography, recent signals, project pipeline, public contacts and sources.</p>
+                            <p class="text-sm text-gray-600">Targets show pipeline stage, funding recap, fit/timing/priority scores, rationale, ownership view, hooks and evidence links.</p>
                         </div>
                     </div>
 
@@ -536,8 +568,8 @@
                         </div>
                     </div>
 
-                    <p class="text-sm text-gray-500 mt-6">Deal cards now display <strong>Weak Signal Score</strong>, <strong>Need Probability</strong>, <strong>Why now</strong> (top triggers), and <strong>Disqualification reason</strong> when excluded.</p>
-                    <p class="text-sm text-gray-500 mt-2">Default sorting for weak-signals is: <code>need_probability DESC</code>, then <code>weak_signal_score DESC</code>, then recency.</p>
+                    <p class="text-sm text-gray-500 mt-6"><strong>Screening filters:</strong> <code>pipeline_stage</code>, <code>funding_age_bucket</code>, <code>funding_amount_bucket</code>, <code>ownership</code>, <code>source_confidence</code>. Available actions: <strong>Validate selection</strong>, <strong>Profile (Step2)</strong>, then <strong>Generate outreach</strong>.</p>
+                    <p class="text-sm text-gray-500 mt-2"><strong>Weak-signal mode:</strong> cards display <code>weak_signal_score</code>, <code>need_probability</code>, top triggers and disqualification reason. Sorting stays <code>need_probability DESC</code>, then <code>weak_signal_score DESC</code>, then recency.</p>
                 </div>
             </div>
         </section>
@@ -594,7 +626,7 @@
                 </div>
                 <div class="p-8">
                     <p class="text-gray-600 mb-6">
-                        Export identified deals and actors in <strong>CSV</strong> format (Excel compatible) for offline analysis or team sharing.
+                        Export identified events/targets (and legacy deals/actors aliases) in <strong>CSV</strong> format (Excel compatible) for offline analysis or team sharing.
                     </p>
 
                     <div class="space-y-4">
@@ -649,7 +681,7 @@
                             </div>
                             <div>
                                 <p class="font-medium text-gray-900">Watchlist cards</p>
-                                <p class="text-sm text-gray-600 mt-1">Each card shows the <strong>owner</strong> (purple badge), sector, geographies, last scan date, and cumulative count of deals and actors. Action buttons allow scanning, editing, viewing results, exporting or deleting.</p>
+                                <p class="text-sm text-gray-600 mt-1">Each card shows owner, <code>engine_type</code>, sector, geographies, last scan date, and cumulative counts (events/targets). For screening watchlists you also see candidates/validated/profiled/high-priority KPIs plus a <strong>Next batch</strong> action.</p>
                             </div>
                         </div>
                         <div class="flex gap-4 items-start">
@@ -832,7 +864,7 @@
                     </div>
                     <div class="border-t border-gray-100 pt-6">
                         <h3 class="font-semibold text-gray-900 mb-2">What sources are used?</h3>
-                        <p class="text-gray-600 text-sm">The AI uses a combination of specialized RSS feeds (Infrastructure Investor, DataCenter Dynamics, etc.) and web search via gpt-5-nano with web_search. The v10 weak-signal pipeline enforces a maturity gate (pre-announcement only), scores advisory/financing need likelihood, and prioritizes independent non-owned evidence.</p>
+                        <p class="text-gray-600 text-sm">The platform uses SourceCatalog v1 (50 sources) with pack activation (<code>EU_CORE</code>, <code>NORDICS</code>, <code>FRANCE</code>, <code>GRANTS_EU</code>) plus web search. Screening uses funding/grants filters and Stage1/Stage2, while weak-signals mode keeps pre-announcement maturity gating.</p>
                     </div>
                     <div class="border-t border-gray-100 pt-6">
                         <h3 class="font-semibold text-gray-900 mb-2">How do I configure the tool for the first time?</h3>
@@ -869,7 +901,7 @@
 
     <!-- Footer -->
     <footer class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
-        <p class="text-sm text-gray-400">AI Commercial Radar v2.1 - Weak-Signal Engine - Last update: Feb 16, 2026 (pipeline v10 pre-announcement)</p>
+        <p class="text-sm text-gray-400">AI Commercial Radar v3.0 - Multi-engine Screening + Weak Signals - Last update: Feb 18, 2026 (pipeline v11 + SourceCatalog v1)</p>
     </footer>
 </body>
 </html>

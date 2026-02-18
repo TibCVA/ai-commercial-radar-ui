@@ -208,7 +208,7 @@
                     </div>
                     <div>
                         <h1 class="text-lg font-bold tracking-tight">AI Commercial Radar</h1>
-                        <p class="text-xs text-indigo-200 -mt-0.5">M&A Intelligence Platform</p>
+                        <p class="text-xs text-indigo-200 -mt-0.5">Screening + Weak Signals Platform</p>
                     </div>
                 </div>
 
@@ -278,7 +278,7 @@
         <!-- Welcome Section -->
         <div class="mb-8 animate-fade-in">
             <h2 class="text-2xl font-bold text-gray-900 mb-1">Welcome</h2>
-            <p class="text-gray-500">Your M&A Intelligence dashboard</p>
+            <p class="text-gray-500">Your target-screening and weak-signal dashboard</p>
         </div>
 
         <!-- Stats Grid -->
@@ -306,7 +306,7 @@
                     <span id="deals-trend" class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full hidden">+0 new</span>
                 </div>
                 <div id="stat-deals" class="text-3xl font-bold text-gray-900 counter-value">-</div>
-                <div class="text-sm text-gray-500 mt-1">Deals detected</div>
+                <div class="text-sm text-gray-500 mt-1">Events detected</div>
             </div>
 
             <div class="card rounded-2xl p-5 animate-slide-up stagger-3">
@@ -318,7 +318,7 @@
                     </div>
                 </div>
                 <div id="stat-actors" class="text-3xl font-bold text-gray-900 counter-value">-</div>
-                <div class="text-sm text-gray-500 mt-1">Actors identified</div>
+                <div class="text-sm text-gray-500 mt-1">Targets identified</div>
             </div>
 
             <div class="card rounded-2xl p-5 animate-slide-up stagger-4">
@@ -485,10 +485,10 @@
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-2 text-sm text-gray-500">
                 <span class="font-medium text-gray-900">AI Commercial Radar</span>
-                <span>v2.0</span>
+                <span>v3.0</span>
             </div>
             <div class="flex items-center gap-4 text-sm text-gray-500">
-                <span>M&A Intelligence for Infrastructure Funds</span>
+                <span>Target Screening and Weak Signals</span>
             </div>
         </div>
     </footer>
@@ -624,9 +624,45 @@
 
                 // Fetch cumulative results for each watchlist
                 const resultsPromises = watchlists.map(w =>
-                    apiCall(`watchlist/results?watchlist_id=${w.watchlist_id}`)
-                        .then(r => ({ id: w.watchlist_id, deals: r.deals?.length || 0, actors: r.actors?.length || 0 }))
-                        .catch(() => ({ id: w.watchlist_id, deals: 0, actors: 0 }))
+                    apiCall(`watchlist/results?watchlist_id=${w.watchlist_id}&mode=${encodeURIComponent(w.engine_type === 'screening_targets_v1' ? 'screening_targets' : 'weak_signals')}`)
+                        .then(r => {
+                            const isScreening = w.engine_type === 'screening_targets_v1';
+                            const deals = isScreening ? (r.events?.length || r.deals?.length || 0) : (r.deals?.length || 0);
+                            const actors = isScreening ? (r.targets?.length || r.actors?.length || 0) : (r.actors?.length || 0);
+                            const targets = isScreening ? (r.targets || r.actors || []) : [];
+                            const pipelineStages = targets.reduce((acc, t) => {
+                                const stage = String(t.pipeline_stage || '').toLowerCase();
+                                if (!stage) return acc;
+                                acc[stage] = (acc[stage] || 0) + 1;
+                                return acc;
+                            }, {});
+                            const highPriority = targets.filter((t) => {
+                                const p = Number(t.priority_score || t.need_probability || 0);
+                                return Number.isFinite(p) && p >= 70;
+                            }).length;
+                            return {
+                                id: w.watchlist_id,
+                                deals,
+                                actors,
+                                events: deals,
+                                targets: actors,
+                                candidates: pipelineStages.candidate_stage1 || 0,
+                                validated: pipelineStages.validated_stage1 || 0,
+                                profiled: pipelineStages.profiled_stage2 || 0,
+                                high_priority: highPriority
+                            };
+                        })
+                        .catch(() => ({
+                            id: w.watchlist_id,
+                            deals: 0,
+                            actors: 0,
+                            events: 0,
+                            targets: 0,
+                            candidates: 0,
+                            validated: 0,
+                            profiled: 0,
+                            high_priority: 0
+                        }))
                 );
                 const resultsData = await Promise.all(resultsPromises);
                 const resultsMap = {};
@@ -742,7 +778,7 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">No watchlists</h3>
-                        <p class="text-gray-500 mb-6 max-w-sm mx-auto">Create your first watchlist to start detecting M&A opportunities</p>
+                        <p class="text-gray-500 mb-6 max-w-sm mx-auto">Create your first watchlist to start detecting targets and weak signals</p>
                         <a href="watchlist.html" class="inline-flex items-center gap-2 px-6 py-3 bg-radar-600 text-white rounded-xl font-semibold hover:bg-radar-700 transition-colors shadow-lg shadow-radar-600/25">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -782,6 +818,11 @@
                                         '<span class="flex-shrink-0 px-2.5 py-1 bg-gray-100 text-gray-500 text-xs font-medium rounded-full">New</span>'
                                     }
                                 </div>
+                                <div class="mb-2">
+                                    <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${w.engine_type === 'screening_targets_v1' ? 'bg-teal-100 text-teal-700' : 'bg-indigo-100 text-indigo-700'}">
+                                        ${w.engine_type === 'screening_targets_v1' ? 'screening_targets_v1' : 'weak_signals_mna'}
+                                    </span>
+                                </div>
                                 <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
                                     ${w.owner ? `<span class="px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full">${escapeHtml(w.owner)}</span><span class="w-1 h-1 bg-gray-300 rounded-full"></span>` : ''}
                                     <span>${escapeHtml(w.sector)}</span>
@@ -790,19 +831,25 @@
                                     ${relativeTime ? `<span class="w-1 h-1 bg-gray-300 rounded-full"></span><span>${relativeTime}</span>` : ''}
                                 </div>
                                 ${(resultsMap[w.watchlist_id]?.deals || resultsMap[w.watchlist_id]?.actors) ? `
-                                    <div class="flex items-center gap-4 text-sm">
+                                    <div class="flex flex-wrap items-center gap-4 text-sm">
                                         <span class="flex items-center gap-1.5 text-emerald-600 font-medium">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                                             </svg>
-                                            ${resultsMap[w.watchlist_id]?.deals || 0} deals
+                                            ${resultsMap[w.watchlist_id]?.deals || 0} events
                                         </span>
                                         <span class="flex items-center gap-1.5 text-amber-600 font-medium">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             </svg>
-                                            ${resultsMap[w.watchlist_id]?.actors || 0} actors
+                                            ${resultsMap[w.watchlist_id]?.actors || 0} targets
                                         </span>
+                                        ${w.engine_type === 'screening_targets_v1' ? `
+                                            <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">candidates ${resultsMap[w.watchlist_id]?.candidates || 0}</span>
+                                            <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">validated ${resultsMap[w.watchlist_id]?.validated || 0}</span>
+                                            <span class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700">profiled ${resultsMap[w.watchlist_id]?.profiled || 0}</span>
+                                            <span class="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">high priority ${resultsMap[w.watchlist_id]?.high_priority || 0}</span>
+                                        ` : ''}
                                     </div>
                                 ` : w.last_run ? '<div class="text-sm text-gray-400">No results</div>' : ''}
                             </div>
@@ -812,6 +859,13 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                                     </svg>
                                 </button>
+                                ${w.engine_type === 'screening_targets_v1' ? `
+                                    <button onclick="runNextBatch('${w.watchlist_id}', this)" class="p-2 text-teal-600 hover:bg-teal-50 rounded-lg transition-colors" title="Next batch">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                        </svg>
+                                    </button>
+                                ` : ''}
                                 <a href="watchlist.html?edit=${w.watchlist_id}" class="p-2 text-gray-400 hover:text-radar-600 hover:bg-radar-50 rounded-lg transition-colors" title="Edit criteria">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -881,7 +935,7 @@
                         <div class="flex-1 min-w-0">
                             <p class="text-sm text-gray-900">
                                 <span class="font-medium">${escapeHtml(a.name)}</span>
-                                ${a.status === 'success' ? `: ${a.deals} deals, ${a.actors} actors` : a.status === 'error' ? ' - Error' : ' - Running...'}
+                                ${a.status === 'success' ? `: ${a.deals} events, ${a.actors} targets` : a.status === 'error' ? ' - Error' : ' - Running...'}
                             </p>
                             <p class="text-xs text-gray-500 mt-0.5">${getRelativeTime(a.time)}</p>
                         </div>
@@ -935,8 +989,8 @@
                     </td>
                     <td class="px-5 py-4">
                         <div class="flex items-center gap-3 text-sm">
-                            <span class="text-emerald-600 font-medium">${resultsMap[r.watchlist_id]?.deals || 0} deals</span>
-                            <span class="text-amber-600 font-medium">${resultsMap[r.watchlist_id]?.actors || 0} actors</span>
+                            <span class="text-emerald-600 font-medium">${resultsMap[r.watchlist_id]?.deals || 0} events</span>
+                            <span class="text-amber-600 font-medium">${resultsMap[r.watchlist_id]?.actors || 0} targets</span>
                         </div>
                     </td>
                     <td class="px-5 py-4">
@@ -971,7 +1025,11 @@
             btn.disabled = true;
 
             try {
-                const result = await apiCall('watchlist/run', 'POST', { watchlist_id: watchlistId });
+                const wl = _allWatchlists.find((w) => w.watchlist_id === watchlistId);
+                const payload = wl?.engine_type === 'screening_targets_v1'
+                    ? { watchlist_id: watchlistId, run_mode: 'stage1' }
+                    : { watchlist_id: watchlistId };
+                const result = await apiCall('watchlist/run', 'POST', payload);
                 // Check for OpenAI quota/billing errors
                 if (result.error && (result.error.includes('insufficient_quota') || result.error.includes('billing') || result.error.includes('exceeded') || result.error.includes('rate_limit'))) {
                     showInsufficientFundsError();
@@ -986,6 +1044,23 @@
                 } else {
                     showToast('Error launching scan', 'error');
                 }
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        }
+
+        async function runNextBatch(watchlistId, btn) {
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>';
+            btn.disabled = true;
+
+            try {
+                await apiCall('watchlist/next_batch', 'POST', { watchlist_id: watchlistId });
+                showToast('Next batch launched', 'success');
+                setTimeout(() => loadDashboard(), 2000);
+            } catch (error) {
+                showToast('Error launching next batch', 'error');
             } finally {
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
@@ -1062,7 +1137,10 @@
                 showToast(`Launching ${watchlists.length} scan(s)...`, 'info');
 
                 for (const w of watchlists) {
-                    await apiCall('watchlist/run', 'POST', { watchlist_id: w.watchlist_id });
+                    const payload = w.engine_type === 'screening_targets_v1'
+                        ? { watchlist_id: w.watchlist_id, run_mode: 'stage1' }
+                        : { watchlist_id: w.watchlist_id };
+                    await apiCall('watchlist/run', 'POST', payload);
                 }
 
                 showToast('All scans have been launched', 'success');

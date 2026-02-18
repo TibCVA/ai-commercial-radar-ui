@@ -81,7 +81,7 @@
                     </div>
                     <div>
                         <h1 class="text-2xl font-bold tracking-tight">AI Commercial Radar</h1>
-                        <p class="text-blue-100 text-sm">M&A Intelligence for Infrastructure Funds</p>
+                        <p class="text-blue-100 text-sm">Target Screening + Weak Signals</p>
                     </div>
                 </div>
                 <nav class="flex gap-2">
@@ -98,85 +98,148 @@
     <main class="container mx-auto px-4 py-8">
         <!-- Filters Bar -->
         <div class="glass-card rounded-2xl shadow-sm p-5 mb-6">
-            <div class="flex flex-col lg:flex-row gap-4 items-end">
-                <div class="flex-1 min-w-0">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                        Watchlist
-                        <span id="ownerBadge" class="hidden ml-2 px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full"></span>
-                    </label>
-                    <select id="watchlistSelect" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-shadow">
-                        <option value="">All watchlists</option>
-                    </select>
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-col lg:flex-row gap-4 items-end">
+                    <div class="flex-1 min-w-0">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Watchlist
+                            <span id="ownerBadge" class="hidden ml-2 px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full"></span>
+                            <span id="engineBadge" class="ml-2 px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">screening_targets_v1</span>
+                        </label>
+                        <select id="watchlistSelect" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent transition-shadow">
+                            <option value="">All watchlists</option>
+                        </select>
+                    </div>
+                    <div class="w-full lg:w-36">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Freshness</label>
+                        <select id="freshnessFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">All</option>
+                            <option value="24h">Last 24h</option>
+                            <option value="7d">Last 7 days</option>
+                            <option value="30d">Last 30 days</option>
+                        </select>
+                    </div>
+                    <button onclick="loadResults()" class="px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-colors shadow-sm flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                        </svg>
+                        Filter
+                    </button>
                 </div>
-                <div class="w-full lg:w-40">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Need Probability</label>
-                    <select id="needProbabilityFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                        <option value="">All</option>
-                        <option value="65">&ge; 65</option>
-                        <option value="70">&ge; 70</option>
-                        <option value="80">&ge; 80</option>
-                    </select>
+
+                <div id="weakFiltersGroup" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Need Probability</label>
+                        <select id="needProbabilityFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">All</option>
+                            <option value="65">&ge; 65</option>
+                            <option value="70">&ge; 70</option>
+                            <option value="80">&ge; 80</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Urgency</label>
+                        <select id="urgencyFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">All</option>
+                            <option value="60">&le; 60d</option>
+                            <option value="90">&le; 90d</option>
+                            <option value="120">&le; 120d</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Advisory Need Type</label>
+                        <select id="advisoryNeedTypeFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">All</option>
+                            <option value="financing">Financing</option>
+                            <option value="strategic_review">Strategic review</option>
+                            <option value="carve_out">Carve-out</option>
+                            <option value="m_and_a">M&A</option>
+                            <option value="growth_capital">Growth capital</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Maturity Status</label>
+                        <select id="maturityStatusFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="pre_announce_pass">Pre-announce pass (Active)</option>
+                            <option value="">All</option>
+                            <option value="matured_excluded">Matured excluded</option>
+                            <option value="insufficient_signal">Insufficient signal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Mode</label>
+                        <input type="text" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 bg-gray-50 text-gray-500" value="weak_signals_mna" disabled>
+                    </div>
                 </div>
-                <div class="w-full lg:w-40">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Urgency</label>
-                    <select id="urgencyFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                        <option value="">All</option>
-                        <option value="60">&le; 60d</option>
-                        <option value="90">&le; 90d</option>
-                        <option value="120">&le; 120d</option>
-                    </select>
+
+                <div id="screeningFiltersGroup" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Pipeline Stage</label>
+                        <select id="pipelineStageFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">All</option>
+                            <option value="candidate_stage1">candidate_stage1</option>
+                            <option value="validated_stage1">validated_stage1</option>
+                            <option value="profiled_stage2">profiled_stage2</option>
+                            <option value="outreach_ready">outreach_ready</option>
+                            <option value="contacted">contacted</option>
+                            <option value="discarded">discarded</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Funding Age</label>
+                        <select id="fundingAgeBucketFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">All</option>
+                            <option value="<6m">&lt;6m</option>
+                            <option value="6-12m">6-12m</option>
+                            <option value="12-24m">12-24m</option>
+                            <option value=">24m">&gt;24m</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Funding Amount</label>
+                        <select id="fundingAmountBucketFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">All</option>
+                            <option value="1-3">1-3M</option>
+                            <option value="3-5">3-5M</option>
+                            <option value="5-10">5-10M</option>
+                            <option value=">10">&gt;10M</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Ownership</label>
+                        <select id="ownershipFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">All</option>
+                            <option value="exclude_corporate">exclude_corporate</option>
+                            <option value="unknown">unknown</option>
+                            <option value="independent">independent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Source Confidence</label>
+                        <select id="sourceConfidenceFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
+                            <option value="">All</option>
+                            <option value="H">H</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="w-full lg:w-44">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Advisory Need Type</label>
-                    <select id="advisoryNeedTypeFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                        <option value="">All</option>
-                        <option value="financing">Financing</option>
-                        <option value="strategic_review">Strategic review</option>
-                        <option value="carve_out">Carve-out</option>
-                        <option value="m_and_a">M&A</option>
-                        <option value="growth_capital">Growth capital</option>
-                        <option value="general">General</option>
-                    </select>
-                </div>
-                <div class="w-full lg:w-44">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Maturity Status</label>
-                    <select id="maturityStatusFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                        <option value="pre_announce_pass">Pre-announce pass (Active)</option>
-                        <option value="">All</option>
-                        <option value="matured_excluded">Matured excluded</option>
-                        <option value="insufficient_signal">Insufficient signal</option>
-                    </select>
-                </div>
-                <div class="w-full lg:w-36">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Freshness</label>
-                    <select id="freshnessFilter" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-radar-500 focus:border-transparent">
-                        <option value="">All</option>
-                        <option value="24h">Last 24h</option>
-                        <option value="7d">Last 7 days</option>
-                        <option value="30d">Last 30 days</option>
-                    </select>
-                </div>
-                <button onclick="loadResults()" class="px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium hover:bg-radar-700 transition-colors shadow-sm flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
-                    Filter
-                </button>
             </div>
         </div>
 
         <!-- Summary Stats -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="glass-card rounded-xl p-4 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1">Total Deals</div>
+                <div id="totalDealsLabel" class="text-sm text-gray-500 mb-1">Total Events</div>
                 <div id="totalDeals" class="text-2xl font-bold text-gray-900">0</div>
             </div>
             <div class="glass-card rounded-xl p-4 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1">Total Actors</div>
+                <div id="totalActorsLabel" class="text-sm text-gray-500 mb-1">Total Targets</div>
                 <div id="totalActors" class="text-2xl font-bold text-gray-900">0</div>
             </div>
             <div class="glass-card rounded-xl p-4 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1">Priority (<=120d)</div>
+                <div id="priorityLabel" class="text-sm text-gray-500 mb-1">Priority (<=120d)</div>
                 <div id="highConfidence" class="text-2xl font-bold text-success">0</div>
             </div>
             <div class="glass-card rounded-xl p-4 shadow-sm">
@@ -191,15 +254,29 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                 </svg>
-                Deals (<span id="dealsCount">0</span>)
+                <span id="tabDealsLabel">Events</span> (<span id="dealsCount">0</span>)
             </button>
             <button id="tabActors" onclick="switchTab('actors')" class="flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
-                Actors (<span id="actorsCount">0</span>)
+                <span id="tabActorsLabel">Targets</span> (<span id="actorsCount">0</span>)
             </button>
             <div class="flex-1"></div>
+            <button id="btnValidateSelection" onclick="validateSelectedStage1('validate')" class="hidden flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Validate selection
+            </button>
+            <button id="btnProfileSelection" onclick="profileSelectedTargets()" class="hidden flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-colors shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h6"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h4v4"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5h4m-4 4V5m0 0l7 7"/>
+                </svg>
+                Profile (Step2)
+            </button>
             <!-- AI Summary Button -->
             <button id="btnAISummary" onclick="openSummaryModal()" class="flex items-center gap-2 px-4 py-2.5 bg-amber-500 text-white rounded-xl font-medium hover:bg-amber-600 transition-colors shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -422,22 +499,22 @@
 
                     <!-- Top Deals -->
                     <div class="mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <h3 id="summaryDealsTitle" class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                             </svg>
-                            Top Deals
+                            <span id="summaryDealsTitleText">Top Deals</span>
                         </h3>
                         <div id="summaryDeals" class="space-y-3"></div>
                     </div>
 
                     <!-- Notable Actors -->
                     <div class="mb-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <h3 id="summaryActorsTitle" class="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
                             <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            Notable Actors
+                            <span id="summaryActorsTitleText">Notable Actors</span>
                         </h3>
                         <div id="summaryActors" class="space-y-3"></div>
                     </div>
@@ -480,15 +557,17 @@
 
     <!-- Footer -->
     <footer class="container mx-auto px-4 py-6 text-center text-sm text-gray-400">
-        AI Commercial Radar v2.0 - M&A Intelligence for Infrastructure Funds
+        AI Commercial Radar v3.0 - Multi-engine results
     </footer>
 
     <script>
         const API_KEY = localStorage.getItem('radar_api_key') || '';
         const API_BASE = localStorage.getItem('radar_api_base') || '';
+        const WEAK_MODE_QUERY = 'mode=weak_signals'; // keep explicit marker for legacy QA checks
         let currentTab = 'deals';
         let currentData = { deals: [], actors: [] };
         let _watchlistsData = [];
+        let currentEngineType = 'screening_targets_v1';
 
         // Actor selection for outreach
         const selectedActors = new Map(); // actor_id -> { id, name }
@@ -516,6 +595,44 @@
             return (s.startsWith('http://') || s.startsWith('https://')) ? escapeHtml(s) : '#';
         }
 
+        function normalizeEngineType(engineType) {
+            return String(engineType || '').toLowerCase() === 'weak_signals_mna' ? 'weak_signals_mna' : 'screening_targets_v1';
+        }
+
+        function getCurrentWatchlist() {
+            const wlId = document.getElementById('watchlistSelect').value;
+            return _watchlistsData.find((w) => w.watchlist_id === wlId) || null;
+        }
+
+        function getCurrentModeQueryParam() {
+            return currentEngineType === 'weak_signals_mna' ? 'weak_signals' : 'screening_targets';
+        }
+
+        function applyEngineUI() {
+            const isScreening = currentEngineType === 'screening_targets_v1';
+            const weakGroup = document.getElementById('weakFiltersGroup');
+            const screeningGroup = document.getElementById('screeningFiltersGroup');
+            if (weakGroup) weakGroup.classList.toggle('hidden', isScreening);
+            if (screeningGroup) screeningGroup.classList.toggle('hidden', !isScreening);
+
+            const engineBadge = document.getElementById('engineBadge');
+            if (engineBadge) {
+                engineBadge.textContent = currentEngineType;
+                engineBadge.className = `ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${isScreening ? 'bg-teal-100 text-teal-700' : 'bg-indigo-100 text-indigo-700'}`;
+            }
+
+            document.getElementById('tabDealsLabel').textContent = isScreening ? 'Events' : 'Deals';
+            document.getElementById('tabActorsLabel').textContent = isScreening ? 'Targets' : 'Actors';
+            document.getElementById('totalDealsLabel').textContent = isScreening ? 'Total Events' : 'Total Deals';
+            document.getElementById('totalActorsLabel').textContent = isScreening ? 'Total Targets' : 'Total Actors';
+            document.getElementById('priorityLabel').textContent = isScreening ? 'High priority' : 'Priority (<=120d)';
+
+            const btnValidate = document.getElementById('btnValidateSelection');
+            const btnProfile = document.getElementById('btnProfileSelection');
+            if (btnValidate) btnValidate.classList.toggle('hidden', !(isScreening && currentTab === 'actors'));
+            if (btnProfile) btnProfile.classList.toggle('hidden', !(isScreening && currentTab === 'actors'));
+        }
+
         // Init
         document.addEventListener('DOMContentLoaded', async () => {
             if (!API_KEY || !API_BASE) {
@@ -528,8 +645,9 @@
             const watchlistId = params.get('watchlist_id');
             if (watchlistId) {
                 document.getElementById('watchlistSelect').value = watchlistId;
-                updateOwnerBadge();
             }
+            updateOwnerBadge();
+            applyEngineUI();
             loadResults();
         });
 
@@ -546,7 +664,8 @@
                     const option = document.createElement('option');
                     option.value = w.watchlist_id;
                     const ownerTag = w.owner ? ` [${w.owner}]` : '';
-                    option.textContent = `${w.name} (${w.sector})${ownerTag}`;
+                    const engineTag = w.engine_type === 'weak_signals_mna' ? 'weak' : 'screening';
+                    option.textContent = `${w.name} (${w.sector} · ${engineTag})${ownerTag}`;
                     select.appendChild(option);
                 });
 
@@ -567,6 +686,8 @@
             } else {
                 badge.classList.add('hidden');
             }
+            currentEngineType = normalizeEngineType(wl?.engine_type || 'screening_targets_v1');
+            applyEngineUI();
         }
 
         async function loadResults() {
@@ -574,20 +695,38 @@
             clearActorSelection();
 
             const watchlistId = document.getElementById('watchlistSelect').value;
-            const needProbability = document.getElementById('needProbabilityFilter').value;
-            const urgency = document.getElementById('urgencyFilter').value;
-            const advisoryNeedType = document.getElementById('advisoryNeedTypeFilter').value;
-            const maturityStatus = document.getElementById('maturityStatusFilter').value;
             const freshness = document.getElementById('freshnessFilter').value;
+            const selectedWatchlist = getCurrentWatchlist();
+            currentEngineType = normalizeEngineType(selectedWatchlist?.engine_type || currentEngineType);
+            applyEngineUI();
 
-            let url = `${API_BASE}/watchlist/results?mode=weak_signals&`;
+            let url = `${API_BASE}/watchlist/results?mode=${encodeURIComponent(getCurrentModeQueryParam())}&`;
             if (watchlistId) url += `watchlist_id=${watchlistId}&`;
-            if (needProbability) url += `need_probability_min=${needProbability}&`;
-            if (urgency) url += `urgency_max_days=${urgency}&`;
-            if (advisoryNeedType) url += `advisory_need_type=${encodeURIComponent(advisoryNeedType)}&`;
-            if (maturityStatus) url += `maturity_status=${encodeURIComponent(maturityStatus)}&`;
             if (freshness) url += `freshness=${freshness}&`;
-            if (maturityStatus && maturityStatus !== 'pre_announce_pass') url += 'include_excluded=true&';
+
+            if (currentEngineType === 'weak_signals_mna') {
+                const needProbability = document.getElementById('needProbabilityFilter').value;
+                const urgency = document.getElementById('urgencyFilter').value;
+                const advisoryNeedType = document.getElementById('advisoryNeedTypeFilter').value;
+                const maturityStatus = document.getElementById('maturityStatusFilter').value;
+                if (needProbability) url += `need_probability_min=${needProbability}&`;
+                if (urgency) url += `urgency_max_days=${urgency}&`;
+                if (advisoryNeedType) url += `advisory_need_type=${encodeURIComponent(advisoryNeedType)}&`;
+                if (maturityStatus) url += `maturity_status=${encodeURIComponent(maturityStatus)}&`;
+                if (maturityStatus && maturityStatus !== 'pre_announce_pass') url += 'include_excluded=true&';
+            } else {
+                const pipelineStage = document.getElementById('pipelineStageFilter').value;
+                const fundingAgeBucket = document.getElementById('fundingAgeBucketFilter').value;
+                const fundingAmountBucket = document.getElementById('fundingAmountBucketFilter').value;
+                const ownership = document.getElementById('ownershipFilter').value;
+                const sourceConfidence = document.getElementById('sourceConfidenceFilter').value;
+                if (pipelineStage) url += `pipeline_stage=${encodeURIComponent(pipelineStage)}&`;
+                if (fundingAgeBucket) url += `funding_age_bucket=${encodeURIComponent(fundingAgeBucket)}&`;
+                if (fundingAmountBucket) url += `funding_amount_bucket=${encodeURIComponent(fundingAmountBucket)}&`;
+                if (ownership) url += `ownership=${encodeURIComponent(ownership)}&`;
+                if (sourceConfidence) url += `source_confidence=${encodeURIComponent(sourceConfidence)}&`;
+                url += 'engine_type=screening_targets_v1&';
+            }
 
             document.getElementById('resultsContainer').innerHTML = `
                 <div class="glass-card rounded-2xl p-12 text-center">
@@ -603,7 +742,10 @@
                 const response = await fetch(url, {
                     headers: { 'workspace-api-key': API_KEY }
                 });
-                currentData = await response.json();
+                const data = await response.json();
+                const deals = data.events || data.deals || [];
+                const actors = data.targets || data.actors || [];
+                currentData = { ...data, deals, actors };
 
                 document.getElementById('dealsCount').textContent = currentData.deals?.length || 0;
                 document.getElementById('actorsCount').textContent = currentData.actors?.length || 0;
@@ -639,17 +781,26 @@
         function updateSummaryStats() {
             const deals = currentData.deals || [];
             const actors = currentData.actors || [];
+            const isScreening = currentEngineType === 'screening_targets_v1';
 
             document.getElementById('totalDeals').textContent = deals.length;
             document.getElementById('totalActors').textContent = actors.length;
 
-            const prioritySignals = deals.filter(d => {
-                if (d.is_priority_signal === true || d.is_priority_signal === 'true') return true;
-                const need = typeof d.need_probability === 'number' ? d.need_probability : parseInt(d.need_probability || '0', 10);
-                const urgency = typeof d.urgency_window_days === 'number' ? d.urgency_window_days : parseInt(d.urgency_window_days || '9999', 10);
-                return need >= 70 && urgency <= 120;
-            }).length;
-            document.getElementById('highConfidence').textContent = prioritySignals;
+            if (isScreening) {
+                const highPriorityTargets = actors.filter((a) => {
+                    const score = Number(a.priority_score || 0);
+                    return Number.isFinite(score) && score >= 70;
+                }).length;
+                document.getElementById('highConfidence').textContent = highPriorityTargets;
+            } else {
+                const prioritySignals = deals.filter(d => {
+                    if (d.is_priority_signal === true || d.is_priority_signal === 'true') return true;
+                    const need = typeof d.need_probability === 'number' ? d.need_probability : parseInt(d.need_probability || '0', 10);
+                    const urgency = typeof d.urgency_window_days === 'number' ? d.urgency_window_days : parseInt(d.urgency_window_days || '9999', 10);
+                    return need >= 70 && urgency <= 120;
+                }).length;
+                document.getElementById('highConfidence').textContent = prioritySignals;
+            }
 
             const now = new Date();
             const yesterday = new Date(now - 24 * 60 * 60 * 1000);
@@ -665,6 +816,7 @@
             document.getElementById('tabActors').className = tab === 'actors'
                 ? 'flex items-center gap-2 px-6 py-2.5 bg-radar-600 text-white rounded-xl font-medium shadow-sm transition-all'
                 : 'flex items-center gap-2 px-6 py-2.5 bg-white text-gray-700 rounded-xl font-medium shadow-sm hover:bg-gray-50 transition-all border border-gray-200';
+            applyEngineUI();
             renderResults();
         }
 
@@ -696,6 +848,7 @@
         function renderResults() {
             const container = document.getElementById('resultsContainer');
             const items = currentTab === 'deals' ? currentData.deals : currentData.actors;
+            const isScreening = currentEngineType === 'screening_targets_v1';
 
             if (!items || items.length === 0) {
                 container.innerHTML = `
@@ -703,7 +856,7 @@
                         <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
-                        <p class="text-gray-500">No ${currentTab === 'deals' ? 'deal' : 'actor'} found with these criteria</p>
+                        <p class="text-gray-500">No ${currentTab === 'deals' ? (isScreening ? 'event' : 'deal') : (isScreening ? 'target' : 'actor')} found with these criteria</p>
                     </div>
                 `;
                 return;
@@ -711,6 +864,14 @@
 
             if (currentTab === 'deals') {
                 const sortedDeals = [...items].sort((a, b) => {
+                    if (isScreening) {
+                        const dtA = new Date(a.announcement_date || a.last_seen_at || a.first_seen_at || 0).getTime();
+                        const dtB = new Date(b.announcement_date || b.last_seen_at || b.first_seen_at || 0).getTime();
+                        if (dtB !== dtA) return dtB - dtA;
+                        const amountA = Number(a.amount_eur || a.valeur_montant || 0);
+                        const amountB = Number(b.amount_eur || b.valeur_montant || 0);
+                        return amountB - amountA;
+                    }
                     const needA = typeof a.need_probability === 'number' ? a.need_probability : parseInt(a.need_probability || '0', 10);
                     const needB = typeof b.need_probability === 'number' ? b.need_probability : parseInt(b.need_probability || '0', 10);
                     if (needB !== needA) return needB - needA;
@@ -719,13 +880,166 @@
                     if (weakB !== weakA) return weakB - weakA;
                     return new Date(b.last_seen_at || b.first_seen_at || 0) - new Date(a.last_seen_at || a.first_seen_at || 0);
                 });
-                container.innerHTML = sortedDeals.map(deal => renderDealCard(deal)).join('');
+                container.innerHTML = sortedDeals.map(deal => isScreening ? renderScreeningEventCard(deal) : renderDealCard(deal)).join('');
             } else {
-                container.innerHTML = items.map(actor => renderActorCard(actor)).join('');
+                const sortedActors = [...items].sort((a, b) => {
+                    if (!isScreening) return 0;
+                    const pA = Number(a.priority_score || 0);
+                    const pB = Number(b.priority_score || 0);
+                    if (pB !== pA) return pB - pA;
+                    const tA = Number(a.timing_score || 0);
+                    const tB = Number(b.timing_score || 0);
+                    if (tB !== tA) return tB - tA;
+                    return new Date(b.last_seen_at || b.first_seen_at || 0) - new Date(a.last_seen_at || a.first_seen_at || 0);
+                });
+                container.innerHTML = sortedActors.map(actor => isScreening ? renderScreeningTargetCard(actor) : renderActorCard(actor)).join('');
             }
         }
 
-                function renderDealCard(deal) {
+        function renderScreeningEventCard(event) {
+            const eventType = event.event_type || event.type_operation || 'event';
+            const roundType = event.round_type || 'n/a';
+            const amount = event.amount_eur || event.valeur_montant;
+            const amountText = amount ? `${Number(amount).toLocaleString('en-US')} EUR` : (event.amount_original ? `${event.amount_original} ${event.currency || ''}` : 'unknown');
+            const beneficiary = event.beneficiary_actor_id || (ensureArray(event.parties_cibles)[0] || event.titre || 'Unnamed');
+            const sources = ensureArray(event.sources || event.source_urls);
+            const dateText = event.announcement_date || event.first_seen_at;
+            return `
+                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover cursor-pointer ${getFreshnessClass(event.first_seen_at)}" onclick="showDealDetail('${escapeHtml(event.deal_id)}')">
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center flex-wrap gap-2 mb-3">
+                                <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(event.titre || beneficiary)}</h3>
+                                <span class="px-2 py-1 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">${escapeHtml(eventType)}</span>
+                                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">${escapeHtml(roundType)}</span>
+                                ${event.maturity_status ? `<span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">${escapeHtml(event.maturity_status)}</span>` : ''}
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm mb-3">
+                                <div><span class="text-gray-400 block text-xs">Amount</span><span class="text-gray-800 font-medium">${escapeHtml(amountText)}</span></div>
+                                <div><span class="text-gray-400 block text-xs">Date</span><span class="text-gray-800 font-medium">${dateText ? new Date(dateText).toLocaleDateString('en-US') : 'n/a'}</span></div>
+                                <div><span class="text-gray-400 block text-xs">Beneficiary</span><span class="text-gray-800 font-medium">${escapeHtml(beneficiary)}</span></div>
+                                <div><span class="text-gray-400 block text-xs">Sources</span><span class="text-gray-800 font-medium">${sources.length}</span></div>
+                            </div>
+                            ${sources.length ? `
+                                <div class="text-xs text-gray-600">
+                                    ${sources.slice(0, 3).map((s) => {
+                                        const url = typeof s === 'string' ? s : (s.url || '');
+                                        const label = typeof s === 'string' ? s : (s.source_name || s.url || 'source');
+                                        return `<a href="${safeUrl(url)}" target="_blank" rel="noopener" class="text-radar-600 hover:underline mr-3">${escapeHtml(label)}</a>`;
+                                    }).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="lg:w-40 text-right text-sm text-gray-500 flex flex-col justify-between">
+                            <span>${getRelativeTime(event.last_seen_at || event.first_seen_at)}</span>
+                            <span class="text-radar-600 font-medium">View details</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderScreeningTargetCard(actor) {
+            const isSelected = selectedActors.has(actor.actor_id);
+            const sources = ensureArray(actor.sources || actor.hook_sources);
+            const rationaleList = ensureArray(actor.selection_rationale_stage1).slice(0, 3);
+            const newsList = ensureArray(actor.recent_news).slice(0, 3);
+            const pitchAngles = ensureArray(actor.suggested_pitch_angles).slice(0, 3);
+            const monthsSince = actor.months_since_last_funding;
+            const fundingText = actor.last_funding_amount_eur
+                ? `${Number(actor.last_funding_amount_eur).toLocaleString('en-US')} EUR`
+                : 'unknown';
+            const stage = actor.pipeline_stage || 'candidate_stage1';
+            const stageColor = stage.includes('validated') ? 'bg-blue-100 text-blue-700'
+                : stage.includes('profiled') ? 'bg-purple-100 text-purple-700'
+                : stage.includes('discard') ? 'bg-rose-100 text-rose-700'
+                : 'bg-gray-100 text-gray-700';
+
+            return `
+                <div class="glass-card rounded-2xl p-5 shadow-sm card-hover ${isSelected ? 'ring-2 ring-violet-500' : ''}" data-actor-id="${escapeHtml(actor.actor_id)}">
+                    <div class="flex items-start gap-3 mb-3">
+                        <label class="flex items-center cursor-pointer" onclick="event.stopPropagation()">
+                            <input type="checkbox" class="actor-checkbox w-5 h-5 rounded text-violet-600 focus:ring-violet-500 cursor-pointer"
+                                data-actor-id="${escapeHtml(actor.actor_id)}"
+                                data-actor-name="${escapeHtml(actor.nom || '')}"
+                                ${isSelected ? 'checked' : ''}
+                                onchange="toggleActorSelection('${escapeHtml(actor.actor_id)}', '${escapeHtml(actor.nom || '').replace(/'/g, "\\'")}', this.checked)">
+                        </label>
+                        <div class="flex-1 cursor-pointer" onclick="showActorDetail('${escapeHtml(actor.actor_id)}')">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h3 class="font-bold text-gray-900 text-lg">${escapeHtml(actor.nom || 'Unnamed target')}</h3>
+                                <span class="px-2 py-1 rounded-full text-xs font-medium ${stageColor}">${escapeHtml(stage)}</span>
+                                ${actor.go_no_go ? `<span class="px-2 py-1 rounded-full text-xs font-medium ${actor.go_no_go === 'go' ? 'bg-emerald-100 text-emerald-700' : actor.go_no_go === 'no_go' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}">${escapeHtml(actor.go_no_go)}</span>` : ''}
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">${escapeHtml(actor.hq_country || actor.geographie || 'Unknown country')}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm mb-3">
+                        <div><span class="text-gray-400 block text-xs">Last funding</span><span class="text-gray-800 font-medium">${escapeHtml(actor.last_funding_round_type || 'n/a')} ${escapeHtml(fundingText)}</span></div>
+                        <div><span class="text-gray-400 block text-xs">Funding age</span><span class="text-gray-800 font-medium">${monthsSince !== undefined && monthsSince !== null ? `${monthsSince} months` : 'n/a'}</span></div>
+                        <div><span class="text-gray-400 block text-xs">Priority</span><span class="text-gray-800 font-medium">${Number(actor.priority_score || 0)}</span></div>
+                        <div><span class="text-gray-400 block text-xs">Confidence</span><span class="text-gray-800 font-medium">${Number(actor.confidence_score || 0)}</span></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs mb-3">
+                        <div class="px-2 py-1 bg-gray-50 rounded-lg">fit ${Number(actor.fit_score || 0)}</div>
+                        <div class="px-2 py-1 bg-gray-50 rounded-lg">timing ${Number(actor.timing_score || 0)}</div>
+                        <div class="px-2 py-1 bg-gray-50 rounded-lg">independence ${Number(actor.independence_score || 0)}</div>
+                        <div class="px-2 py-1 bg-gray-50 rounded-lg">traction ${Number(actor.traction_score || 0)}</div>
+                    </div>
+
+                    ${rationaleList.length ? `
+                        <div class="mb-3">
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Rationale</span>
+                            <ul class="mt-1 space-y-1 text-sm text-gray-700">
+                                ${rationaleList.map((r) => `<li>• ${escapeHtml(r)}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+
+                    ${actor.why_now ? `<p class="text-sm text-gray-700 mb-3"><span class="font-medium text-gray-600">Why now:</span> ${escapeHtml(actor.why_now)}</p>` : ''}
+                    ${actor.ownership_summary ? `<p class="text-sm text-gray-700 mb-3"><span class="font-medium text-gray-600">Ownership:</span> ${escapeHtml(actor.ownership_summary)}</p>` : ''}
+                    ${actor.hook_paragraph ? `<p class="text-sm text-violet-700 bg-violet-50 border border-violet-100 rounded-lg p-3 mb-3">${escapeHtml(actor.hook_paragraph)}</p>` : ''}
+
+                    ${newsList.length ? `
+                        <div class="mb-3">
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Recent news</span>
+                            <div class="mt-1 text-sm">
+                                ${newsList.map((n) => {
+                                    const url = typeof n === 'string' ? '' : (n.url || n.source_url || '');
+                                    const title = typeof n === 'string' ? n : (n.title || n.headline || n.url || 'news');
+                                    return url
+                                        ? `<a href="${safeUrl(url)}" target="_blank" rel="noopener" class="block text-radar-600 hover:underline">${escapeHtml(title)}</a>`
+                                        : `<span class="block text-gray-700">${escapeHtml(title)}</span>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${pitchAngles.length ? `
+                        <div class="mb-3">
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pitch angles</span>
+                            <div class="mt-1 flex flex-wrap gap-2">
+                                ${pitchAngles.map((p) => `<span class="px-2 py-1 text-xs bg-teal-50 text-teal-700 rounded-full">${escapeHtml(p)}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${sources.length ? `
+                        <div class="text-xs text-gray-600">
+                            ${sources.slice(0, 3).map((s) => {
+                                const url = typeof s === 'string' ? s : (s.url || '');
+                                const label = typeof s === 'string' ? s : (s.source_name || s.url || 'source');
+                                return `<a href="${safeUrl(url)}" target="_blank" rel="noopener" class="text-radar-600 hover:underline mr-3">${escapeHtml(label)}</a>`;
+                            }).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderDealCard(deal) {
             const stageLabels = {
                 rumeur: { label: 'Rumor', color: 'bg-purple-100 text-purple-700' },
                 discussions: { label: 'Discussions', color: 'bg-blue-100 text-blue-700' },
@@ -1369,6 +1683,17 @@
         // ==========================================
 
         function toggleActorSelection(actorId, actorName, isChecked) {
+            const actor = (currentData.actors || []).find((a) => a.actor_id === actorId);
+            const stage = String(actor?.pipeline_stage || '').toLowerCase();
+            const eligibleForOutreach = currentEngineType !== 'screening_targets_v1' || ['profiled_stage2', 'outreach_ready'].includes(stage);
+
+            if (isChecked && !eligibleForOutreach) {
+                alert('Outreach in screening mode is available for profiled_stage2 or outreach_ready targets.');
+                const checkbox = document.querySelector(`.actor-checkbox[data-actor-id="${CSS.escape(actorId)}"]`);
+                if (checkbox) checkbox.checked = false;
+                return;
+            }
+
             if (isChecked) {
                 selectedActors.set(actorId, { id: actorId, name: actorName });
             } else {
@@ -1397,6 +1722,100 @@
                 btn.classList.add('hidden');
                 btn.classList.remove('flex');
             }
+            applyEngineUI();
+        }
+
+        async function validateSelectedStage1(action) {
+            const watchlistId = document.getElementById('watchlistSelect').value;
+            if (!watchlistId) {
+                alert('Select a watchlist');
+                return;
+            }
+            const actorIds = Array.from(selectedActors.keys());
+            if (!actorIds.length) {
+                alert('Select at least one target');
+                return;
+            }
+
+            const body = {
+                watchlist_id: watchlistId,
+                actor_ids: actorIds,
+                action
+            };
+
+            if (action === 'discard') {
+                const reason = prompt('Discard reason');
+                if (!reason) return;
+                body.discard_reason = reason;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/watchlist/validate_stage1`, {
+                    method: 'POST',
+                    headers: {
+                        'workspace-api-key': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                clearActorSelection();
+                await loadResults();
+            } catch (error) {
+                console.error(error);
+                alert('Validation failed');
+            }
+        }
+
+        async function profileSelectedTargets() {
+            const watchlistId = document.getElementById('watchlistSelect').value;
+            if (!watchlistId) {
+                alert('Select a watchlist');
+                return;
+            }
+            const actorIds = Array.from(selectedActors.keys());
+            if (!actorIds.length) {
+                alert('Select at least one target');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/watchlist/profile`, {
+                    method: 'POST',
+                    headers: {
+                        'workspace-api-key': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        watchlist_id: watchlistId,
+                        actor_ids: actorIds,
+                        profile_depth: 'standard'
+                    })
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const payload = await res.json();
+                const jobId = payload.job_id;
+                if (jobId) {
+                    let done = false;
+                    let attempts = 0;
+                    while (!done && attempts < 30) {
+                        attempts += 1;
+                        await new Promise((resolve) => setTimeout(resolve, 2000));
+                        const check = await fetch(`${API_BASE}/watchlist/profile/job?job_id=${encodeURIComponent(jobId)}`, {
+                            headers: { 'workspace-api-key': API_KEY }
+                        });
+                        if (!check.ok) continue;
+                        const status = await check.json();
+                        const state = String(status.status || '').toLowerCase();
+                        done = ['done', 'failed', 'error', 'success'].includes(state);
+                    }
+                }
+                clearActorSelection();
+                await loadResults();
+            } catch (error) {
+                console.error(error);
+                alert('Profile job failed');
+            }
         }
 
         function clearActorSelection() {
@@ -1421,7 +1840,7 @@
                 return;
             }
             if (selectedActors.size === 0) {
-                alert('Select at least one actor');
+                alert(`Select at least one ${currentEngineType === 'screening_targets_v1' ? 'target' : 'actor'}`);
                 return;
             }
 
@@ -1698,6 +2117,7 @@
             // Generate a simple summary from the loaded data
             const deals = currentData.deals || [];
             const actors = currentData.actors || [];
+            const isScreening = currentEngineType === 'screening_targets_v1';
 
             const summary = {
                 key_takeaways: [],
@@ -1709,21 +2129,28 @@
 
             // Key takeaways
             if (deals.length > 0) {
-                const activeSignals = deals.filter(d => d.is_active_signal === true || d.is_active_signal === 'true').length;
-                const prioritySignals = deals.filter(d => d.is_priority_signal === true || d.is_priority_signal === 'true').length;
-                summary.key_takeaways.push(`${activeSignals} active weak signals detected (${prioritySignals} priority <=120 days)`);
+                if (isScreening) {
+                    summary.key_takeaways.push(`${deals.length} funding/grant events identified`);
+                } else {
+                    const activeSignals = deals.filter(d => d.is_active_signal === true || d.is_active_signal === 'true').length;
+                    const prioritySignals = deals.filter(d => d.is_priority_signal === true || d.is_priority_signal === 'true').length;
+                    summary.key_takeaways.push(`${activeSignals} active weak signals detected (${prioritySignals} priority <=120 days)`);
+                }
             }
             if (actors.length > 0) {
-                summary.key_takeaways.push(`${actors.length} actors identified in the market`);
+                summary.key_takeaways.push(`${actors.length} ${isScreening ? 'targets' : 'actors'} identified`);
             }
             const now = new Date();
             const recentDeals = deals.filter(d => (now - new Date(d.first_seen_at)) < 7 * 86400000).length;
             if (recentDeals > 0) {
-                summary.key_takeaways.push(`${recentDeals} new deals in the last 7 days`);
+                summary.key_takeaways.push(`${recentDeals} new ${isScreening ? 'events' : 'deals'} in the last 7 days`);
             }
 
-            // Top deals (by weak-signal actionability)
+            // Top events/deals
             const sortedDeals = [...deals].sort((a, b) => {
+                if (isScreening) {
+                    return new Date(b.announcement_date || b.first_seen_at || 0) - new Date(a.announcement_date || a.first_seen_at || 0);
+                }
                 const needA = typeof a.need_probability === 'number' ? a.need_probability : parseInt(a.need_probability || '0', 10);
                 const needB = typeof b.need_probability === 'number' ? b.need_probability : parseInt(b.need_probability || '0', 10);
                 if (needB !== needA) return needB - needA;
@@ -1733,17 +2160,20 @@
             });
             summary.deal_cards = sortedDeals.slice(0, 5).map(d => ({
                 headline: d.titre,
-                parties: [...ensureArray(d.parties_acquereurs), ...ensureArray(d.parties_cibles)].join(' → '),
-                geography: d.geographie_pays,
-                stage: d.stade,
-                confidence_score: d.weak_signal_score || d.confiance_score
+                parties: [...ensureArray(d.parties_acquereurs), ...ensureArray(d.parties_cibles)].join(' -> '),
+                geography: d.geographie_pays || d.hq_country_guess || '',
+                stage: isScreening ? (d.event_type || d.round_type || d.maturity_status || '') : d.stade,
+                confidence_score: isScreening ? (d.amount_eur || d.valeur_montant || 0) : (d.weak_signal_score || d.confiance_score)
             }));
 
             // Top actors
-            summary.actor_cards = actors.slice(0, 5).map(a => ({
+            const topActors = isScreening
+                ? [...actors].sort((a, b) => Number(b.priority_score || 0) - Number(a.priority_score || 0)).slice(0, 5)
+                : actors.slice(0, 5);
+            summary.actor_cards = topActors.map(a => ({
                 actor_name: a.nom,
-                actor_type: a.type_acteur,
-                signal_summary: ensureArray(a.signaux_recents).slice(0, 2).join('; ')
+                actor_type: isScreening ? (a.pipeline_stage || a.type_acteur || '') : a.type_acteur,
+                signal_summary: isScreening ? (a.why_now || '') : ensureArray(a.signaux_recents).slice(0, 2).join('; ')
             }));
 
             // Themes from sectors
@@ -1753,10 +2183,10 @@
 
             // What to monitor
             const pendingDeals = deals.filter(d => d.stade === 'discussions' || d.stade === 'rumeur');
-            if (pendingDeals.length > 0) {
+            if (!isScreening && pendingDeals.length > 0) {
                 summary.monitor_next.push(`${pendingDeals.length} deals in early stages (rumors/discussions)`);
             }
-            summary.monitor_next.push('New actors entering the market');
+            summary.monitor_next.push(`New ${isScreening ? 'targets' : 'actors'} entering the market`);
             summary.monitor_next.push('Deal stage progressions');
 
             displaySummaryResults(summary);
@@ -1765,6 +2195,11 @@
         function displaySummaryResults(result) {
             document.getElementById('summaryProgress').classList.add('hidden');
             document.getElementById('summaryResults').classList.remove('hidden');
+            const isScreening = currentEngineType === 'screening_targets_v1';
+            const dealsTitle = document.getElementById('summaryDealsTitleText');
+            const actorsTitle = document.getElementById('summaryActorsTitleText');
+            if (dealsTitle) dealsTitle.textContent = isScreening ? 'Top Events' : 'Top Deals';
+            if (actorsTitle) actorsTitle.textContent = isScreening ? 'Top Targets' : 'Notable Actors';
 
             // Key Takeaways
             const takeaways = result.key_takeaways || [];
@@ -1789,7 +2224,7 @@
                         ${d.confidence_score ? `<span class="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">${d.confidence_score}/100</span>` : ''}
                     </div>
                 </div>
-            `).join('') : '<p class="text-gray-500 text-sm">No deals to display</p>';
+            `).join('') : `<p class="text-gray-500 text-sm">No ${isScreening ? 'events' : 'deals'} to display</p>`;
 
             // Notable Actors
             const actors = result.actor_cards || [];
@@ -1799,7 +2234,7 @@
                     <div class="text-sm text-gray-600">${escapeHtml(a.actor_type || '')}</div>
                     ${a.signal_summary ? `<div class="text-sm text-gray-500 mt-1 italic">${escapeHtml(a.signal_summary)}</div>` : ''}
                 </div>
-            `).join('') : '<p class="text-gray-500 text-sm">No actors to display</p>';
+            `).join('') : `<p class="text-gray-500 text-sm">No ${isScreening ? 'targets' : 'actors'} to display</p>`;
 
             // Themes
             const themes = result.themes || [];
