@@ -608,6 +608,46 @@
             return currentEngineType === 'weak_signals_mna' ? 'weak_signals' : 'screening_targets';
         }
 
+        let _actionStatusTimer = null;
+        function showActionStatus(message, level = 'info', timeoutMs = 5000) {
+            let banner = document.getElementById('actionStatusBanner');
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'actionStatusBanner';
+                banner.className = 'hidden fixed bottom-4 right-4 z-[70] px-4 py-3 rounded-xl shadow-lg max-w-md text-sm font-medium';
+                document.body.appendChild(banner);
+            }
+            const styles = {
+                info: 'bg-blue-50 text-blue-800 border border-blue-200',
+                success: 'bg-emerald-50 text-emerald-800 border border-emerald-200',
+                warning: 'bg-amber-50 text-amber-800 border border-amber-200',
+                error: 'bg-rose-50 text-rose-800 border border-rose-200'
+            };
+            banner.className = `fixed bottom-4 right-4 z-[70] px-4 py-3 rounded-xl shadow-lg max-w-md text-sm font-medium ${styles[level] || styles.info}`;
+            banner.textContent = message;
+            clearTimeout(_actionStatusTimer);
+            _actionStatusTimer = setTimeout(() => {
+                banner.classList.add('hidden');
+            }, timeoutMs);
+        }
+
+        function setButtonBusy(buttonId, busyLabel, isBusy) {
+            const btn = document.getElementById(buttonId);
+            if (!btn) return;
+            if (isBusy) {
+                if (!btn.dataset.originalLabel) btn.dataset.originalLabel = btn.innerHTML;
+                btn.disabled = true;
+                btn.classList.add('opacity-70', 'cursor-not-allowed');
+                btn.innerHTML = busyLabel;
+                return;
+            }
+            if (btn.dataset.originalLabel) {
+                btn.innerHTML = btn.dataset.originalLabel;
+            }
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+
         function applyEngineUI() {
             const isScreening = currentEngineType === 'screening_targets_v1';
             const weakGroup = document.getElementById('weakFiltersGroup');
@@ -1704,6 +1744,42 @@
             return (currentData.actors || []).find((a) => String(a.actor_id) === String(actorId));
         }
 
+        function getSelectedActorEntries() {
+            return Array.from(selectedActors.keys()).map((id) => {
+                const actor = getActorById(id);
+                const fallback = selectedActors.get(id);
+                return {
+                    id,
+                    actor,
+                    name: actor?.nom || fallback?.name || id,
+                    watchlist_id: String(actor?.watchlist_id || '').trim()
+                };
+            }).filter((entry) => String(entry.id || '').trim() !== '');
+        }
+
+        function resolveActionWatchlistId(actionLabel) {
+            const selectedWatchlistId = String(document.getElementById('watchlistSelect').value || '').trim();
+            if (selectedWatchlistId) return selectedWatchlistId;
+            const watchlistIds = [...new Set(getSelectedActorEntries().map((entry) => entry.watchlist_id).filter(Boolean))];
+            if (watchlistIds.length === 1) return watchlistIds[0];
+            if (watchlistIds.length > 1) {
+                showActionStatus(`Selected targets span multiple watchlists. Select one watchlist before ${actionLabel}.`, 'error');
+                return '';
+            }
+            showActionStatus(`Select a watchlist before ${actionLabel}.`, 'error');
+            return '';
+        }
+
+        function getSelectedActorIdsForWatchlist(watchlistId) {
+            const entries = getSelectedActorEntries();
+            const matched = entries.filter((entry) => !watchlistId || entry.watchlist_id === watchlistId || !entry.watchlist_id);
+            return {
+                entries,
+                matched,
+                ids: matched.map((entry) => String(entry.id || '').trim()).filter(Boolean)
+            };
+        }
+
         function isScreeningOutreachEligibleActor(actor) {
             if (currentEngineType !== 'screening_targets_v1') return true;
             const stage = String(actor?.pipeline_stage || '').toLowerCase();
@@ -1743,15 +1819,17 @@
         }
 
         async function validateSelectedStage1(action) {
-            const watchlistId = document.getElementById('watchlistSelect').value;
+            const watchlistId = resolveActionWatchlistId('validating targets');
             if (!watchlistId) {
-                alert('Select a watchlist');
                 return;
             }
-            const actorIds = Array.from(selectedActors.keys());
+            const { entries, ids: actorIds } = getSelectedActorIdsForWatchlist(watchlistId);
             if (!actorIds.length) {
-                alert('Select at least one target');
+                showActionStatus('Select at least one target from the active watchlist.', 'error');
                 return;
+            }
+            if (entries.length > actorIds.length) {
+                showActionStatus(`Only ${actorIds.length} selected targets match watchlist ${watchlistId}.`, 'warning', 6000);
             }
 
             const body = {
@@ -1766,6 +1844,8 @@
                 body.discard_reason = reason;
             }
 
+            setButtonBusy('btnValidateSelection', 'Validating...', true);
+            showActionStatus('Validation in progress...', 'info', 2500);
             try {
                 const res = await fetch(`${API_BASE}/watchlist/validate_stage1`, {
                     method: 'POST',
@@ -1775,27 +1855,36 @@
                     },
                     body: JSON.stringify(body)
                 });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const payload = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(payload?.error || `HTTP ${res.status}`);
+                if (payload?.error) throw new Error(payload.error);
                 clearActorSelection();
                 await loadResults();
+                showActionStatus(`${action === 'validate' ? 'Validated' : 'Discarded'} ${actorIds.length} target(s).`, 'success');
             } catch (error) {
                 console.error(error);
-                alert('Validation failed');
+                showActionStatus(`Validation failed: ${error.message || 'Unknown error'}`, 'error', 7000);
+            } finally {
+                setButtonBusy('btnValidateSelection', '', false);
             }
         }
 
         async function profileSelectedTargets() {
-            const watchlistId = document.getElementById('watchlistSelect').value;
+            const watchlistId = resolveActionWatchlistId('launching Step2 profiling');
             if (!watchlistId) {
-                alert('Select a watchlist');
                 return;
             }
-            const actorIds = Array.from(selectedActors.keys());
+            const { entries, ids: actorIds } = getSelectedActorIdsForWatchlist(watchlistId);
             if (!actorIds.length) {
-                alert('Select at least one target');
+                showActionStatus('Select at least one target from the active watchlist.', 'error');
                 return;
+            }
+            if (entries.length > actorIds.length) {
+                showActionStatus(`Only ${actorIds.length} selected targets match watchlist ${watchlistId}.`, 'warning', 6000);
             }
 
+            setButtonBusy('btnProfileSelection', 'Starting Step2...', true);
+            showActionStatus('Profiling job started...', 'info', 2500);
             try {
                 const res = await fetch(`${API_BASE}/watchlist/profile`, {
                     method: 'POST',
@@ -1809,29 +1898,45 @@
                         profile_depth: 'standard'
                     })
                 });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const payload = await res.json();
+                const payload = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(payload?.error || `HTTP ${res.status}`);
                 const jobId = payload.job_id;
-                if (jobId) {
-                    let done = false;
-                    let attempts = 0;
-                    while (!done && attempts < 30) {
-                        attempts += 1;
-                        await new Promise((resolve) => setTimeout(resolve, 2000));
-                        const check = await fetch(`${API_BASE}/watchlist/profile/job?job_id=${encodeURIComponent(jobId)}`, {
-                            headers: { 'workspace-api-key': API_KEY }
-                        });
-                        if (!check.ok) continue;
-                        const status = await check.json();
-                        const state = String(status.status || '').toLowerCase();
-                        done = ['done', 'failed', 'error', 'success'].includes(state);
+                if (!jobId) {
+                    throw new Error(payload?.message || payload?.error || 'Missing job_id in profile response');
+                }
+
+                let finalStatus = null;
+                let attempts = 0;
+                while (attempts < 30) {
+                    attempts += 1;
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+                    const check = await fetch(`${API_BASE}/watchlist/profile/job?job_id=${encodeURIComponent(jobId)}`, {
+                        headers: { 'workspace-api-key': API_KEY }
+                    });
+                    if (!check.ok) continue;
+                    const status = await check.json().catch(() => ({}));
+                    const state = String(status.status || '').toLowerCase();
+                    if (['done', 'failed', 'error', 'success', 'completed'].includes(state)) {
+                        finalStatus = status;
+                        break;
                     }
                 }
+
+                if (!finalStatus) throw new Error('Profile job timeout');
+                const finalState = String(finalStatus.status || '').toLowerCase();
+                if (['failed', 'error'].includes(finalState)) {
+                    throw new Error(finalStatus.error_message || 'Profile job failed');
+                }
+
                 clearActorSelection();
                 await loadResults();
+                const profiledCount = Number(finalStatus?.results?.profiled || actorIds.length);
+                showActionStatus(`Step2 profiling completed for ${profiledCount} target(s).`, 'success');
             } catch (error) {
                 console.error(error);
-                alert('Profile job failed');
+                showActionStatus(`Profile step2 failed: ${error.message || 'Unknown error'}`, 'error', 7000);
+            } finally {
+                setButtonBusy('btnProfileSelection', '', false);
             }
         }
 
