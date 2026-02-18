@@ -1683,17 +1683,6 @@
         // ==========================================
 
         function toggleActorSelection(actorId, actorName, isChecked) {
-            const actor = (currentData.actors || []).find((a) => a.actor_id === actorId);
-            const stage = String(actor?.pipeline_stage || '').toLowerCase();
-            const eligibleForOutreach = currentEngineType !== 'screening_targets_v1' || ['profiled_stage2', 'outreach_ready'].includes(stage);
-
-            if (isChecked && !eligibleForOutreach) {
-                alert('Outreach in screening mode is available for profiled_stage2 or outreach_ready targets.');
-                const checkbox = document.querySelector(`.actor-checkbox[data-actor-id="${CSS.escape(actorId)}"]`);
-                if (checkbox) checkbox.checked = false;
-                return;
-            }
-
             if (isChecked) {
                 selectedActors.set(actorId, { id: actorId, name: actorName });
             } else {
@@ -1711,16 +1700,44 @@
             }
         }
 
+        function getActorById(actorId) {
+            return (currentData.actors || []).find((a) => String(a.actor_id) === String(actorId));
+        }
+
+        function isScreeningOutreachEligibleActor(actor) {
+            if (currentEngineType !== 'screening_targets_v1') return true;
+            const stage = String(actor?.pipeline_stage || '').toLowerCase();
+            return ['profiled_stage2', 'outreach_ready'].includes(stage);
+        }
+
+        function getSelectedOutreachActorEntries() {
+            return Array.from(selectedActors.keys())
+                .map((id) => {
+                    const actor = getActorById(id);
+                    const fallback = selectedActors.get(id);
+                    return {
+                        id,
+                        actor,
+                        name: actor?.nom || fallback?.name || id
+                    };
+                })
+                .filter((entry) => isScreeningOutreachEligibleActor(entry.actor));
+        }
+
         function updateOutreachButton() {
             const btn = document.getElementById('btnGenerateOutreach');
             const count = document.getElementById('selectedActorsCount');
-            if (selectedActors.size > 0) {
+            const selectedCount = selectedActors.size;
+            const eligibleCount = getSelectedOutreachActorEntries().length;
+            const displayCount = currentEngineType === 'screening_targets_v1' ? eligibleCount : selectedCount;
+            if (displayCount > 0) {
                 btn.classList.remove('hidden');
                 btn.classList.add('flex');
-                count.textContent = selectedActors.size;
+                count.textContent = displayCount;
             } else {
                 btn.classList.add('hidden');
                 btn.classList.remove('flex');
+                count.textContent = '0';
             }
             applyEngineUI();
         }
@@ -1844,11 +1861,20 @@
                 return;
             }
 
+            const outreachEntries = getSelectedOutreachActorEntries();
+            if (outreachEntries.length === 0) {
+                alert('Outreach in screening mode is available for profiled_stage2 or outreach_ready targets.');
+                return;
+            }
+            if (currentEngineType === 'screening_targets_v1' && outreachEntries.length < selectedActors.size) {
+                alert(`Only ${outreachEntries.length} selected targets are eligible for outreach. Continuing with eligible targets only.`);
+            }
+
             // Populate actor list
             const listEl = document.getElementById('outreachActorList');
             const countEl = document.getElementById('outreachActorCount');
-            countEl.textContent = selectedActors.size;
-            listEl.innerHTML = Array.from(selectedActors.values()).map(a => `
+            countEl.textContent = outreachEntries.length;
+            listEl.innerHTML = outreachEntries.map((a) => `
                 <span class="px-3 py-1.5 bg-violet-100 text-violet-700 text-sm font-medium rounded-full">${escapeHtml(a.name)}</span>
             `).join('');
 
@@ -1872,7 +1898,13 @@
 
         async function generateOutreachEmails() {
             const watchlistId = document.getElementById('watchlistSelect').value;
-            const actorRefs = Array.from(selectedActors.keys());
+            const actorRefs = getSelectedOutreachActorEntries().map((entry) => entry.id);
+            if (!actorRefs.length) {
+                document.getElementById('outreachProgress').classList.add('hidden');
+                document.getElementById('outreachPreGen').classList.remove('hidden');
+                alert('Outreach in screening mode is available for profiled_stage2 or outreach_ready targets.');
+                return;
+            }
 
             // Show progress
             document.getElementById('outreachPreGen').classList.add('hidden');
